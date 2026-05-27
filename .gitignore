@@ -1,0 +1,8 @@
+node_modules
+dist
+.env
+.env.local
+.DS_Store
+*.log
+scrape_cache
+.claude/skills/ui-ux-pro-max/scripts/__pycache__

@@ -8,24 +8,24 @@ export default {
       colors: {
         // Primary brand — heat (orange)
         heat: {
-          4: 'rgba(250, 93, 25, 0.04)',
-          8: 'rgba(250, 93, 25, 0.08)',
-          12: 'rgba(250, 93, 25, 0.12)',
-          20: 'rgba(250, 93, 25, 0.20)',
-          30: 'rgba(250, 93, 25, 0.30)',
-          50: 'rgba(250, 93, 25, 0.50)',
-          70: 'rgba(250, 93, 25, 0.70)',
-          100: '#fa5d19',
+          4: 'rgba(255, 255, 255, 0.04)',
+          8: 'rgba(255, 255, 255, 0.08)',
+          12: 'rgba(255, 255, 255, 0.12)',
+          20: 'rgba(255, 255, 255, 0.20)',
+          30: 'rgba(255, 255, 255, 0.30)',
+          50: 'rgba(255, 255, 255, 0.50)',
+          70: 'rgba(255, 255, 255, 0.70)',
+          100: '#ffffff',
         },
         // Accent palette
         accent: {
           black: '#262626',
           white: '#ffffff',
-          amethyst: '#9061ff',
-          bluetron: '#2a6dfb',
+          amethyst: '#8b5cf6',
+          bluetron: '#0099ff',
           crimson: '#eb3424',
-          forest: '#42c366',
-          honey: '#ecb730',
+          forest: '#12b76a',
+          honey: '#f7b955',
         },
         // Alpha overlays
         'black-alpha': {
@@ -53,8 +53,8 @@ export default {
         'illustrations-faint': 'rgba(255,255,255,0.04)',
         'illustrations-muted': 'rgba(255,255,255,0.08)',
         'illustrations-default': 'rgba(255,255,255,0.12)',
-        'background-lighter': '#111118',
-        'background-base': '#08080f',
+        'background-lighter': '#1c1c1f',
+        'background-base': '#050505',
         // Legacy neon (kept for transition, prefer heat)
         'neon-purple': '#7c3aed',
         'neon-blue': '#2563eb',
@@ -64,12 +64,12 @@ export default {
         'neon-gold': '#f59e0b',
         // Void (dark surface)
         void: {
-          DEFAULT: '#08080f',
-          50: '#0d0d18',
-          100: '#11111c',
-          200: '#161621',
-          300: '#1e1e2d',
-          400: '#2a2a3d',
+          DEFAULT: '#050505',
+          50: '#0b0b0c',
+          100: '#111113',
+          200: '#1a1a1d',
+          300: '#242428',
+          400: '#303037',
         },
       },
 
@@ -108,20 +108,20 @@ export default {
 
       fontFamily: {
         sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
-        heading: ['"Space Grotesk"', 'Inter', 'system-ui', 'sans-serif'],
+        display: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['Inter', 'system-ui', 'sans-serif'],
         body: ['Inter', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
 
       // ─── Shadows ───
       boxShadow: {
-        'card': '0 1px 3px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.04)',
-        'card-hover': '0 8px 30px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.06)',
+        'card': 'inset 0 1px 0 rgba(255,255,255,0.10), 0 10px 30px rgba(0,0,0,0.25)',
+        'card-hover': 'inset 0 1px 0 rgba(255,255,255,0.12), 0 14px 36px rgba(0,0,0,0.32)',
         'elevated': '0 4px 20px rgba(0,0,0,0.35)',
-        'glow-sm': '0 0 15px rgba(250, 93, 25, 0.15)',
-        'glow-heat': '0 0 30px rgba(250, 93, 25, 0.30)',
-        'glow-purple': '0 0 30px rgba(124, 58, 237, 0.30)',
+        'glow-sm': '0 0 15px rgba(0, 153, 255, 0.15)',
+        'glow-heat': '0 0 0 1px rgba(0, 153, 255, 0.15)',
+        'glow-purple': '0 0 30px rgba(0, 153, 255, 0.15)',
       },
 
       // ─── Animations ───
@@ -164,8 +164,8 @@ export default {
       // ─── Background Image ───
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
-        'hero-glow': 'radial-gradient(ellipse 70% 50% at 50% 0%, rgba(250,93,25,0.08) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(42,109,251,0.06) 0%, transparent 60%)',
-        'mesh-purple': 'radial-gradient(ellipse 70% 50% at 50% 50%, rgba(124,58,237,0.08) 0%, transparent 70%)',
+        'hero-glow': 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(5,5,5,0) 55%)',
+        'mesh-purple': 'linear-gradient(180deg, rgba(255,255,255,0.025) 0%, rgba(5,5,5,0) 100%)',
       },
 
       // ─── Screens ───

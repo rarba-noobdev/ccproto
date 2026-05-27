@@ -1,80 +1,71 @@
-# NexForge — Premium Gaming PC Builder
+# Challenger Computers
 
-A full-featured, gamified React web application for a custom PC building company. Built with a cinematic dark/cyberpunk aesthetic and premium UX.
+Premium Indian gaming PC builder and component storefront built with React, Vite, TailwindCSS, Framer Motion, Supabase, and Firecrawl-sourced product data.
 
-## Tech Stack
+The current design intentionally moved away from generic neon/cyberpunk UI. It now uses a consistent retail-dark ecommerce system: real product imagery, INR pricing, source links, dense filters, trust cues, and admin inventory views.
 
-- **React 18** + **Vite 5**
-- **TailwindCSS 3** — custom gaming color palette
-- **Framer Motion** — page transitions, scroll animations, modal animations
-- **GSAP** — hero text animation, PC float effect
-- **React Router 6** — all pages with smooth transitions
-- **Zustand** — cart, wishlist, builder state, auth (persisted)
-- **Recharts** — admin revenue/category charts
+## Stack
 
-## Quick Start
+- React 18 + Vite
+- TailwindCSS
+- React Router
+- Framer Motion
+- Zustand persisted cart/wishlist/auth/builds
+- Recharts for admin charts
+- Supabase database
+- Firecrawl MCP/API for MD Computers scraping
+
+## Data
+
+Supabase project: `CCPROTo`
+
+Seeded tables:
+
+- `components`: real scraped component rows with category, brand, image, source URL, INR price, MRP, discount, score, and tier
+- `prebuilts`: curated PC builds referencing component rows
+- `benchmarks`: benchmark rows by game/build
+- `testimonials`: verified customer-style content
+- `posts`: buying guide content
+- `orders`: admin-ready order table
+
+Firecrawl was verified against MD Computers. Some MD Computers category pages include mixed carousel products, so the parser/database filters category names before seeding.
+
+## Run
 
 ```bash
 npm install
 npm run dev
 ```
 
-Open [http://localhost:5173](http://localhost:5173)
+Open `http://localhost:5173`.
 
-## Pages
+## Build
 
-| Route | Page |
-|-------|------|
-| `/` | Home — Hero, Featured PCs, Benchmarks, Testimonials, FAQ |
-| `/build` | PC Builder — Step-by-step with compatibility + FPS estimation |
-| `/prebuilt` | All Prebuilt PCs with filtering |
-| `/gaming-pcs` | Gaming PC catalog |
-| `/workstations` | Workstation catalog |
-| `/accessories` | Peripherals catalog |
-| `/about` | Company story, team, stats |
-| `/blog` | Blog/news hub |
-| `/contact` | Contact form + info |
-| `/auth` | Login / Register |
-| `/dashboard` | User dashboard (orders, builds, badges) |
-| `/admin` | Admin dashboard (revenue charts, orders, KPIs) |
+```bash
+npm run build
+```
 
-## Key Features
+## Routes
 
-- **Loading screen** with futuristic animated progress bar
-- **Animated hero** with GSAP-powered floating PC render and letter-by-letter text reveal
-- **Canvas particle background** with connected-node network
-- **Glassmorphism** cards throughout
-- **PC Builder** with:
-  - Step-by-step animated component selection
-  - CPU/GPU bottleneck detection
-  - Wattage calculator with PSU recommendation
-  - Build score system (0–100)
-  - Achievement badges (First Build, Half Way, Ultra Builder, Complete Build)
-  - Save build modal
-- **Cart drawer** (slide-in from right)
-- **Wishlist** with persistent state
-- **Admin Dashboard** with Recharts area/pie charts and KPI cards
-- **RGB animated borders** on PC renders
-- **Scroll-triggered** reveal animations on all sections
+| Route | Purpose |
+| --- | --- |
+| `/` | Retail homepage with real prebuilts, live catalog products, benchmarks, testimonials, and guides |
+| `/build` | Supabase-backed custom PC builder with price, wattage, score, and bottleneck logic |
+| `/prebuilt` | Prebuilt gaming PCs from real component references |
+| `/gaming-pcs` | Full component catalog |
+| `/workstations` | Creator/workstation builds |
+| `/accessories` | Upgrade-focused parts catalog |
+| `/category/:category` | Direct category catalog route |
+| `/blog` | Buying guides from Supabase |
+| `/about` | Trust/system story |
+| `/contact` | Enquiry page |
+| `/auth` | Demo login/admin entry |
+| `/dashboard` | User cart/wishlist/saved builds |
+| `/admin` | Supabase-backed admin dashboard |
 
-## Admin Access
+## Notes
 
-On the `/auth` page, click **[DEV] Login as Admin →** to access the admin dashboard at `/admin`.
-
-## Color System
-
-| Token | Value | Use |
-|-------|-------|-----|
-| `void` | `#08080f` | Background |
-| `neon-purple` | `#7c3aed` | Primary accent |
-| `neon-blue` | `#2563eb` | Secondary accent |
-| `neon-cyan` | `#06b6d4` | Tertiary / FPS |
-| `neon-pink` | `#ec4899` | Wishlist / hot tags |
-| `neon-gold` | `#f59e0b` | Stars / badges |
-
-## Fonts
-
-- **Orbitron** — Display / logo / stats
-- **Space Grotesk** — Headings / UI labels
-- **Inter** — Body text
-- **JetBrains Mono** — Labels / badges / code
+- Dark mode is default.
+- The Supabase client is in `src/lib/supabase.js`.
+- Shared retail UI lives in `src/components/retail`.
+- The old generic cyberpunk components are no longer used by the routed app.

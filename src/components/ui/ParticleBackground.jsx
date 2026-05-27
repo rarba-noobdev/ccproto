@@ -16,7 +16,7 @@ export default function ParticleBackground({ count = 60, className = '' }) {
     resize()
     window.addEventListener('resize', resize)
 
-    const colors = ['rgba(250,93,25,', 'rgba(144,97,255,', 'rgba(42,109,251,', 'rgba(6,182,212,']
+    const colors = ['rgba(255,255,255,', 'rgba(153,153,153,', 'rgba(0,153,255,']
     const particles = Array.from({ length: count }, () => ({
       x: Math.random() * canvas.width,
       y: Math.random() * canvas.height,
@@ -59,7 +59,7 @@ export default function ParticleBackground({ count = 60, className = '' }) {
             ctx.beginPath()
             ctx.moveTo(p.x, p.y)
             ctx.lineTo(p2.x, p2.y)
-            ctx.strokeStyle = `rgba(250,93,25,${(1 - dist / 100) * 0.06})`
+            ctx.strokeStyle = `rgba(255,255,255,${(1 - dist / 100) * 0.04})`
             ctx.lineWidth = 0.5
             ctx.stroke()
           }

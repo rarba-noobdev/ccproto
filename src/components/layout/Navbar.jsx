@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingCart, Heart, User, Menu, X, Zap, ChevronDown, Gamepad2, Monitor, Box } from 'lucide-react'
+import { ShoppingCart, Heart, User, Menu, X, Cpu, ChevronDown, Gamepad2, Monitor, Box, Grid3X3, Fan, Keyboard, Mouse, Laptop, MemoryStick, HardDrive, PlugZap } from 'lucide-react'
 import useStore from '@/store/useStore'
 import clsx from 'clsx'
 
@@ -14,8 +14,31 @@ const navLinks = [
       { label: 'Prebuilt PCs', href: '/prebuilt', icon: Box },
     ],
   },
+  {
+    label: 'Parts',
+    children: [
+      { label: 'Cabinet', href: '/category/cabinet', icon: Box },
+      { label: 'Cooler', href: '/category/cooler', icon: Fan },
+      { label: 'Graphic Card', href: '/category/graphic-card', icon: Gamepad2 },
+      { label: 'Processor', href: '/category/processor', icon: Cpu },
+      { label: 'Motherboard', href: '/category/motherboard', icon: Cpu },
+      { label: 'RAM', href: '/category/ram', icon: MemoryStick },
+      { label: 'SSD', href: '/category/ssd', icon: HardDrive },
+      { label: 'Power Supply', href: '/category/power-supply', icon: PlugZap },
+    ],
+  },
+  {
+    label: 'Gear',
+    children: [
+      { label: 'Accessories', href: '/category/accessories', icon: Grid3X3 },
+      { label: 'Keyboard', href: '/category/keyboard', icon: Keyboard },
+      { label: 'Mouse', href: '/category/mouse', icon: Mouse },
+      { label: 'Laptop', href: '/category/laptop', icon: Laptop },
+      { label: 'Monitor', href: '/category/monitor', icon: Monitor },
+      { label: 'Prebuild', href: '/category/prebuild', icon: Box },
+    ],
+  },
   { label: 'Build PC', href: '/build', highlight: true },
-  { label: 'Accessories', href: '/accessories' },
   { label: 'Blog', href: '/blog' },
   { label: 'About', href: '/about' },
 ]
@@ -44,8 +67,8 @@ export default function Navbar() {
         className={clsx(
           'fixed top-0 inset-x-0 z-50 transition-all duration-500',
           scrolled
-            ? 'py-3 bg-void/90 backdrop-blur-xl border-b border-white/5 shadow-elevated'
-            : 'py-5 bg-transparent'
+            ? 'py-3 bg-void/95 border-b border-white/5'
+            : 'py-3 bg-void'
         )}
         initial={{ y: -80 }}
         animate={{ y: 0 }}
@@ -53,13 +76,12 @@ export default function Navbar() {
       >
         <div className="container-max flex items-center justify-between">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100 rounded-6">
-            <div className="relative w-8 h-8 flex items-center justify-center">
-              <div className="absolute inset-0 rounded bg-gradient-to-br from-heat-100 to-accent-amethyst opacity-20 group-hover:opacity-40 transition-opacity" />
-              <Zap className="w-5 h-5 text-heat-100 relative z-10" />
+          <Link to="/" className="flex items-center gap-2 group focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron rounded-full">
+            <div className="relative w-8 h-8 rounded-full bg-white text-void flex items-center justify-center">
+              <Cpu className="w-4 h-4 relative z-10" />
             </div>
-            <span className="font-display text-lg font-black tracking-widest text-white group-hover:text-heat-100 transition-colors">
-              NEXFORGE
+            <span className="font-display text-[15px] font-medium tracking-[-0.15px] text-white transition-colors">
+              Challenger Computers
             </span>
           </Link>
 
@@ -76,19 +98,21 @@ export default function Navbar() {
                   <Link
                     to={link.href}
                     className={clsx(
-                      'flex items-center gap-1 px-4 py-2 rounded-8 text-sm font-medium font-heading transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100',
+                      'flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium font-heading transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron',
                       link.highlight
-                        ? 'bg-gradient-to-r from-heat-100 to-accent-amethyst text-white shadow-glow-sm hover:shadow-glow-heat hover:scale-105'
+                        ? 'bg-white text-void hover:scale-[0.98]'
                         : 'text-white/70 hover:text-white hover:bg-white/5',
-                      location.pathname === link.href && !link.highlight && 'text-heat-100'
+                      location.pathname === link.href && !link.highlight && 'text-white bg-white/10'
                     )}
                   >
                     {link.label}
                   </Link>
                 ) : (
                   <button
+                    aria-expanded={activeDropdown === link.label}
+                    aria-haspopup="menu"
                     className={clsx(
-                      'flex items-center gap-1 px-4 py-2 rounded-8 text-sm font-medium font-heading transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100',
+                      'flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium font-heading transition-all duration-200 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron',
                       'text-white/70 hover:text-white hover:bg-white/5',
                       activeDropdown === link.label && 'text-white bg-white/5'
                     )}
@@ -103,7 +127,7 @@ export default function Navbar() {
                   <AnimatePresence>
                     {activeDropdown === link.label && (
                       <motion.div
-                        className="absolute top-full left-0 mt-2 w-52 glass rounded-8 border border-border-muted shadow-elevated overflow-hidden"
+                        className="absolute top-full left-0 mt-2 w-52 bg-void-100 rounded-[15px] border border-border-muted shadow-card overflow-hidden"
                         initial={{ opacity: 0, y: -8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -8 }}
@@ -115,9 +139,9 @@ export default function Navbar() {
                             <Link
                               key={child.href}
                               to={child.href}
-                              className="flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100 focus-visible:ring-inset"
+                              className="flex items-center gap-3 px-4 py-3 text-sm text-white/70 hover:text-white hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron focus-visible:ring-inset"
                             >
-                              <Icon className="w-4 h-4 text-heat-100/70" />
+                              <Icon className="w-4 h-4 text-white/60" />
                               <span className="font-heading">{child.label}</span>
                             </Link>
                           )
@@ -134,23 +158,25 @@ export default function Navbar() {
           <div className="flex items-center gap-2">
             <Link
               to="/wishlist"
-              className="relative p-2 rounded-lg text-white/60 hover:text-accent-crimson hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100 rounded-6"
+              aria-label={`Wishlist, ${wishlist.length} items`}
+              className="relative p-2 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron"
             >
               <Heart className="w-5 h-5" />
               {wishlist.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-accent-crimson text-[9px] font-bold flex items-center justify-center text-white">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center text-void">
                   {wishlist.length}
                 </span>
               )}
             </Link>
 
             <button
-              className="relative p-2 rounded-lg text-white/60 hover:text-accent-bluetron hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100 rounded-6"
+              aria-label={`Open cart, ${cartCount} items`}
+              className="relative p-2 rounded-full text-white/60 hover:text-white hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron"
               onClick={() => useStore.getState().setCartOpen(true)}
             >
               <ShoppingCart className="w-5 h-5" />
               {cartCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-heat-100 text-[9px] font-bold flex items-center justify-center text-white">
+                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-white text-[9px] font-bold flex items-center justify-center text-void">
                   {cartCount}
                 </span>
               )}
@@ -165,7 +191,9 @@ export default function Navbar() {
             </Link>
 
             <button
-              className="lg:hidden p-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100 rounded-6"
+              aria-label="Open navigation menu"
+              aria-expanded={mobileOpen}
+              className="lg:hidden p-2 rounded-full text-white/70 hover:text-white hover:bg-white/5 transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron"
               onClick={() => setMobileOpen(true)}
             >
               <Menu className="w-5 h-5" />
@@ -193,10 +221,11 @@ export default function Navbar() {
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
             >
               <div className="flex justify-between items-center mb-8">
-                <span className="font-display font-black text-lg tracking-widest gradient-text">NEXFORGE</span>
+                <span className="font-display font-medium text-lg tracking-[-0.18px] text-white">Challenger Computers</span>
                 <button
+                  aria-label="Close navigation menu"
                   onClick={() => setMobileOpen(false)}
-                  className="p-2 rounded-lg hover:bg-white/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100 rounded-6"
+                  className="p-2 rounded-full hover:bg-white/5 focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -210,13 +239,13 @@ export default function Navbar() {
                       key={link.href || link.label}
                       to={link.href || '#'}
                       className={clsx(
-                        'flex items-center gap-3 px-4 py-3 rounded-lg font-heading text-sm transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100',
+                        'flex items-center gap-3 px-4 py-3 rounded-full font-heading text-sm transition-all focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-accent-bluetron',
                         link.highlight
-                          ? 'bg-gradient-to-r from-heat-100 to-accent-amethyst text-white'
+                          ? 'bg-white text-void'
                           : 'text-white/70 hover:text-white hover:bg-white/5'
                       )}
                     >
-                      {Icon && <Icon className="w-4 h-4 text-heat-100/70" />}
+                      {Icon && <Icon className="w-4 h-4 text-white/60" />}
                       {link.label}
                     </Link>
                   )

@@ -5,4 +5,6 @@ dist
 .DS_Store
 *.log
 scrape_cache
+.agents
+.claude
 .claude/skills/ui-ux-pro-max/scripts/__pycache__

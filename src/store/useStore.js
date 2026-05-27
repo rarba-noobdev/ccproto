@@ -75,7 +75,7 @@ const useStore = create(
       // Auth
       user: null,
       isAdmin: false,
-      login: (userData) => set({ user: userData, isAdmin: userData.email === 'admin@nexforge.com' }),
+      login: (userData) => set({ user: userData, isAdmin: userData.email === 'admin@challengercomputers.in' }),
       logout: () => set({ user: null, isAdmin: false }),
 
       // UI
@@ -89,7 +89,7 @@ const useStore = create(
       addNotification: (n) => set({ notifications: [...get().notifications, { id: Date.now(), ...n }] }),
       removeNotification: (id) => set({ notifications: get().notifications.filter((n) => n.id !== id) }),
     }),
-    { name: 'nexforge-store', partialize: (s) => ({ cart: s.cart, wishlist: s.wishlist, savedBuilds: s.savedBuilds, user: s.user }) }
+    { name: 'challenger-computers-store', partialize: (s) => ({ cart: s.cart, wishlist: s.wishlist, savedBuilds: s.savedBuilds, user: s.user }) }
   )
 )
 

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function LoadingScreen({ onComplete }) {
   const [progress, setProgress] = useState(0)
   const [phase, setPhase] = useState('initializing')
-  const phases = ['INITIALIZING SYSTEMS', 'LOADING COMPONENTS', 'CALIBRATING PERFORMANCE', 'LAUNCHING NEXFORGE']
+  const phases = ['INITIALIZING SYSTEMS', 'LOADING COMPONENTS', 'CALIBRATING PERFORMANCE', 'LAUNCHING Challenger Computers']
 
   useEffect(() => {
     let current = 0
@@ -27,37 +27,7 @@ export default function LoadingScreen({ onComplete }) {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {/* Grid background */}
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(250,93,25,0.3) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(250,93,25,0.3) 1px, transparent 1px)
-          `,
-          backgroundSize: '60px 60px',
-        }}
-      />
-
-      {/* Corner decorations */}
-      {[
-        'top-8 left-8 border-t-2 border-l-2',
-        'top-8 right-8 border-t-2 border-r-2',
-        'bottom-8 left-8 border-b-2 border-l-2',
-        'bottom-8 right-8 border-b-2 border-r-2',
-      ].map((cls, i) => (
-        <motion.div
-          key={i}
-          className={`absolute ${cls} border-heat-100/60 w-12 h-12`}
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: i * 0.1 }}
-        />
-      ))}
-
-      {/* Glowing orbs */}
-      <div className="absolute w-96 h-96 rounded-full bg-heat-100/10 blur-3xl top-1/4 left-1/4 animate-pulse" />
-      <div className="absolute w-64 h-64 rounded-full bg-accent-bluetron/10 blur-3xl bottom-1/4 right-1/4 animate-pulse" style={{ animationDelay: '1s' }} />
+      <div className="absolute inset-x-0 top-0 h-px bg-white/10" />
 
       {/* Logo */}
       <motion.div
@@ -66,16 +36,16 @@ export default function LoadingScreen({ onComplete }) {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="font-display text-5xl font-black tracking-widest gradient-text mb-2">
-          NEXFORGE
+        <div className="font-display text-5xl font-medium tracking-[-2.5px] text-white mb-2">
+          Challenger Computers
         </div>
-        <div className="font-mono text-xs tracking-[0.4em] text-heat-100/70">
+        <div className="text-xs tracking-[-0.12px] text-white/50">
           GAMING SYSTEMS
         </div>
 
         {/* Animated underline */}
         <motion.div
-          className="mt-4 h-px bg-gradient-to-r from-transparent via-heat-100 to-transparent"
+          className="mt-4 h-px bg-white/10"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
@@ -91,16 +61,16 @@ export default function LoadingScreen({ onComplete }) {
       >
         <div className="h-1 bg-void-300 rounded-full overflow-hidden">
           <motion.div
-            className="h-full bg-gradient-to-r from-heat-100 via-accent-amethyst to-accent-bluetron rounded-full relative"
+            className="h-full bg-white rounded-full relative"
             style={{ width: `${progress}%` }}
             transition={{ duration: 0.1 }}
           >
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white shadow-glow-heat" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-white" />
           </motion.div>
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="font-mono text-[10px] tracking-widest text-heat-100/70">
+          <span className="text-[10px] tracking-[-0.1px] text-white/50">
             {phase}
           </span>
           <span className="font-mono text-[10px] text-white/50">
@@ -109,12 +79,7 @@ export default function LoadingScreen({ onComplete }) {
         </div>
       </motion.div>
 
-      {/* Scanning lines */}
-      <motion.div
-        className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-accent-bluetron/30 to-transparent"
-        animate={{ top: ['0%', '100%'] }}
-        transition={{ duration: 3, repeat: Infinity, ease: 'linear' }}
-      />
+      <motion.div className="absolute inset-x-0 bottom-0 h-px bg-white/10" />
     </motion.div>
   )
 }

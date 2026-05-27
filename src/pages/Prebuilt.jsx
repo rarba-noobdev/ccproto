@@ -1,175 +1,115 @@
-import { useState } from 'react'
-import { motion } from 'framer-motion'
-import { Filter, SlidersHorizontal, Star, ShoppingCart, Heart, Zap } from 'lucide-react'
-import { prebuiltPCs } from '@/data/products'
-import GlassCard from '@/components/ui/GlassCard'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+import { useMemo, useState } from 'react'
+import { ExternalLink, ShoppingCart } from 'lucide-react'
+import RetailLayout from '@/components/retail/RetailLayout'
+import PageHeader from '@/components/retail/PageHeader'
+import { fetchPrebuilts } from '@/lib/supabase'
+import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
+import { formatINR } from '@/utils/currency'
 import useStore from '@/store/useStore'
-import clsx from 'clsx'
 
 export default function Prebuilt() {
-  const [sort, setSort] = useState('featured')
-  const [maxPrice, setMaxPrice] = useState(4000)
-  const { addToCart, toggleWishlist, isWishlisted } = useStore()
+  const [sort, setSort] = useState('price-asc')
+  const { data = [], loading, error } = useSupabaseQuery(fetchPrebuilts, [])
+  const { addToCart } = useStore()
 
-  const sorted = [...prebuiltPCs]
-    .filter((p) => p.price <= maxPrice)
-    .sort((a, b) => {
-      if (sort === 'price-asc') return a.price - b.price
+  const pcs = useMemo(() => {
+    return [...data].sort((a, b) => {
       if (sort === 'price-desc') return b.price - a.price
-      if (sort === 'rating') return b.rating - a.rating
-      return 0
+      if (sort === 'fps') return b.fps_1440p - a.fps_1440p
+      if (sort === 'stock') return b.stock - a.stock
+      return a.price - b.price
     })
+  }, [data, sort])
 
   return (
-    <div className="min-h-screen bg-void">
-      <Navbar />
-      <div className="pt-28 pb-20">
-        <div className="container-max">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <div className="section-label mx-auto mb-4">
-              <Zap className="w-3 h-3" />
-              PREBUILT PCS
-            </div>
-            <h1 className="font-display text-5xl font-black text-white">
-              READY TO <span className="gradient-text">DOMINATE</span>
-            </h1>
-            <p className="text-white/50 mt-3 max-w-lg mx-auto">
-              Stress-tested systems ship within 5 business days. Every build guaranteed.
-            </p>
-          </div>
+    <RetailLayout>
+      <PageHeader
+        kicker="Warranty-backed builds"
+        title="Prebuilt gaming PCs configured from real catalog parts"
+        description="Every system here is built from the Supabase component catalog scraped from MD Computers, with INR pricing and actual component images."
+      >
+        <select value={sort} onChange={(e) => setSort(e.target.value)} className="input-base w-full sm:w-56" aria-label="Sort prebuilts">
+          <option value="price-asc">Price: low to high</option>
+          <option value="price-desc">Price: high to low</option>
+          <option value="fps">Best 1440p FPS</option>
+          <option value="stock">Most stock</option>
+        </select>
+      </PageHeader>
 
-          {/* Filters bar */}
-          <div className="flex flex-wrap gap-4 items-center mb-8 p-4 glass border border-border-muted rounded-16">
-            <div className="flex items-center gap-2 text-white/50">
-              <SlidersHorizontal className="w-4 h-4" />
-              <span className="text-sm font-mono">FILTERS</span>
-            </div>
-
-            <div className="flex items-center gap-3 flex-1 min-w-48">
-              <span className="text-xs text-white/40 whitespace-nowrap font-mono">MAX ${maxPrice.toLocaleString()}</span>
-              <input
-                type="range" min={999} max={4000} step={100}
-                value={maxPrice}
-                onChange={(e) => setMaxPrice(Number(e.target.value))}
-                className="flex-1 accent-heat-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100 rounded-8"
-              />
-            </div>
-
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value)}
-              className="bg-void-200 border border-white/10 rounded-8 px-4 py-2 text-sm text-white focus:outline-none focus:border-heat-100/40 font-heading focus-visible:ring-2 focus-visible:ring-heat-100"
-            >
-              <option value="featured">Featured</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="rating">Best Rated</option>
-            </select>
-
-            <span className="text-xs text-white/30 font-mono ml-auto">{sorted.length} results</span>
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-            {sorted.map((pc, i) => (
-              <GlassCard key={pc.id} delay={i * 0.06} className="overflow-hidden group rounded-12">
-                {/* Image area */}
-                <div
-                  className={clsx('relative h-48 bg-gradient-to-br overflow-hidden rounded-t-12', pc.color)}
-                  style={{ boxShadow: `inset 0 -30px 40px -10px #08080f` }}
-                >
-                  {/* Abstract PC */}
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="relative">
-                      <div className="w-28 h-40 bg-void-200/70 rounded-xl border border-white/10 relative overflow-hidden">
-                        <div className="absolute top-0 inset-x-0 h-1 animate-rgb-border" style={{ background: `linear-gradient(90deg, ${pc.glowColor}, rgba(37,99,235,0.8), rgba(6,182,212,0.8))`, backgroundSize: '200%' }} />
-                        <div className="absolute inset-2 rounded-lg bg-white/5 flex flex-col items-center justify-center gap-2">
-                          {[...Array(3)].map((_, fi) => (
-                            <div key={fi} className="w-9 h-9 rounded-full border border-white/10 flex items-center justify-center animate-spin-slow" style={{ animationDelay: `${fi * 0.3}s` }}>
-                              <div className="w-4 h-4 rounded-full border border-heat-100/30" />
-                            </div>
-                          ))}
-                        </div>
-                        <div className="absolute bottom-2 inset-x-2 h-4 rounded blur-sm" style={{ background: `linear-gradient(90deg, ${pc.glowColor}, rgba(37,99,235,0.5))` }} />
+      <section className="container-max py-10">
+        {error && <div className="panel mb-6 rounded-xl p-5 text-red-200">{error.message}</div>}
+        <div className="grid gap-6 lg:grid-cols-2">
+          {loading && Array.from({ length: 4 }).map((_, i) => <div key={i} className="panel h-96 animate-pulse rounded-2xl" />)}
+          {pcs.map((pc) => {
+            const image = pc.case?.image || pc.gpu?.image || pc.cpu?.image
+            return (
+              <article key={pc.id} className="panel overflow-hidden rounded-2xl">
+                <div className="grid lg:grid-cols-[.9fr_1.1fr]">
+                  <div className="product-image-box relative min-h-80 bg-[#141820]">
+                    <img src={image} alt={pc.name} className="absolute inset-0 h-full w-full object-contain p-7" />
+                    <span className="absolute left-4 top-4 rounded-md bg-white px-3 py-1 text-xs font-black text-black">{pc.badge}</span>
+                  </div>
+                  <div className="p-6">
+                    <div className="mb-4 flex items-start justify-between gap-4">
+                      <div>
+                        <h2 className="text-2xl font-black tracking-tight">{pc.name}</h2>
+                        <p className="mt-1 text-sm leading-6 text-white/55">{pc.tagline}</p>
                       </div>
-                      <div className="absolute -inset-4 rounded-full blur-2xl opacity-30" style={{ background: pc.glowColor }} />
-                    </div>
-                  </div>
-
-                  {/* Badge */}
-                  <div className="absolute top-3 left-3">
-                    <span className={clsx(
-                      'text-[10px] font-mono font-bold tracking-widest px-3 py-1 rounded-full',
-                      pc.badgeColor === 'neon-purple' && 'bg-heat-100/30 text-heat-100 border border-heat-100/40',
-                      pc.badgeColor === 'neon-pink' && 'bg-accent-crimson/30 text-accent-crimson border border-accent-crimson/40',
-                      pc.badgeColor === 'neon-cyan' && 'bg-accent-amethyst/30 text-accent-amethyst border border-accent-amethyst/40',
-                      pc.badgeColor === 'neon-green' && 'bg-accent-forest/30 text-accent-forest border border-accent-forest/40',
-                      pc.badgeColor === 'neon-gold' && 'bg-accent-honey/30 text-accent-honey border border-accent-honey/40',
-                    )}>
-                      {pc.badge}
-                    </span>
-                  </div>
-
-                  {/* Wishlist */}
-                  <button
-                    onClick={() => toggleWishlist(pc)}
-                    className="absolute top-3 right-3 p-2 glass border border-border-muted rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100"
-                  >
-                    <Heart className={clsx('w-4 h-4', isWishlisted(pc.id) ? 'fill-accent-crimson text-accent-crimson' : 'text-white/50')} />
-                  </button>
-
-                  {/* FPS tag */}
-                  <div className="absolute bottom-3 right-3 glass rounded-lg px-2 py-1">
-                    <span className="font-display font-bold text-sm text-accent-amethyst">{pc.fps['1080p']}</span>
-                    <span className="text-[10px] text-white/40 ml-1">FPS</span>
-                  </div>
-                </div>
-
-                {/* Info */}
-                <div className="p-5 space-y-3">
-                  <div>
-                    <div className="flex justify-between items-start">
-                      <h3 className="font-display font-black text-xl text-white group-hover:gradient-text transition-all">{pc.name}</h3>
                       <div className="text-right">
-                        <div className="font-display font-bold text-lg text-white">${pc.price.toLocaleString()}</div>
-                        <div className="text-xs text-white/30 line-through">${pc.originalPrice.toLocaleString()}</div>
+                        <div className="price text-2xl font-black">{formatINR(pc.price)}</div>
+                        <div className="price text-xs font-bold text-white/35 line-through">{formatINR(pc.mrp)}</div>
                       </div>
                     </div>
-                    <p className="text-xs text-white/40 mt-0.5">{pc.tagline}</p>
-                  </div>
 
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} className={clsx('w-3.5 h-3.5', i < Math.floor(pc.rating) ? 'fill-accent-honey text-accent-honey' : 'text-white/15')} />
-                    ))}
-                    <span className="text-xs text-white/40 ml-1">({pc.reviews.toLocaleString()})</span>
-                  </div>
+                    <div className="grid gap-2 text-sm">
+                      <Spec label="CPU" value={pc.cpu?.name} />
+                      <Spec label="GPU" value={pc.gpu?.name} />
+                      <Spec label="RAM" value={pc.ram?.name} />
+                      <Spec label="Storage" value={pc.storage?.name} />
+                    </div>
 
-                  <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                    {[['GPU', pc.gpu], ['CPU', pc.cpu]].map(([k, v]) => (
-                      <div key={k} className="text-xs">
-                        <span className="text-white/30 font-mono">{k}</span>
-                        <span className="text-white/60 ml-2 truncate">{v.split(' ').slice(0, 3).join(' ')}</span>
-                      </div>
-                    ))}
-                  </div>
+                    <div className="mt-5 grid grid-cols-4 gap-2 text-center">
+                      <Metric value={pc.fps_1080p} label="1080p" />
+                      <Metric value={pc.fps_1440p} label="1440p" />
+                      <Metric value={pc.fps_4k} label="4K" />
+                      <Metric value={pc.stock} label="Stock" />
+                    </div>
 
-                  <div className="flex gap-2 pt-1">
-                    <button onClick={() => addToCart(pc)} className="flex-1 btn-primary py-2.5 text-xs justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100">
-                      <ShoppingCart className="w-3.5 h-3.5" />
-                      Add to Cart
-                    </button>
+                    <div className="mt-5 flex gap-2">
+                      <button onClick={() => addToCart({ ...pc, image })} className="btn-primary flex-1">
+                        <ShoppingCart className="h-4 w-4" /> Add to cart
+                      </button>
+                      {pc.gpu?.source_url && (
+                        <a href={pc.gpu.source_url} target="_blank" rel="noreferrer" className="btn-secondary px-3" aria-label="Open source GPU">
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </GlassCard>
-            ))}
-          </div>
+              </article>
+            )
+          })}
         </div>
-      </div>
-      <Footer />
+      </section>
+    </RetailLayout>
+  )
+}
+
+function Spec({ label, value }) {
+  return (
+    <div className="grid grid-cols-[72px_1fr] gap-3 rounded-lg border border-white/8 bg-white/[.025] px-3 py-2">
+      <span className="text-xs font-black uppercase tracking-wide text-white/35">{label}</span>
+      <span className="truncate text-white/78">{value || 'Selected part'}</span>
+    </div>
+  )
+}
+
+function Metric({ value, label }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-black/18 p-2">
+      <div className="font-mono text-lg font-black text-[#f26522]">{value}</div>
+      <div className="text-[11px] font-bold text-white/42">{label}</div>
     </div>
   )
 }

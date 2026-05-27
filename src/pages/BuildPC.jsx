@@ -1,431 +1,177 @@
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import {
-  Cpu, HardDrive, Zap, ChevronRight, ChevronLeft,
-  CheckCircle2, AlertTriangle, ShoppingCart, Save,
-  Trophy, Star, BarChart3, ThumbsUp,
-  Gamepad2, Crown
-} from 'lucide-react'
-import { builderComponents } from '@/data/components'
+import { useMemo, useState } from 'react'
+import { AlertTriangle, CheckCircle2, Cpu, Gauge, HardDrive, MemoryStick, Monitor, Save, ShoppingCart, Snowflake } from 'lucide-react'
+import RetailLayout from '@/components/retail/RetailLayout'
+import PageHeader from '@/components/retail/PageHeader'
+import { fetchComponents } from '@/lib/supabase'
+import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
+import { formatINR } from '@/utils/currency'
 import useStore from '@/store/useStore'
-import GlassCard from '@/components/ui/GlassCard'
-import ParticleBackground from '@/components/ui/ParticleBackground'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
-import clsx from 'clsx'
 
-const STEPS = Object.keys(builderComponents)
-const STEP_LABELS = {
-  cpu: 'CPU', gpu: 'GPU', ram: 'RAM', storage: 'Storage',
-  motherboard: 'Mobo', cooling: 'Cooling', psu: 'PSU', case: 'Case'
-}
-
-const tierColors = {
-  ultra: 'text-heat-100 border-heat-100/40 bg-heat-100/10',
-  high: 'text-accent-bluetron border-accent-bluetron/40 bg-accent-bluetron/10',
-  mid: 'text-accent-amethyst border-accent-amethyst/40 bg-accent-amethyst/10',
-  base: 'text-white/50 border-white/20 bg-white/5',
-}
-
-const badges = [
-  { id: 'firstBuild', label: 'First Build', icon: Gamepad2, condition: (build) => Object.values(build).filter(Boolean).length >= 1 },
-  { id: 'halfWay', label: 'Half Way', icon: Zap, condition: (build) => Object.values(build).filter(Boolean).length >= 4 },
-  { id: 'ultraBuilder', label: 'Ultra Builder', icon: Crown, condition: (build) => Object.values(build).filter(Boolean).filter(c => c.tier === 'ultra').length >= 3 },
-  { id: 'completeBuild', label: 'Complete Build', icon: Trophy, condition: (build) => Object.values(build).every(Boolean) },
+const steps = [
+  { key: 'cpu', label: 'Processor', icon: Cpu },
+  { key: 'gpu', label: 'Graphics card', icon: Monitor },
+  { key: 'ram', label: 'Memory', icon: MemoryStick },
+  { key: 'storage', label: 'Storage', icon: HardDrive },
+  { key: 'cooler', label: 'Cooling', icon: Snowflake },
+  { key: 'case', label: 'Cabinet', icon: Gauge },
 ]
 
+const wattage = { cpu: 125, gpu: 180, ram: 8, storage: 7, cooler: 12, case: 20 }
+
 export default function BuildPC() {
-  const { currentBuild, builderStep, setBuilderComponent, setBuilderStep, getBuildPrice, getBuildWattage, getBuildScore, addToCart, saveBuild } = useStore()
-  const [earnedBadges, setEarnedBadges] = useState([])
-  const [newBadge, setNewBadge] = useState(null)
-  const [buildName, setBuildName] = useState('')
-  const [showSaveModal, setShowSaveModal] = useState(false)
+  const [active, setActive] = useState('cpu')
+  const [build, setBuild] = useState({})
+  const { data = [], loading, error } = useSupabaseQuery(() => fetchComponents(), [])
+  const { addToCart, saveBuild } = useStore()
 
-  const step = STEPS[builderStep]
-  const stepData = builderComponents[step]
-  const progress = (Object.values(currentBuild).filter(Boolean).length / STEPS.length) * 100
-  const buildPrice = getBuildPrice()
-  const buildWattage = getBuildWattage()
-  const buildScore = getBuildScore()
+  const grouped = useMemo(() => {
+    return steps.reduce((acc, step) => {
+      acc[step.key] = data.filter((p) => p.category === step.key).sort((a, b) => a.price - b.price)
+      return acc
+    }, {})
+  }, [data])
 
-  // Check badges
-  useEffect(() => {
-    badges.forEach((badge) => {
-      if (!earnedBadges.includes(badge.id) && badge.condition(currentBuild)) {
-        setEarnedBadges((prev) => [...prev, badge.id])
-        setNewBadge(badge)
-        setTimeout(() => setNewBadge(null), 3000)
-      }
+  const selected = Object.values(build).filter(Boolean)
+  const price = selected.reduce((sum, p) => sum + p.price, 0)
+  const draw = selected.reduce((sum, p) => sum + (p.wattage || wattage[p.category] || 25), 0)
+  const score = selected.length ? Math.round(selected.reduce((sum, p) => sum + (p.score || 72), 0) / selected.length) : 0
+  const progress = Math.round((selected.length / steps.length) * 100)
+  const cpuScore = build.cpu?.score || 0
+  const gpuScore = build.gpu?.score || 0
+  const bottleneck = cpuScore && gpuScore && Math.abs(cpuScore - gpuScore) > 16
+    ? cpuScore < gpuScore ? 'Processor is weaker than the graphics card. Move up one CPU tier.' : 'Graphics card is weaker than the processor. Spend more on GPU for gaming.'
+    : null
+
+  const selectPart = (part) => {
+    setBuild((current) => ({ ...current, [active]: part }))
+    const index = steps.findIndex((s) => s.key === active)
+    if (index < steps.length - 1) setActive(steps[index + 1].key)
+  }
+
+  const orderBuild = () => {
+    addToCart({
+      id: `custom-${Date.now()}`,
+      name: 'Custom Challenger Build',
+      price,
+      image: build.case?.image || build.gpu?.image || build.cpu?.image,
+      specs: build,
     })
-  }, [currentBuild])
-
-  const selectComponent = (component) => {
-    setBuilderComponent(step, component)
-    if (builderStep < STEPS.length - 1) {
-      setTimeout(() => setBuilderStep(builderStep + 1), 350)
-    }
   }
-
-  const handleAddToCart = () => {
-    if (Object.values(currentBuild).every(Boolean)) {
-      addToCart({ id: `build-${Date.now()}`, name: 'Custom Build', price: buildPrice, quantity: 1 })
-    }
-  }
-
-  const isCompatible = (opt) => {
-    if (step === 'motherboard' && currentBuild.cpu) {
-      const cpuSocket = builderComponents.cpu.options.find(c => c.id === currentBuild.cpu?.id)?.socket
-      if (cpuSocket && opt.socket && opt.socket !== cpuSocket) return false
-    }
-    return true
-  }
-
-  // Bottleneck detection
-  const getBottleneck = () => {
-    const cpu = currentBuild.cpu
-    const gpu = currentBuild.gpu
-    if (!cpu || !gpu) return null
-    const cpuScore = cpu.score || 0
-    const gpuScore = gpu.score || 0
-    const diff = Math.abs(cpuScore - gpuScore)
-    if (diff > 15) {
-      return cpuScore < gpuScore
-        ? { type: 'CPU', msg: 'CPU may bottleneck your GPU. Consider upgrading.' }
-        : { type: 'GPU', msg: 'GPU may limit your CPU potential. Consider upgrading.' }
-    }
-    return null
-  }
-
-  const bottleneck = getBottleneck()
-
-  const recommendedPSU = buildWattage * 1.25
 
   return (
-    <div className="min-h-screen bg-void">
-      <Navbar />
+    <RetailLayout>
+      <PageHeader
+        kicker="Custom PC builder"
+        title="Build from real parts, not fictional SKUs"
+        description="Select components from the Supabase catalog populated with scraped MD Computers products. Pricing, MRP, and imagery stay tied to real products."
+      />
 
-      {/* Badge toast */}
-      <AnimatePresence>
-        {newBadge && (
-          <motion.div
-            className="fixed top-24 right-6 z-50 glass border border-heat-100/40 rounded-16 px-5 py-4 flex items-center gap-3 shadow-glow-heat"
-            initial={{ x: 100, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 100, opacity: 0 }}
-          >
-            <newBadge.icon className="w-6 h-6 text-heat-100" />
+      <section className="container-max grid gap-6 py-10 lg:grid-cols-[1fr_380px]">
+        <div>
+          <div className="panel mb-5 rounded-2xl p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <span className="text-sm font-black text-white/70">Build progress</span>
+              <span className="font-mono text-sm font-black text-[#f26522]">{progress}%</span>
+            </div>
+            <div className="h-2 overflow-hidden rounded-full bg-white/8">
+              <div className="h-full rounded-full bg-[#f26522]" style={{ width: `${progress}%` }} />
+            </div>
+            <div className="mt-4 grid gap-2 sm:grid-cols-3 lg:grid-cols-6">
+              {steps.map(({ key, label, icon: Icon }) => (
+                <button
+                  key={key}
+                  onClick={() => setActive(key)}
+                  className={`rounded-lg border px-3 py-3 text-left transition ${active === key ? 'border-[#f26522] bg-[#f26522]/10' : build[key] ? 'border-[#28c76f]/35 bg-[#28c76f]/8' : 'border-white/10 bg-white/[.025]'}`}
+                >
+                  <Icon className="mb-2 h-4 w-4 text-white/62" />
+                  <span className="block text-xs font-black">{label}</span>
+                  <span className="mt-1 block truncate text-[11px] text-white/38">{build[key]?.brand || 'Choose'}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="mb-4 flex items-end justify-between">
             <div>
-              <p className="text-xs font-mono text-heat-100">BADGE UNLOCKED</p>
-              <p className="font-heading font-bold text-white">{newBadge.label}</p>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <div className="pt-24 pb-20 relative overflow-hidden">
-        <ParticleBackground count={30} className="opacity-30" />
-        <div className="absolute inset-0 bg-hero-glow pointer-events-none" />
-
-        <div className="container-max relative">
-          {/* Header */}
-          <div className="text-center mb-10">
-            <div className="section-label mx-auto mb-4">
-              <Zap className="w-3 h-3" />
-              PC CONFIGURATOR
-            </div>
-            <h1 className="font-display text-4xl sm:text-title-h3 font-black text-white">
-              BUILD YOUR <span className="gradient-text">DREAM RIG</span>
-            </h1>
-            <p className="text-white/50 mt-3 max-w-lg mx-auto">
-              Choose every component step-by-step. Real-time compatibility checks, wattage calculations, and FPS estimates included.
-            </p>
-          </div>
-
-          {/* Progress bar */}
-          <div className="mb-8 max-w-3xl mx-auto">
-            <div className="flex justify-between items-center mb-2">
-              <span className="font-mono text-xs text-white/40">BUILD PROGRESS</span>
-              <span className="font-mono text-xs text-heat-100">{Math.round(progress)}% Complete</span>
-            </div>
-            <div className="h-2 bg-void-300 rounded-full overflow-hidden">
-              <div className="progress-bar-fill" style={{ width: `${progress}%` }} />
+              <p className="kicker mb-1">Step {steps.findIndex((s) => s.key === active) + 1} of {steps.length}</p>
+              <h2 className="text-2xl font-black">{steps.find((s) => s.key === active)?.label}</h2>
             </div>
           </div>
 
-          {/* Step tabs */}
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-2 mb-8 max-w-4xl mx-auto">
-            {STEPS.map((s, i) => (
+          {error && <div className="panel mb-5 rounded-xl p-5 text-red-200">{error.message}</div>}
+          <div className="grid gap-3">
+            {loading && Array.from({ length: 6 }).map((_, i) => <div key={i} className="panel h-24 animate-pulse rounded-xl" />)}
+            {(grouped[active] || []).map((part) => (
               <button
-                key={s}
-                onClick={() => setBuilderStep(i)}
-                className={clsx(
-                  'flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-8 font-mono text-xs tracking-wide transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100',
-                  i === builderStep
-                    ? 'bg-gradient-to-r from-heat-100 to-accent-amethyst text-white shadow-glow-heat'
-                    : currentBuild[s]
-                    ? 'bg-void-300 text-accent-amethyst border border-accent-amethyst/20'
-                    : 'glass text-white/40 hover:text-white'
-                )}
+                key={part.id}
+                onClick={() => selectPart(part)}
+                className={`panel grid gap-4 rounded-xl p-4 text-left transition hover:border-white/20 sm:grid-cols-[92px_1fr_auto] ${build[active]?.id === part.id ? 'border-[#f26522]' : ''}`}
               >
-                {currentBuild[s] ? <CheckCircle2 className="w-3.5 h-3.5" /> : <span className="w-3.5 h-3.5 rounded-full border border-current flex items-center justify-center text-[8px]">{i + 1}</span>}
-                {STEP_LABELS[s]}
+                <img src={part.image} alt={part.name} className="h-20 w-20 rounded-lg bg-white object-contain p-1" />
+                <div className="min-w-0">
+                  <div className="mb-2 flex flex-wrap items-center gap-2">
+                    <span className="rounded bg-white/8 px-2 py-1 text-[11px] font-black uppercase tracking-wide text-white/50">{part.brand}</span>
+                    <span className="rounded bg-[#28c76f]/12 px-2 py-1 text-[11px] font-black text-[#7ee5aa]">In stock</span>
+                  </div>
+                  <h3 className="font-black">{part.name}</h3>
+                  <p className="mt-1 text-sm text-white/45">Score {part.score || 72}/100 - {part.tier || 'catalog'} tier</p>
+                </div>
+                <div className="text-left sm:text-right">
+                  <div className="price text-xl font-black">{formatINR(part.price)}</div>
+                  {part.mrp && <div className="price text-xs font-semibold text-white/35 line-through">{formatINR(part.mrp)}</div>}
+                  {build[active]?.id === part.id && <CheckCircle2 className="ml-auto mt-3 h-5 w-5 text-[#28c76f]" />}
+                </div>
               </button>
             ))}
           </div>
+        </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Component selector */}
-            <div className="lg:col-span-2 space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h2 className="font-heading font-bold text-xl text-white">
-                    Select {stepData.label}
-                  </h2>
-                  <p className="text-xs text-white/40 font-mono mt-0.5">
-                    {builderStep + 1} of {STEPS.length}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <AnimatePresence mode="wait">
-                  <motion.div
-                    key={step}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.25 }}
-                    className="space-y-3"
-                  >
-                    {stepData.options.map((opt, i) => {
-                      const selected = currentBuild[step]?.id === opt.id
-                      const compat = isCompatible(opt)
-                      return (
-                        <motion.button
-                          key={opt.id}
-                          onClick={() => compat && selectComponent(opt)}
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: i * 0.05 }}
-                          className={clsx(
-                            'w-full text-left glass rounded-12 border transition-all duration-200 p-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100',
-                            selected
-                              ? 'border-heat-100/60 bg-heat-100/10 shadow-glow-heat'
-                              : compat
-                              ? 'border-transparent hover:border-heat-100/30 hover:bg-white/5 cursor-pointer'
-                              : 'border-transparent opacity-40 cursor-not-allowed'
-                          )}
-                        >
-                          <div className="flex items-center gap-4">
-                            {/* Selection indicator */}
-                            <div className={clsx(
-                              'w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 transition-all',
-                              selected ? 'border-heat-100 bg-heat-100' : 'border-white/20'
-                            )}>
-                              {selected && <CheckCircle2 className="w-3 h-3 text-white" />}
-                            </div>
-
-                            {/* Info */}
-                            <div className="flex-1 min-w-0">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <span className="font-heading font-semibold text-white text-sm">{opt.name}</span>
-                                <span className={clsx('text-[10px] font-mono px-2 py-0.5 rounded-full border', tierColors[opt.tier])}>
-                                  {opt.tier?.toUpperCase()}
-                                </span>
-                                {!compat && <span className="text-[10px] font-mono px-2 py-0.5 rounded-full border text-amber-400 border-amber-400/30 bg-amber-400/10">INCOMPATIBLE</span>}
-                              </div>
-                              <div className="text-xs text-white/40 mt-0.5 font-body">
-                                {opt.brand}
-                                {opt.speed && ` · ${opt.speed}`}
-                                {opt.vram && ` · ${opt.vram}`}
-                                {opt.efficiency && ` · ${opt.efficiency} Efficient`}
-                                {opt.wattage > 0 && ` · ${opt.wattage}W`}
-                              </div>
-                            </div>
-
-                            {/* Score bar */}
-                            <div className="hidden sm:flex flex-col items-end gap-1 shrink-0 w-20">
-                              <span className="text-[10px] font-mono text-white/30">SCORE</span>
-                              <div className="w-full h-1.5 bg-void-300 rounded-full overflow-hidden">
-                                <div
-                                  className="h-full bg-gradient-to-r from-heat-100 to-accent-bluetron rounded-full"
-                                  style={{ width: `${opt.score}%` }}
-                                />
-                              </div>
-                              <span className="text-xs font-display font-bold text-heat-100">{opt.score}</span>
-                            </div>
-
-                            {/* Price */}
-                            <div className="text-right shrink-0">
-                              <div className="font-display font-bold text-white">${opt.price}</div>
-                            </div>
-                          </div>
-                        </motion.button>
-                      )
-                    })}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-
-              {/* Navigation */}
-              <div className="flex gap-3 pt-2">
-                {builderStep > 0 && (
-                  <button onClick={() => setBuilderStep(builderStep - 1)} className="btn-ghost flex-1 justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100">
-                    <ChevronLeft className="w-4 h-4" />
-                    Back
-                  </button>
-                )}
-                {builderStep < STEPS.length - 1 && (
-                  <button onClick={() => setBuilderStep(builderStep + 1)} className="btn-primary flex-1 justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100">
-                    Next
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
+        <aside className="space-y-4 lg:sticky lg:top-28 lg:self-start">
+          <div className="panel rounded-2xl p-5">
+            <h2 className="mb-4 text-lg font-black">Live build summary</h2>
+            <div className="mb-5">
+              <div className="price text-4xl font-black">{formatINR(price)}</div>
+              <p className="mt-1 text-sm text-white/45">Estimated from selected catalog rows</p>
             </div>
-
-            {/* Right panel — Build Summary */}
-            <div className="space-y-4">
-              {/* Live price */}
-              <GlassCard animate={false} className="p-5 space-y-4 rounded-12">
-                <div className="flex items-center justify-between">
-                  <h3 className="font-heading font-bold text-white">Build Summary</h3>
-                  <div className="font-display font-black text-2xl gradient-text">${buildPrice.toLocaleString()}</div>
-                </div>
-
-                {/* Build score */}
-                <div>
-                  <div className="flex justify-between text-xs mb-1.5">
-                    <span className="font-mono text-white/40">BUILD SCORE</span>
-                    <span className="font-display font-bold text-heat-100">{buildScore}/100</span>
-                  </div>
-                  <div className="h-2 bg-void-300 rounded-full overflow-hidden">
-                    <div className="progress-bar-fill" style={{ width: `${buildScore}%` }} />
-                  </div>
-                </div>
-
-                {/* Wattage */}
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-white/40 font-mono">EST. WATTAGE</span>
-                  <span className={clsx('font-mono font-bold', buildWattage > 800 ? 'text-amber-400' : 'text-accent-forest')}>
-                    ~{buildWattage}W / Recommend {Math.ceil(recommendedPSU / 50) * 50}W PSU
-                  </span>
-                </div>
-
-                {/* Selected components */}
-                <div className="space-y-2 border-t border-white/5 pt-4">
-                  {STEPS.map((s) => (
-                    <div key={s} className="flex justify-between items-center text-xs">
-                      <span className="font-mono text-white/30 w-16">{STEP_LABELS[s]}</span>
-                      <span className={clsx('flex-1 text-right truncate ml-2', currentBuild[s] ? 'text-white/70' : 'text-white/20')}>
-                        {currentBuild[s]?.name || '— Not selected'}
-                      </span>
-                      {currentBuild[s] && (
-                        <span className="ml-2 text-white/40 shrink-0">${currentBuild[s].price}</span>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </GlassCard>
-
-              {/* Bottleneck alert */}
-              {bottleneck && (
-                <motion.div
-                  className="glass border border-amber-500/30 rounded-12 p-4 flex gap-3"
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                >
-                  <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-xs font-mono text-amber-400">BOTTLENECK DETECTED</p>
-                    <p className="text-xs text-white/60 mt-1">{bottleneck.msg}</p>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Earned badges */}
-              {earnedBadges.length > 0 && (
-                <GlassCard animate={false} className="p-4 rounded-12">
-                  <p className="text-xs font-mono text-white/30 mb-3">BADGES EARNED</p>
-                  <div className="flex flex-wrap gap-2">
-                    {badges.filter(b => earnedBadges.includes(b.id)).map((b) => (
-                      <div key={b.id} className="flex items-center gap-1.5 glass border border-heat-100/20 rounded-8 px-3 py-1.5">
-                        <b.icon className="w-4 h-4 text-heat-100" />
-                        <span className="text-xs font-heading text-white/70">{b.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                </GlassCard>
-              )}
-
-              {/* CTA buttons */}
-              <div className="space-y-3">
-                <button
-                  onClick={handleAddToCart}
-                  disabled={!Object.values(currentBuild).every(Boolean)}
-                  className={clsx(
-                    'w-full btn-primary justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100',
-                    !Object.values(currentBuild).every(Boolean) && 'opacity-40 cursor-not-allowed'
-                  )}
-                >
-                  <ShoppingCart className="w-4 h-4" />
-                  Order This Build — ${buildPrice.toLocaleString()}
-                </button>
-                <button
-                  onClick={() => setShowSaveModal(true)}
-                  disabled={buildPrice === 0}
-                  className="w-full btn-ghost justify-center text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100"
-                >
-                  <Save className="w-4 h-4" />
-                  Save Build
-                </button>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <Metric value={score} label="Score" />
+              <Metric value={`${draw}W`} label="Draw" />
+              <Metric value={`${Math.ceil((draw * 1.35) / 50) * 50}W`} label="PSU" />
+            </div>
+            {bottleneck && (
+              <div className="mt-4 flex gap-3 rounded-xl border border-[#f6bd16]/25 bg-[#f6bd16]/8 p-3 text-sm text-[#ffd66b]">
+                <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+                <span>{bottleneck}</span>
               </div>
+            )}
+            <div className="mt-5 space-y-2">
+              {steps.map((step) => (
+                <div key={step.key} className="flex justify-between gap-3 border-b border-white/8 py-2 text-sm">
+                  <span className="font-bold text-white/40">{step.label}</span>
+                  <span className="max-w-[190px] truncate text-right text-white/75">{build[step.key]?.name || 'Not selected'}</span>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 grid gap-2">
+              <button disabled={selected.length < 2} onClick={orderBuild} className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-40">
+                <ShoppingCart className="h-4 w-4" /> Add build to cart
+              </button>
+              <button disabled={!selected.length} onClick={() => saveBuild('Custom Challenger Build')} className="btn-secondary w-full disabled:cursor-not-allowed disabled:opacity-40">
+                <Save className="h-4 w-4" /> Save build
+              </button>
             </div>
           </div>
-        </div>
-      </div>
+        </aside>
+      </section>
+    </RetailLayout>
+  )
+}
 
-      {/* Save modal */}
-      <AnimatePresence>
-        {showSaveModal && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowSaveModal(false)} />
-            <motion.div
-              className="relative glass border border-heat-100/30 rounded-16 p-8 w-full max-w-md shadow-glow-heat"
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
-            >
-              <h3 className="font-display font-bold text-xl text-white mb-2">Save Your Build</h3>
-              <p className="text-white/50 text-sm mb-6">Give your build a name to save it for later.</p>
-              <input
-                type="text"
-                value={buildName}
-                onChange={(e) => setBuildName(e.target.value)}
-                placeholder="My Dream Rig..."
-                className="input-base mb-4 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100"
-              />
-              <div className="flex gap-3">
-                <button onClick={() => setShowSaveModal(false)} className="flex-1 btn-ghost justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100">Cancel</button>
-                <button
-                  onClick={() => { saveBuild(buildName || 'My Build'); setShowSaveModal(false) }}
-                  className="flex-1 btn-primary justify-center focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-heat-100"
-                >
-                  <Save className="w-4 h-4" />
-                  Save
-                </button>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <Footer />
+function Metric({ value, label }) {
+  return (
+    <div className="rounded-lg border border-white/10 bg-black/20 p-3">
+      <div className="font-mono text-lg font-black text-[#f26522]">{value}</div>
+      <div className="text-[11px] font-bold text-white/40">{label}</div>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 {
-  "name": "nexforge",
+  "name": "challenger-computers",
   "version": "1.0.0",
   "type": "module",
   "scripts": {
@@ -8,18 +8,19 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.106.2",
+    "clsx": "^2.1.1",
     "framer-motion": "^11.3.0",
     "gsap": "^3.12.5",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-router-dom": "^6.24.1",
-    "zustand": "^4.5.4",
-    "recharts": "^2.12.7",
-    "react-countup": "^6.5.3",
-    "react-intersection-observer": "^9.13.0",
-    "react-hot-toast": "^2.4.1",
     "lucide-react": "^0.400.0",
-    "clsx": "^2.1.1"
+    "react": "^18.3.1",
+    "react-countup": "^6.5.3",
+    "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.4.1",
+    "react-intersection-observer": "^9.13.0",
+    "react-router-dom": "^6.24.1",
+    "recharts": "^2.12.7",
+    "zustand": "^4.5.4"
   },
   "devDependencies": {
     "@types/react": "^18.3.3",

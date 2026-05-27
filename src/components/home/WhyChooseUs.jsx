@@ -1,114 +1,45 @@
-import { motion } from 'framer-motion'
-import { Shield, Zap, HeartHandshake, Package, Cpu, BarChart3 } from 'lucide-react'
-import GlassCard from '@/components/ui/GlassCard'
+import { ListChecks, ReceiptText, SearchCheck } from 'lucide-react'
 
-const features = [
+const items = [
   {
-    icon: Cpu,
-    title: 'Expert Component Selection',
-    desc: 'Our engineers handpick every component for maximum compatibility and performance. No compromises, ever.',
-    color: 'text-heat-100',
-    glow: 'heat',
+    icon: SearchCheck,
+    title: 'Traceable inventory',
+    text: 'Every highlighted build keeps a consistent internal spec sheet so shoppers can compare parts without guesswork.',
   },
   {
-    icon: Shield,
-    title: 'Lifetime Support Guarantee',
-    desc: 'Every build comes with lifetime technical support and a 3-year comprehensive warranty on all components.',
-    color: 'text-accent-bluetron',
-    glow: 'bluetron',
+    icon: ListChecks,
+    title: 'Specs are visible before the cart',
+    text: 'CPU, GPU, RAM, storage, cooling, PSU, motherboard, and case are shown in plain language.',
   },
   {
-    icon: BarChart3,
-    title: 'Real-Time FPS Estimator',
-    desc: 'See exactly how your custom build performs in your favorite games before you buy — powered by real benchmark data.',
-    color: 'text-accent-amethyst',
-    glow: 'amethyst',
-  },
-  {
-    icon: Zap,
-    title: 'Same-Week Delivery',
-    desc: 'Most builds ship within 5 business days. Fully tested, stress-checked, and packed with military-grade protection.',
-    color: 'text-accent-forest',
-    glow: 'bluetron',
-  },
-  {
-    icon: HeartHandshake,
-    title: 'Zero Bloatware Promise',
-    desc: 'Clean Windows install, optimized drivers, and a custom BIOS tune — your PC performs at peak from day one.',
-    color: 'text-accent-crimson',
-    glow: 'pink',
-  },
-  {
-    icon: Package,
-    title: 'White-Glove Unboxing',
-    desc: 'Every system arrives in custom foam-lined packaging with cable management done and GPU brace installed.',
-    color: 'text-accent-honey',
-    glow: 'heat',
+    icon: ReceiptText,
+    title: 'INR pricing throughout',
+    text: 'Cards, cart totals, and comparison views use rupee formatting with no generic placeholder pricing.',
   },
 ]
 
 export default function WhyChooseUs() {
   return (
-    <section className="section-padding relative">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-heat-100/3 to-transparent pointer-events-none" />
-
+    <section className="bg-void py-20 lg:py-28">
       <div className="container-max">
-        <div className="text-center mb-14 space-y-4">
-          <motion.div
-            className="section-label mx-auto"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-          >
-            WHY NEXFORGE
-          </motion.div>
-
-          <motion.h2
-            className="font-display text-4xl sm:text-title-h3 font-black text-white"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-          >
-            BUILT DIFFERENT.
-            <span className="gradient-text"> PROVEN BETTER.</span>
-          </motion.h2>
+        <div className="mb-10 max-w-3xl">
+          <p className="section-label mb-4">How this storefront works</p>
+          <h2 className="text-4xl font-medium leading-[0.98] tracking-[-1.8px] text-white md:text-6xl">
+            Designed for comparison, not decoration.
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {features.map(({ icon: Icon, title, desc, color, glow }, i) => (
-            <GlassCard key={title} delay={i * 0.07} glow={glow} className="p-6 space-y-4">
-              <div className={`w-12 h-12 rounded-xl bg-void-300 flex items-center justify-center ${color}`}>
-                <Icon className="w-6 h-6" />
+        <div className="grid gap-px overflow-hidden rounded-[24px] border border-white/5 bg-white/5 md:grid-cols-3">
+          {items.map(({ icon: Icon, title, text }) => (
+            <div key={title} className="bg-void-100 p-6 md:p-8">
+              <div className="mb-8 flex h-11 w-11 items-center justify-center rounded-full bg-white text-void">
+                <Icon className="h-5 w-5" aria-hidden="true" />
               </div>
-              <div>
-                <h3 className="font-heading font-bold text-white mb-2">{title}</h3>
-                <p className="text-white/50 text-sm leading-relaxed font-body">{desc}</p>
-              </div>
-            </GlassCard>
+              <h3 className="text-2xl font-medium tracking-[-0.7px] text-white">{title}</h3>
+              <p className="mt-3 text-sm leading-relaxed text-white/50">{text}</p>
+            </div>
           ))}
         </div>
-
-        {/* Trust bar */}
-        <motion.div
-          className="mt-16 glass rounded-2xl border border-border-muted p-8"
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-        >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x divide-white/5">
-            {[
-              { value: '47,000+', label: 'Happy Customers' },
-              { value: '99.7%', label: 'Satisfaction Rate' },
-              { value: '<5 Days', label: 'Average Ship Time' },
-              { value: '3 Years', label: 'Warranty Included' },
-            ].map(({ value, label }) => (
-              <div key={label} className="space-y-1">
-                <div className="font-display font-black text-2xl gradient-text">{value}</div>
-                <div className="text-white/40 text-sm font-body">{label}</div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
       </div>
     </section>
   )

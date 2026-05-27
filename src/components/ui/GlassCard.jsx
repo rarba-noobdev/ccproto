@@ -19,7 +19,7 @@ export default function GlassCard({
     none: '',
   }
 
-  const Tag = animate ? motion.div : 'div'
+  const Tag = onClick ? (animate ? motion.button : 'button') : (animate ? motion.div : 'div')
   const animProps = animate
     ? {
         initial: { opacity: 0, y: 24 },
@@ -33,11 +33,12 @@ export default function GlassCard({
   return (
     <Tag
       {...animProps}
+      type={onClick ? 'button' : undefined}
       onClick={onClick}
       className={clsx(
-        'glass rounded-[20px] border border-border-muted transition-all duration-300',
+        'glass rounded-[20px] border border-border-muted transition-[transform,background,border-color,box-shadow] duration-300',
         hover && glowColors[glow],
-        onClick && 'cursor-pointer',
+        onClick && 'cursor-pointer text-left',
         className,
       )}
     >

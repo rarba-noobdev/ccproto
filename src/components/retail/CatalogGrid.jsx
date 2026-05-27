@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
-import { SlidersHorizontal } from 'lucide-react'
+import { ArrowDownAZ, Search, SlidersHorizontal } from 'lucide-react'
 import { ProductCard, ProductSkeleton } from '@/components/retail/ProductCard'
+import SelectMenu from '@/components/ui/SelectMenu'
 import { formatINR } from '@/utils/currency'
 
 export default function CatalogGrid({ products = [], loading = false, categories = true }) {
@@ -26,41 +27,36 @@ export default function CatalogGrid({ products = [], loading = false, categories
       })
   }, [products, search, category, sort])
 
-  const min = visible[0]?.price || 0
   const max = visible.reduce((value, p) => Math.max(value, p.price || 0), 0)
+  const categoryItems = useMemo(() => [
+    { value: 'all', label: 'All' },
+    ...categoryOptions.map((option) => ({ value: option, label: option.toUpperCase() })),
+  ], [categoryOptions])
+  const sortItems = [
+    { value: 'price-asc', label: 'Lowest' },
+    { value: 'price-desc', label: 'Highest' },
+    { value: 'discount', label: 'Discount' },
+    { value: 'name', label: 'A-Z' },
+  ]
 
   return (
     <div>
-      <div className="panel mb-6 rounded-xl p-4">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-          <div className="flex items-center gap-2 text-white/55">
-            <SlidersHorizontal className="h-4 w-4" />
-            <span className="text-xs font-black uppercase tracking-wide">Filters</span>
-          </div>
-          <input
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="input-base lg:max-w-sm"
-            placeholder="Search GPUs, Ryzen, DDR5..."
-            aria-label="Search products"
-          />
+      <div className="surface mb-6 rounded-full p-2">
+        <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+          <label className="relative flex-1">
+            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 muted" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} className="input-base pl-10" name="product-search" autoComplete="off" placeholder="Search…" aria-label="Search products" />
+          </label>
           {categories && (
-            <select value={category} onChange={(e) => setCategory(e.target.value)} className="input-base lg:w-52" aria-label="Filter by category">
-              <option value="all">All categories</option>
-              {categoryOptions.map((option) => <option key={option} value={option}>{option.toUpperCase()}</option>)}
-            </select>
+            <SelectMenu ariaLabel="Category" className="lg:w-48" icon={SlidersHorizontal} options={categoryItems} value={category} onChange={setCategory} />
           )}
-          <select value={sort} onChange={(e) => setSort(e.target.value)} className="input-base lg:w-52" aria-label="Sort products">
-            <option value="price-asc">Price: low to high</option>
-            <option value="price-desc">Price: high to low</option>
-            <option value="discount">Best discount</option>
-            <option value="name">Name</option>
-          </select>
-          <div className="ml-auto text-sm font-bold text-white/52">
-            {visible.length} products
-            {visible.length > 0 && <span className="ml-2 text-white/32">{formatINR(min)}-{formatINR(max)}</span>}
-          </div>
+          <SelectMenu ariaLabel="Sort" className="lg:w-48" icon={ArrowDownAZ} options={sortItems} value={sort} onChange={setSort} />
         </div>
+      </div>
+
+      <div className="mb-5 flex items-center justify-between px-1 text-xs font-bold muted">
+        <span>{visible.length}</span>
+        {visible.length > 0 && <span>{formatINR(max)}</span>}
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">

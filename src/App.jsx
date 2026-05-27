@@ -18,7 +18,7 @@ import UserDashboard from '@/pages/UserDashboard'
 import AdminDashboard from '@/pages/AdminDashboard'
 
 const PageWrapper = ({ children }) => (
-  <motion.main
+  <motion.div
     id="main-content"
     tabIndex={-1}
     initial={{ opacity: 0, y: 8 }}
@@ -27,7 +27,7 @@ const PageWrapper = ({ children }) => (
     transition={{ duration: 0.22 }}
   >
     {children}
-  </motion.main>
+  </motion.div>
 )
 
 export default function App() {

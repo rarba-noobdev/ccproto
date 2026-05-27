@@ -6,7 +6,8 @@ import { formatINR } from '@/utils/currency'
 import useStore from '@/store/useStore'
 
 export default function Workstations() {
-  const { data = [], loading, error } = useSupabaseQuery(fetchPrebuilts, [])
+  const { data: result = [], loading, error } = useSupabaseQuery(fetchPrebuilts, [])
+  const data = Array.isArray(result) ? result : []
   const { addToCart } = useStore()
   const workstations = data.filter((p) => p.name?.includes('WORK') || p.use_cases?.some((u) => /render|creator|editing|ai/i.test(u)))
 
@@ -25,8 +26,10 @@ export default function Workstations() {
               const image = pc.case?.image || pc.gpu?.image || pc.cpu?.image
               return (
                 <article key={pc.id} className="panel overflow-hidden rounded-2xl">
-                  <div className="product-image-box grid h-80 place-items-center bg-[#151820]">
-                    <img src={image} alt={pc.name} className="h-full w-full object-contain p-8" />
+                  <div className="hardware-stage grid h-80 place-items-center p-5">
+                    <div className="hardware-frame h-full w-full">
+                      <img src={image} alt={pc.name} width="420" height="300" className="hardware-image h-64 w-full object-contain p-5" loading="lazy" decoding="async" />
+                    </div>
                   </div>
                   <div className="p-6">
                     <div className="mb-4 flex items-start justify-between gap-4">
@@ -39,7 +42,7 @@ export default function Workstations() {
                     <div className="mb-5 flex flex-wrap gap-2">
                       {(pc.use_cases || []).map((use) => <span key={use} className="rounded-md border border-white/10 px-2 py-1 text-xs font-bold text-white/55">{use}</span>)}
                     </div>
-                    <button onClick={() => addToCart({ ...pc, image })} className="btn-primary w-full">Add workstation to cart</button>
+                    <button type="button" onClick={() => addToCart({ ...pc, image })} className="btn-primary w-full">Add workstation to cart</button>
                   </div>
                 </article>
               )

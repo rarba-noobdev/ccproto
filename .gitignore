@@ -7,4 +7,5 @@ dist
 scrape_cache
 .agents
 .claude
+.codex
 .claude/skills/ui-ux-pro-max/scripts/__pycache__

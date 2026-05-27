@@ -37,7 +37,7 @@ function Panel({ icon: Icon, title, count, children }) {
   return (
     <article className="panel rounded-2xl p-5">
       <div className="mb-5 flex items-center justify-between">
-        <div className="flex items-center gap-3"><Icon className="h-5 w-5 text-[#f26522]" /><h2 className="text-xl font-black">{title}</h2></div>
+        <div className="flex items-center gap-3"><Icon className="h-5 w-5 text-[var(--ink)]" /><h2 className="text-xl font-black">{title}</h2></div>
         <span className="rounded-md bg-white/8 px-2 py-1 text-xs font-black">{count}</span>
       </div>
       <div className="space-y-3">{children}</div>

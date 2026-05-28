@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { motion, useReducedMotion } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight,
   ArrowUpRight,
@@ -18,7 +18,7 @@ import {
   Sparkles,
   ChevronRight,
 } from 'lucide-react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import RetailLayout from '@/components/retail/RetailLayout'
 import { ProductSkeleton } from '@/components/retail/ProductCard'
 import ProductDialog from '@/components/retail/ProductDialog'
@@ -28,7 +28,7 @@ import { fetchHomeData } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { formatINR } from '@/utils/currency'
 import { brandLogos } from '@/components/ui/BrandLogos'
-import { AnimatedNumber } from '@/components/ui/Hud'
+import { AnimatedNumber, HudMeter, LevelBadge, GBadge, PulseDot } from '@/components/ui/Hud'
 
 const easeOut = [0.23, 1, 0.32, 1]
 
@@ -277,19 +277,29 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Configurator promo banner */}
+        {/* Configurator — live build preview */}
         <section className="border-b border-border-muted">
           <div className="container-max py-48">
-            <div className="poster poster-grain relative grid gap-32 overflow-hidden px-32 py-48 md:grid-cols-[1.4fr_1fr] md:py-56 lg:px-56">
-              <div className="relative z-10">
-                <p className="meta" style={{ color: 'rgba(246,244,238,.66)' }}>Build to order</p>
-                <h2 className="mt-12 text-title-h2 font-semibold leading-[1.04] tracking-[-.025em] md:text-title-h1">
-                  Spec it. Quote it. Ship it.
-                </h2>
-                <p className="mt-16 max-w-[480px] text-body-large text-canvas/72">
-                  Pick case, processor, graphics, memory, storage, cooling, and power. Live compatibility, wattage, and pricing as you choose.
-                </p>
-                <div className="mt-28 flex flex-wrap items-center gap-12">
+            <div className="poster poster-grain relative grid gap-32 overflow-hidden px-24 py-40 md:grid-cols-[1fr_1.1fr] md:px-40 md:py-48 lg:px-56">
+              <div className="relative z-10 flex flex-col justify-between gap-28">
+                <div>
+                  <p className="meta" style={{ color: 'rgba(246,244,238,.66)' }}>Build to order</p>
+                  <h2 className="mt-12 text-title-h2 font-semibold leading-[1.04] tracking-[-.025em] md:text-title-h1">
+                    Try a build,<br />no commitment.
+                  </h2>
+                  <p className="mt-16 max-w-[460px] text-body-large text-canvas/72">
+                    Live wattage, instant pricing, compatibility as you swap parts. Three presets running on the right — open the configurator to make one yours.
+                  </p>
+                </div>
+
+                <div className="grid gap-12 sm:grid-cols-2">
+                  <PerkLine icon={Wrench} title="500+ tested parts" sub="Corsair, ASUS, NVIDIA, AMD" />
+                  <PerkLine icon={ShieldCheck} title="3-year warranty" sub="On every custom build" />
+                  <PerkLine icon={Truck} title="Ships in 48 hrs" sub="Bench-tested before dispatch" />
+                  <PerkLine icon={CreditCard} title="No-cost EMI" sub="From ₹3,999/mo · 12 mo" />
+                </div>
+
+                <div className="flex flex-wrap items-center gap-12">
                   <Link to="/build" className="btn-primary magnetic" data-tone="heat">
                     Open configurator <ArrowRight className="h-16 w-16" aria-hidden="true" />
                   </Link>
@@ -298,19 +308,8 @@ export default function Home() {
                   </Link>
                 </div>
               </div>
-              <div className="relative z-10 grid grid-cols-2 gap-px border border-canvas/15 bg-canvas/15">
-                {[
-                  ['01', 'Compatibility'],
-                  ['02', 'Live quote'],
-                  ['03', 'Wattage check'],
-                  ['04', 'Save & share'],
-                ].map(([code, label]) => (
-                  <div key={code} className="bg-ink px-16 py-20">
-                    <p className="meta" style={{ color: 'rgba(246,244,238,.5)' }}>{code}</p>
-                    <p className="mt-12 text-body-medium font-semibold text-canvas">{label}</p>
-                  </div>
-                ))}
-              </div>
+
+              <LiveBuildPreview />
             </div>
           </div>
         </section>
@@ -601,5 +600,192 @@ function PartCard({ part }) {
     </button>
     <ProductDialog product={part} open={open} onClose={() => setOpen(false)} />
     </>
+  )
+}
+
+function PerkLine({ icon: Icon, title, sub }) {
+  return (
+    <div className="flex items-start gap-12 border-l border-canvas/20 pl-14">
+      <Icon className="mt-2 h-18 w-18 shrink-0 text-accent-heat" aria-hidden="true" />
+      <div className="min-w-0">
+        <p className="text-body-small font-semibold leading-tight text-canvas">{title}</p>
+        <p className="hud-label" style={{ color: 'rgba(246,244,238,.55)' }}>{sub}</p>
+      </div>
+    </div>
+  )
+}
+
+const samplePresets = [
+  {
+    tier: 'Starter',
+    badge: 'Esports · 1080p',
+    score: 72,
+    price: 78500,
+    wattage: 380,
+    psu: 650,
+    parts: [
+      { Icon: Cpu, label: 'Processor', value: 'AMD Ryzen 5 7600' },
+      { Icon: Monitor, label: 'Graphics', value: 'RTX 4060 8GB' },
+      { Icon: HardDrive, label: 'Memory', value: 'Corsair 16GB DDR5-5200' },
+      { Icon: Wrench, label: 'Storage', value: '1TB NVMe Gen4' },
+    ],
+  },
+  {
+    tier: 'Gaming',
+    badge: '1440p · ultra',
+    score: 86,
+    price: 142000,
+    wattage: 540,
+    psu: 850,
+    parts: [
+      { Icon: Cpu, label: 'Processor', value: 'Intel Core i7-14700KF' },
+      { Icon: Monitor, label: 'Graphics', value: 'RTX 4070 Ti 12GB' },
+      { Icon: HardDrive, label: 'Memory', value: 'Corsair 32GB DDR5-6000' },
+      { Icon: Wrench, label: 'Storage', value: '2TB NVMe Gen4' },
+    ],
+  },
+  {
+    tier: 'Creator',
+    badge: 'Render · 4K edit',
+    score: 94,
+    price: 235000,
+    wattage: 720,
+    psu: 1000,
+    parts: [
+      { Icon: Cpu, label: 'Processor', value: 'AMD Ryzen 9 7950X' },
+      { Icon: Monitor, label: 'Graphics', value: 'RTX 4080 Super 16GB' },
+      { Icon: HardDrive, label: 'Memory', value: 'Corsair 64GB DDR5-6000' },
+      { Icon: Wrench, label: 'Storage', value: '4TB NVMe Gen4' },
+    ],
+  },
+]
+
+function LiveBuildPreview() {
+  const [index, setIndex] = useState(0)
+  const reduceMotion = useReducedMotion()
+  const preset = samplePresets[index]
+
+  useEffect(() => {
+    if (reduceMotion) return
+    const id = setInterval(() => setIndex((i) => (i + 1) % samplePresets.length), 4200)
+    return () => clearInterval(id)
+  }, [reduceMotion])
+
+  return (
+    <div className="relative z-10 flex flex-col gap-14 border border-canvas/15 bg-ink p-20 shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)]">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-10">
+          <PulseDot tone="heat" />
+          <span className="hud-label" style={{ color: 'rgba(246,244,238,.6)' }}>Live preview · cycles every 4s</span>
+        </div>
+        <span className="hud-label tabular-nums" style={{ color: 'rgba(246,244,238,.6)' }}>
+          {String(index + 1).padStart(2, '0')} / {String(samplePresets.length).padStart(2, '0')}
+        </span>
+      </div>
+
+      <div className="flex items-end justify-between border-b border-canvas/15 pb-14">
+        <div>
+          <p className="hud-label" style={{ color: 'rgba(246,244,238,.55)' }}>Preset</p>
+          <AnimatePresence mode="wait">
+            <motion.p
+              key={preset.tier}
+              className="mt-4 text-title-h3 font-semibold tracking-[-.02em] text-canvas"
+              initial={reduceMotion ? false : { opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3, ease: easeOut }}
+            >
+              {preset.tier}
+            </motion.p>
+          </AnimatePresence>
+          <p className="hud-label mt-2 text-accent-heat">{preset.badge}</p>
+        </div>
+        <GBadge tone="heat">Build score {preset.score}</GBadge>
+      </div>
+
+      <ul className="grid gap-10">
+        <AnimatePresence mode="wait">
+          {preset.parts.map((part, i) => (
+            <motion.li
+              key={`${preset.tier}-${part.label}`}
+              className="flex items-center gap-12 border-b border-canvas/8 pb-8"
+              initial={reduceMotion ? false : { opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 10 }}
+              transition={{ duration: 0.32, ease: easeOut, delay: i * 0.05 }}
+            >
+              <span className="grid h-28 w-28 shrink-0 place-items-center border border-canvas/15 bg-canvas/5">
+                <part.Icon className="h-14 w-14 text-accent-heat" aria-hidden="true" />
+              </span>
+              <span className="hud-label w-72 shrink-0" style={{ color: 'rgba(246,244,238,.5)' }}>{part.label}</span>
+              <span className="min-w-0 flex-1 truncate text-body-small font-semibold text-canvas">{part.value}</span>
+            </motion.li>
+          ))}
+        </AnimatePresence>
+      </ul>
+
+      <div className="grid gap-10 border-t border-canvas/15 pt-14">
+        <PreviewMeter label="Power draw" value={preset.wattage} max={preset.psu} suffix="W" />
+        <PreviewMeter label="PSU headroom" value={preset.psu - preset.wattage} max={preset.psu} suffix="W" tone="success" />
+      </div>
+
+      <div className="flex items-end justify-between border-t border-canvas/15 pt-14">
+        <div>
+          <p className="hud-label" style={{ color: 'rgba(246,244,238,.55)' }}>Live quote</p>
+          <p className="price text-title-h3 font-semibold leading-none text-canvas tabular-nums">
+            ₹<AnimatedNumber value={preset.price} duration={900} />
+          </p>
+          <p className="hud-label mt-4" style={{ color: 'rgba(246,244,238,.55)' }}>
+            EMI ₹<AnimatedNumber value={Math.round(preset.price / 12)} duration={900} />/mo · 12 mo
+          </p>
+        </div>
+        <Link
+          to="/build"
+          className="inline-flex min-h-[40px] items-center gap-8 bg-accent-heat px-14 text-label-x-small font-semibold uppercase tracking-[0.08em] text-canvas transition hover:brightness-110"
+        >
+          Customize <ArrowRight className="h-12 w-12" aria-hidden="true" />
+        </Link>
+      </div>
+
+      <div className="flex items-center justify-center gap-8 pt-2">
+        {samplePresets.map((p, i) => (
+          <button
+            key={p.tier}
+            type="button"
+            onClick={() => setIndex(i)}
+            aria-label={`Show ${p.tier} preset`}
+            className={`h-3 transition-all ${i === index ? 'w-24 bg-accent-heat' : 'w-12 bg-canvas/25 hover:bg-canvas/40'}`}
+          />
+        ))}
+      </div>
+    </div>
+  )
+}
+
+function PreviewMeter({ label, value, max, suffix = '', tone = 'heat' }) {
+  const pct = Math.max(0, Math.min(100, (value / max) * 100))
+  return (
+    <div className="flex flex-col gap-6">
+      <div className="flex items-baseline justify-between">
+        <span className="hud-label" style={{ color: 'rgba(246,244,238,.55)' }}>{label}</span>
+        <span className="price text-body-small font-semibold text-canvas tabular-nums">
+          {value}{suffix}<span className="ml-2 hud-label font-normal" style={{ color: 'rgba(246,244,238,.45)' }}>/ {max}{suffix}</span>
+        </span>
+      </div>
+      <div className="relative h-6 w-full overflow-hidden border border-canvas/10 bg-canvas/8">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: `${pct}%` }}
+          transition={{ duration: 0.7, ease: easeOut }}
+          className="h-full"
+          style={{
+            background: tone === 'success'
+              ? 'linear-gradient(90deg, #0f7a45, #15b365)'
+              : 'linear-gradient(90deg, #fa5d19, #ff8a3b)',
+            boxShadow: tone === 'success' ? '0 0 10px rgba(15,122,69,.45)' : '0 0 10px rgba(250,93,25,.45)',
+          }}
+        />
+      </div>
+    </div>
   )
 }

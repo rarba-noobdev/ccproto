@@ -15,34 +15,34 @@ export default function Workstations() {
     <RetailLayout>
       <PageHeader
         kicker="Creator rigs"
-        title="Workstations for render, edit, compile, and ship"
-        description="High-core CPUs, stable thermals, and GPU acceleration for Indian creators and studios."
+        title="Workstations"
+        description="Quiet, stable builds for render, edit, compile, and ship."
       />
-      <section className="container-max py-10">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-200">{error.message}</div>}
-        {loading ? <div className="panel h-96 animate-pulse rounded-2xl" /> : (
-          <div className="grid gap-6 lg:grid-cols-2">
+      <section className="container-max py-8">
+        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
+        {loading ? <div className="h-80 animate-pulse rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)]" /> : (
+          <div className="grid gap-4 lg:grid-cols-2">
             {(workstations.length ? workstations : data.slice(-2)).map((pc) => {
               const image = pc.case?.image || pc.gpu?.image || pc.cpu?.image
               return (
-                <article key={pc.id} className="panel overflow-hidden rounded-2xl">
-                  <div className="hardware-stage grid h-80 place-items-center p-5">
-                    <div className="hardware-frame h-full w-full">
-                      <img src={image} alt={pc.name} width="420" height="300" className="hardware-image h-64 w-full object-contain p-5" loading="lazy" decoding="async" />
+                <article key={pc.id} className="grid overflow-hidden rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_14px_42px_rgba(38,38,38,.08)] md:grid-cols-[.82fr_1fr]">
+                  <div className="hardware-stage grid min-h-64 place-items-center p-4">
+                    <div className="hardware-frame h-full min-h-56 w-full">
+                      <img src={image} alt={pc.name} width="420" height="300" className="hardware-image h-52 w-full object-contain p-5" loading="lazy" decoding="async" />
                     </div>
                   </div>
-                  <div className="p-6">
+                  <div className="flex flex-col justify-between p-5">
                     <div className="mb-4 flex items-start justify-between gap-4">
                       <div>
-                        <h2 className="text-2xl font-black">{pc.name}</h2>
-                        <p className="mt-1 text-sm text-white/55">{pc.tagline}</p>
+                        <h2 className="text-2xl font-black tracking-[-.05em]">{pc.name}</h2>
+                        <p className="mt-1 text-sm font-semibold text-[var(--ink-muted)]">{pc.tagline}</p>
                       </div>
                       <div className="price text-2xl font-black">{formatINR(pc.price)}</div>
                     </div>
                     <div className="mb-5 flex flex-wrap gap-2">
-                      {(pc.use_cases || []).map((use) => <span key={use} className="rounded-md border border-white/10 px-2 py-1 text-xs font-bold text-white/55">{use}</span>)}
+                      {(pc.use_cases || []).map((use) => <span key={use} className="rounded-full bg-[var(--surface-2)] px-3 py-1.5 text-xs font-black text-[var(--ink-muted)]">{use}</span>)}
                     </div>
-                    <button type="button" onClick={() => addToCart({ ...pc, image })} className="btn-primary w-full">Add workstation to cart</button>
+                    <button type="button" onClick={() => addToCart({ ...pc, image })} className="btn-primary w-full">Add to cart</button>
                   </div>
                 </article>
               )

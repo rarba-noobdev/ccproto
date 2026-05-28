@@ -25,7 +25,7 @@ export default class ErrorBoundary extends Component {
         <div className="panel max-w-lg rounded-2xl p-6 text-center">
           <p className="kicker mb-3 justify-center">Route error</p>
           <h1 className="text-2xl font-black">Something failed to render</h1>
-          <p className="mt-3 text-sm leading-6 text-white/58">
+          <p className="mt-3 text-sm leading-6 text-[var(--ink-muted)]">
             {this.state.error?.message || 'The page hit a runtime error.'}
           </p>
           <Link to="/" className="btn-primary mt-6">Back to home</Link>

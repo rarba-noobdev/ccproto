@@ -39,11 +39,18 @@ All data-driven route pages should guard against unexpected non-array responses.
 
 ## Scraped Data Context
 
-Real Indian-market product data was scraped and seeded earlier. Local scrape artifacts exist under `scrape_cache/`, including:
+Real catalog data was scraped and seeded. Local scrape artifacts exist under `scrape_cache/`, including:
 - `products.json`
 - `01_components.sql`
 - `02_prebuilts.sql`
 - parser/generator scripts
+
+Latest replacement pass:
+- `scripts/scrape_catalog_replacements.cjs` uses the Firecrawl HTTP API and expects `FIRECRAWL_API_KEY`.
+- It scrapes ready systems plus cabinet, air cooler, PSU, storage, and DDR5 RGB memory sources.
+- It writes ignored artifacts to `scrape_cache/replacement_*.md`, `replacement_products.json`, and `03_replacements.sql`.
+- Supabase has a `replace_catalog_replacements(jsonb)` RPC used to delete old prebuilts plus `ram`, `storage`, `cooler`, `psu`, and `case` rows before inserting replacements.
+- `prebuilts` now has `image` and `source_url` columns.
 
 Do not mention the scraped source website in public UI copy. The user explicitly asked that the website should read as their own brand.
 
@@ -68,9 +75,9 @@ Routes are defined in `src/App.jsx`:
 
 ## Design Direction
 
-The active design system is dark, restrained, and commerce-focused:
-- Near-black canvas
-- White/charcoal surfaces
+The active design system is light, restrained, and commerce-focused:
+- Warm off-white canvas
+- White and soft-gray surfaces
 - Very limited blue accent for focus/selected states
 - Rounded but not playful
 - Compact premium retail cards
@@ -222,10 +229,9 @@ foreach ($r in $routes) {
 
 - Avoid AI-placeholder text and generic cards.
 - Do not mention scraped/source vendor names in the UI.
-- Dark mode should be default.
+- Light mode is the current default.
 - UI should feel real, professional, and conversion-oriented.
 - Use less text, more visual hierarchy.
 - Avoid giant cards unless there is a strong reason.
 - Keep pages consistent with the design system.
 - The user prefers direct implementation over long explanations.
-

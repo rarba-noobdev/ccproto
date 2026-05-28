@@ -44,12 +44,12 @@ export default function CategoryRail() {
   const ActiveIcon = activeCategory?.icon || Grid3X3
 
   return (
-    <section className="container-max relative z-30 pt-3">
-      <div className="surface rounded-[24px] p-1.5">
+    <section className="container-max relative z-30 pt-4">
+      <div className="rounded-[28px] border border-[var(--line)] bg-[var(--surface-1)] p-2 shadow-[0_14px_38px_rgba(38,38,38,.07)]">
         <button
           type="button"
           onClick={() => setOpen((value) => !value)}
-          className="flex min-h-11 w-full items-center justify-between rounded-[18px] px-4 text-left transition hover:bg-white/[.055]"
+          className="flex min-h-12 w-full items-center justify-between rounded-[20px] px-4 text-left transition hover:bg-[var(--surface-hover)]"
           aria-expanded={open}
           aria-controls="shop-category-menu"
         >
@@ -58,7 +58,7 @@ export default function CategoryRail() {
               <ActiveIcon className="h-4 w-4" aria-hidden="true" />
             </span>
             <span>
-              <span className="block text-[11px] font-black uppercase tracking-[.12em] muted">Shop category</span>
+              <span className="block text-[11px] font-black uppercase tracking-[.12em] muted">Browse</span>
               <span className="block text-sm font-black tracking-[-.02em]">{activeCategory?.label || 'All sections'}</span>
             </span>
           </span>
@@ -66,19 +66,21 @@ export default function CategoryRail() {
         </button>
 
         {open && (
-          <nav id="shop-category-menu" className="mt-1 grid gap-1 rounded-[20px] border border-[var(--line)] bg-[var(--surface-1)] p-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Shop categories">
+          <nav id="shop-category-menu" className="mt-2 grid gap-1.5 rounded-[22px] border border-[var(--line)] bg-[var(--surface-2)] p-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Shop categories">
             {shopCategories.map(({ label, to, icon: Icon }) => (
               <NavLink
                 key={label}
                 to={to}
                 onClick={() => setOpen(false)}
                 className={({ isActive }) =>
-                  `group flex items-center gap-3 rounded-[16px] px-3 py-3 text-sm font-black transition ${
-                    isActive ? 'bg-[var(--ink)] text-[var(--canvas)]' : 'text-[var(--ink-muted)] hover:bg-white/[.06] hover:text-[var(--ink)]'
+                  `group flex items-center gap-3 rounded-[18px] px-3 py-3 text-sm font-black transition ${
+                    isActive ? 'bg-[var(--ink)] text-[var(--canvas)] shadow-sm' : 'bg-[var(--surface-1)] text-[var(--ink-muted)] hover:text-[var(--ink)]'
                   }`
                 }
               >
-                <Icon className="h-4 w-4" aria-hidden="true" />
+                <span className="grid h-8 w-8 place-items-center rounded-full bg-white/70 text-current">
+                  <Icon className="h-4 w-4" aria-hidden="true" />
+                </span>
                 <span>{label}</span>
               </NavLink>
             ))}

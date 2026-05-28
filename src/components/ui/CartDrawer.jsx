@@ -9,15 +9,15 @@ export default function CartDrawer() {
 
   return (
     <div className="fixed inset-0 z-[70]">
-      <button type="button" className="absolute inset-0 bg-black/70" aria-label="Close cart" onClick={() => setCartOpen(false)} />
-      <aside className="absolute right-0 top-0 flex h-full w-[min(100%,420px)] overscroll-contain flex-col border-l border-white/10 bg-[#101217] shadow-2xl" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-        <div className="flex h-16 items-center justify-between border-b border-white/10 px-5">
+      <button type="button" className="absolute inset-0 bg-black/20 backdrop-blur-sm" aria-label="Close cart" onClick={() => setCartOpen(false)} />
+      <aside className="absolute right-3 top-3 flex h-[calc(100%-24px)] w-[min(calc(100%-24px),440px)] overscroll-contain flex-col overflow-hidden rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_24px_80px_rgba(38,38,38,.22)]" role="dialog" aria-modal="true" aria-labelledby="cart-title">
+        <div className="flex h-18 items-center justify-between border-b border-[var(--line)] px-5 py-4">
           <div>
-            <h2 id="cart-title" className="text-lg font-black">Cart</h2>
-            <p className="text-xs text-white/45">{cart.length} item types selected</p>
+            <h2 id="cart-title" className="text-xl font-black tracking-[-.04em]">Cart</h2>
+            <p className="text-xs font-bold text-[var(--ink-muted)]">{cart.length} selected</p>
           </div>
-          <button type="button" onClick={() => setCartOpen(false)} className="grid h-10 w-10 place-items-center rounded-lg border border-white/10" aria-label="Close cart">
-            <X className="h-5 w-5" />
+          <button type="button" onClick={() => setCartOpen(false)} className="icon-btn" aria-label="Close cart">
+            <X className="h-4 w-4" />
           </button>
         </div>
 
@@ -26,21 +26,21 @@ export default function CartDrawer() {
             <div className="grid h-full place-items-center text-center">
               <div>
                 <p className="font-black">Your cart is empty</p>
-                <p className="mt-1 text-sm text-white/50">Add a prebuilt PC or a custom configuration.</p>
+                <p className="mt-1 text-sm text-[var(--ink-muted)]">Add a prebuilt PC or a custom configuration.</p>
               </div>
             </div>
           ) : (
             <div className="space-y-3">
               {cart.map((item) => (
-                <div key={item.id} className="rounded-xl border border-white/10 bg-white/[.035] p-3">
+                <div key={item.id} className="rounded-[22px] border border-[var(--line)] bg-[var(--surface-2)] p-2">
                   <div className="flex gap-3">
-                    {item.image && <img src={item.image} alt={item.name} width="64" height="64" className="h-16 w-16 rounded-lg bg-white object-contain p-1" loading="lazy" decoding="async" />}
+                    {item.image && <img src={item.image} alt={item.name} width="72" height="72" className="h-[72px] w-[72px] rounded-[18px] border border-[var(--line)] bg-white object-contain p-2" loading="lazy" decoding="async" />}
                     <div className="min-w-0 flex-1">
                       <h3 className="truncate-2 text-sm font-black">{item.name}</h3>
-                      <p className="mt-1 text-xs text-white/45">Qty {item.quantity}</p>
+                      <p className="mt-1 text-xs font-bold text-[var(--ink-muted)]">Qty {item.quantity}</p>
                       <p className="price mt-2 font-black text-[var(--ink)]">{formatINR(item.price * item.quantity)}</p>
                     </div>
-                    <button type="button" onClick={() => removeFromCart(item.id)} className="grid h-9 w-9 place-items-center rounded-lg border border-white/10 text-white/60" aria-label={`Remove ${item.name}`}>
+                    <button type="button" onClick={() => removeFromCart(item.id)} className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] bg-white text-[var(--ink-soft)] transition hover:text-[var(--ink)]" aria-label={`Remove ${item.name}`}>
                       <Trash2 className="h-4 w-4" />
                     </button>
                   </div>
@@ -50,13 +50,13 @@ export default function CartDrawer() {
           )}
         </div>
 
-        <div className="border-t border-white/10 p-5">
+        <div className="border-t border-[var(--line)] bg-[var(--surface-2)] p-5">
           <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-bold text-white/60">Estimated total</span>
+            <span className="text-sm font-bold text-[var(--ink-soft)]">Estimated total</span>
             <span className="price text-2xl font-black">{formatINR(cartTotal())}</span>
           </div>
           <button type="button" className="btn-primary w-full">Request Invoice</button>
-          {cart.length > 0 && <button type="button" onClick={() => window.confirm('Clear all cart items?') && clearCart()} className="mt-3 w-full text-sm font-bold text-white/45">Clear Cart</button>}
+          {cart.length > 0 && <button type="button" onClick={() => window.confirm('Clear all cart items?') && clearCart()} className="mt-3 w-full text-sm font-bold text-[var(--ink-muted)]">Clear Cart</button>}
         </div>
       </aside>
     </div>

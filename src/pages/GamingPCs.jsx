@@ -1,6 +1,7 @@
 import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 import CatalogGrid from '@/components/retail/CatalogGrid'
+import CategoryRail from '@/components/retail/CategoryRail'
 import { fetchComponents } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 
@@ -14,10 +15,11 @@ export default function GamingPCs() {
       <PageHeader
         kicker="Components"
         title="Parts library"
-        description="GPU, CPU, memory, storage, cooling, and cases."
+        description="Core hardware, filtered for quick comparison."
       />
-      <section className="container-max py-10">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-200">{error.message}</div>}
+      <CategoryRail />
+      <section className="container-max py-8">
+        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
         <CatalogGrid products={priority} loading={loading} />
       </section>
     </RetailLayout>

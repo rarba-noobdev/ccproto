@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 import CatalogGrid from '@/components/retail/CatalogGrid'
+import CategoryRail from '@/components/retail/CategoryRail'
 import { fetchComponents } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { catalogCategories, catalogProducts } from '@/data/catalog'
@@ -14,7 +15,7 @@ const aliases = {
   ssd: 'storage',
   cabinet: 'case',
   prebuild: 'prebuild',
-  'power-supply': 'power-supply',
+  'power-supply': 'psu',
 }
 
 const remoteAliases = {
@@ -24,6 +25,8 @@ const remoteAliases = {
   cabinet: 'case',
   cooler: 'cooler',
   ram: 'ram',
+  'power-supply': 'psu',
+  psu: 'psu',
 }
 
 export default function CategoryShop() {
@@ -54,8 +57,9 @@ export default function CategoryShop() {
         title={title}
         description={categoryMeta?.description || 'Browse by fit, price, and performance tier.'}
       />
-      <section className="container-max py-10">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-200">{error.message}</div>}
+      <CategoryRail />
+      <section className="container-max py-8">
+        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
         <CatalogGrid products={products} loading={loading && products.length === 0} categories={false} />
       </section>
     </RetailLayout>

@@ -40,11 +40,12 @@ export default function App() {
         position="top-right"
         toastOptions={{
           style: {
-            background: '#111318',
-            color: '#fff',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: '#ffffff',
+            color: '#262626',
+            border: '1px solid rgba(38,38,38,0.10)',
             borderRadius: '12px',
             fontFamily: 'Inter, sans-serif',
+            boxShadow: '0 18px 50px rgba(38,38,38,0.12)',
           },
         }}
       />

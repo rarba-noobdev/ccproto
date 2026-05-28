@@ -5,19 +5,19 @@ export default {
   theme: {
     extend: {
       colors: {
-        canvas: '#050506',
+        canvas: '#fbfbfb',
         surface: {
-          1: '#101114',
-          2: '#181a1f',
+          1: '#ffffff',
+          2: '#f2f0ec',
         },
         ink: {
-          DEFAULT: '#f7f7f3',
-          soft: '#d9dbe0',
-          muted: '#8d929c',
+          DEFAULT: '#262626',
+          soft: 'rgba(38,38,38,0.76)',
+          muted: 'rgba(38,38,38,0.56)',
         },
         accent: {
-          blue: '#2081ff',
-          bluetron: '#2081ff',
+          blue: '#2a6dfb',
+          bluetron: '#2a6dfb',
         },
         gradient: {
           violet: '#8b2cff',
@@ -26,15 +26,15 @@ export default {
           coral: '#ff6b9d',
         },
         void: {
-          DEFAULT: '#050506',
-          50: '#08090b',
-          100: '#101114',
-          200: '#181a1f',
-          300: '#22242a',
-          400: '#2c2f36',
+          DEFAULT: '#fbfbfb',
+          50: '#f9f9f9',
+          100: '#f2f0ec',
+          200: '#ebe8e1',
+          300: '#ded8cc',
+          400: '#cfc6b8',
         },
         heat: {
-          100: '#f7f7f3',
+          100: '#fa5d19',
         },
         'white-alpha': {
           4: 'rgba(255,255,255,0.04)',
@@ -45,7 +45,7 @@ export default {
           56: 'rgba(255,255,255,0.56)',
           72: 'rgba(255,255,255,0.72)',
         },
-        'border-muted': 'rgba(255,255,255,0.10)',
+        'border-muted': 'rgba(38,38,38,0.10)',
       },
       borderRadius: {
         4: '4px',
@@ -65,13 +65,13 @@ export default {
         'body-sm': ['13px', { lineHeight: '20px' }],
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
-        display: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['SuisseIntl', 'Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+        display: ['SuisseIntl', 'Inter', 'system-ui', 'sans-serif'],
         mono: ['"JetBrains Mono"', 'ui-monospace', 'monospace'],
       },
       boxShadow: {
-        card: 'inset 0 1px 0 rgba(255,255,255,0.07), 0 18px 50px rgba(0,0,0,0.30)',
-        focus: '0 0 0 4px rgba(32,129,255,0.18)',
+        card: 'inset 0 1px 0 rgba(255,255,255,0.86), 0 18px 50px rgba(38,38,38,0.10)',
+        focus: '0 0 0 4px rgba(42,109,251,0.14)',
       },
       animation: {
         'fade-in': 'fadeIn 0.35s ease forwards',

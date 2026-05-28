@@ -14,34 +14,36 @@ export default function Contact() {
     <RetailLayout>
       <PageHeader
         kicker="Support"
-        title="Talk to a builder before you spend"
-        description="Use this page for sales enquiries, saved build reviews, bulk workstation quotes, and post-sale support tickets."
+        title="Talk to a builder"
+        description="Quotes, saved build reviews, and support tickets."
       />
-      <section className="container-max grid gap-6 py-10 lg:grid-cols-[.9fr_1.1fr]">
-        <div className="space-y-4">
+      <section className="container-max grid gap-5 py-8 lg:grid-cols-[.82fr_1.18fr]">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
           {[
             [Phone, 'Sales line', '+91 98765 43210'],
             [Mail, 'Email', 'support@challengercomputers.in'],
             [MapPin, 'Store desk', 'Bengaluru, Karnataka'],
             [MessageSquare, 'Response SLA', 'Under 2 business hours'],
           ].map(([Icon, label, value]) => (
-            <div key={label} className="panel flex items-center gap-4 rounded-xl p-4">
-              <Icon className="h-5 w-5 text-[var(--ink)]" />
+            <div key={label} className="flex items-center gap-4 rounded-[24px] border border-[var(--line)] bg-[var(--surface-1)] p-4 shadow-[0_10px_30px_rgba(38,38,38,.06)]">
+              <span className="grid h-11 w-11 place-items-center rounded-[16px] bg-[var(--surface-2)]">
+                <Icon className="h-5 w-5 text-[var(--ink)]" />
+              </span>
               <div>
-                <div className="text-xs font-black uppercase tracking-wide text-white/40">{label}</div>
+                <div className="text-xs font-black uppercase tracking-wide text-[var(--ink-muted)]">{label}</div>
                 <div className="font-black">{value}</div>
               </div>
             </div>
           ))}
         </div>
-        <form onSubmit={submit} className="panel rounded-2xl p-6">
+        <form onSubmit={submit} className="rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] p-5 shadow-[0_14px_42px_rgba(38,38,38,.08)]">
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="grid gap-2 text-sm font-bold">Name<input className="input-base" name="name" autoComplete="name" /></label>
-            <label className="grid gap-2 text-sm font-bold">Phone<input className="input-base" name="phone" type="tel" inputMode="tel" autoComplete="tel" /></label>
-            <label className="grid gap-2 text-sm font-bold sm:col-span-2">Email<input className="input-base" name="email" type="email" inputMode="email" autoComplete="email" spellCheck={false} /></label>
-            <label className="grid gap-2 text-sm font-bold sm:col-span-2">What are you building?<textarea className="min-h-32 rounded-lg border border-white/10 bg-[#0f1116] p-3 transition-[border-color,box-shadow] focus-visible:border-[var(--accent-blue)] focus-visible:ring-4 focus-visible:ring-[var(--accent-blue-soft)]" name="message" autoComplete="off" /></label>
+            <label className="grid gap-2 text-sm font-black">Name<input className="input-base" name="name" autoComplete="name" /></label>
+            <label className="grid gap-2 text-sm font-black">Phone<input className="input-base" name="phone" type="tel" inputMode="tel" autoComplete="tel" /></label>
+            <label className="grid gap-2 text-sm font-black sm:col-span-2">Email<input className="input-base" name="email" type="email" inputMode="email" autoComplete="email" spellCheck={false} /></label>
+            <label className="grid gap-2 text-sm font-black sm:col-span-2">Build brief<textarea className="min-h-32 rounded-[20px] border border-[var(--line)] bg-[var(--surface-2)] p-4 transition-[border-color,box-shadow] focus-visible:border-[var(--accent-blue)] focus-visible:ring-4 focus-visible:ring-[var(--accent-blue-soft)]" name="message" autoComplete="off" /></label>
           </div>
-          <button type="submit" className="btn-primary mt-5 w-full">Send Enquiry</button>
+          <button type="submit" className="btn-primary mt-5 w-full">Send</button>
         </form>
       </section>
     </RetailLayout>

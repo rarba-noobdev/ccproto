@@ -11,11 +11,11 @@ export default function GlassCard({
   delay = 0,
 }) {
   const glowColors = {
-    heat: 'hover:bg-void-200',
-    amethyst: 'hover:bg-void-200',
-    bluetron: 'hover:bg-void-200',
-    cyan: 'hover:bg-void-200',
-    pink: 'hover:bg-void-200',
+    heat: 'hover:bg-[var(--accent-heat-soft)]',
+    amethyst: 'hover:bg-[rgba(144,97,255,.10)]',
+    bluetron: 'hover:bg-[rgba(42,109,251,.10)]',
+    cyan: 'hover:bg-[rgba(42,109,251,.10)]',
+    pink: 'hover:bg-[rgba(250,93,25,.10)]',
     none: '',
   }
 

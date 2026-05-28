@@ -16,21 +16,23 @@ export default function Accessories() {
     <RetailLayout>
       <PageHeader
         kicker="Shop"
-        title="Every section, one place"
-        description="Jump straight into parts, systems, peripherals, displays, storage, and upgrades."
+        title="Browse the catalog"
+        description="Parts, systems, peripherals, and upgrades in one clean view."
       />
       <section className="container-max py-10">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-200">{error.message}</div>}
-        <div className="mb-8 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
+        <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           {shopCategories.map(({ label, to, icon: Icon }) => (
-            <Link key={label} to={to} className="panel group flex items-center justify-between rounded-[24px] p-4 transition hover:-translate-y-0.5 hover:bg-[var(--surface-hover)]">
+            <Link key={label} to={to} className="group rounded-[26px] border border-[var(--line)] bg-[var(--surface-1)] p-3 shadow-[0_10px_30px_rgba(38,38,38,.06)] transition hover:-translate-y-0.5 hover:border-[var(--line-strong)]">
               <span className="flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-full bg-[var(--surface-2)] text-[var(--ink)]">
+                <span className="grid h-12 w-12 place-items-center rounded-[18px] bg-[var(--surface-2)] text-[var(--ink)] transition group-hover:bg-[var(--ink)] group-hover:text-[var(--canvas)]">
                   <Icon className="h-4 w-4" aria-hidden="true" />
                 </span>
-                <span className="font-black tracking-[-.02em]">{label}</span>
+                <span>
+                  <span className="block font-black tracking-[-.02em]">{label}</span>
+                  <span className="mt-0.5 block text-xs font-bold muted">Open catalog</span>
+                </span>
               </span>
-              <span className="text-xs font-black muted transition group-hover:text-[var(--ink)]">Open</span>
             </Link>
           ))}
         </div>

@@ -82,11 +82,11 @@ export default function BuildPC() {
   return (
     <RetailLayout>
       <main className="container-max py-6 lg:py-8">
-        <section className="mb-5 grid gap-4 lg:grid-cols-[1fr_auto] lg:items-end">
+        <section className="mb-5 grid gap-4 rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] p-5 shadow-[0_16px_48px_rgba(38,38,38,.07)] lg:grid-cols-[1fr_auto] lg:items-end">
           <div>
             <p className="kicker mb-3"><Zap className="h-4 w-4" /> Configurator</p>
-            <h1 className="max-w-4xl text-[46px] font-black leading-[.88] tracking-[-.075em] sm:text-[72px]">
-              Build with restraint.
+            <h1 className="max-w-4xl text-[42px] font-black leading-[.9] tracking-[-.07em] sm:text-[64px]">
+              Build your PC.
             </h1>
           </div>
           <div className="grid grid-cols-3 gap-2 text-center">
@@ -96,9 +96,9 @@ export default function BuildPC() {
           </div>
         </section>
 
-        {error && <div className="panel mb-4 rounded-[20px] p-4 text-sm font-bold text-red-200">{error.message}</div>}
+        {error && <div className="panel mb-4 rounded-[20px] p-4 text-sm font-bold text-red-700">{error.message}</div>}
 
-        <section className="grid gap-4 xl:grid-cols-[390px_minmax(0,1fr)]">
+        <section className="grid gap-4 xl:grid-cols-[360px_minmax(0,1fr)]">
           <BuildPreview
             activeStep={activeStep}
             activePart={activePart}
@@ -119,7 +119,7 @@ export default function BuildPC() {
           <section className="min-w-0">
             <StepTabs active={active} build={build} setActive={setActive} />
 
-            <div className="panel mt-4 rounded-[30px] p-4">
+            <div className="mt-4 rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] p-4 shadow-[0_14px_42px_rgba(38,38,38,.08)]">
               <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
                 <div>
                   <p className="kicker mb-1">Select part</p>
@@ -169,15 +169,15 @@ function StepTabs({ active, build, setActive }) {
             type="button"
             key={step.key}
             onClick={() => setActive(step.key)}
-            className={`group min-h-[76px] rounded-[22px] border px-3 py-3 text-left transition-[transform,background,border-color,box-shadow] duration-200 active:scale-[.985] ${
+            className={`group min-h-[66px] rounded-[20px] border px-3 py-2.5 text-left transition-[transform,background,border-color,box-shadow] duration-200 active:scale-[.985] ${
               active === step.key
                 ? 'border-[var(--accent-blue)] bg-[var(--surface-2)] shadow-[0_0_0_1px_var(--accent-blue-soft)]'
                 : selected
-                  ? 'border-white/12 bg-white/[.04]'
-                  : 'border-transparent hover:bg-white/[.055]'
+                  ? 'border-[var(--line)] bg-[var(--surface-2)]'
+                  : 'border-transparent hover:bg-[var(--surface-hover)]'
             }`}
           >
-            <div className="mb-3 flex items-center justify-between">
+            <div className="mb-2 flex items-center justify-between">
               <Icon className="h-4 w-4" />
               <span className="font-mono text-[10px] font-black muted">{String(index + 1).padStart(2, '0')}</span>
             </div>
@@ -195,12 +195,12 @@ function BuildPreview({ activeStep, activePart, build, bottleneck, draw, orderBu
   const ready = selected.length >= 2
 
   return (
-    <aside className="panel overflow-hidden rounded-[34px] p-4 xl:sticky xl:top-24 xl:self-start">
-      <div className="relative overflow-hidden rounded-[28px] border border-[var(--line)] bg-[#0c0d10]">
-        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-        <div className="relative grid min-h-[350px] place-items-center p-5">
-          <div className="absolute inset-5 rounded-[28px] border border-white/8" />
-          <div className="absolute inset-12 rounded-full border border-white/8" />
+    <aside className="overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] p-3 shadow-[0_16px_48px_rgba(38,38,38,.08)] xl:sticky xl:top-24 xl:self-start">
+      <div className="relative overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--surface-2)]">
+        <div className="absolute inset-x-8 top-0 h-px bg-gradient-to-r from-transparent via-black/15 to-transparent" />
+        <div className="relative grid min-h-[300px] place-items-center p-5">
+          <div className="absolute inset-5 rounded-[28px] border border-[var(--line)]" />
+          <div className="absolute inset-12 rounded-full border border-[var(--line)]" />
           <AnimatePresence mode="wait">
             {previewImage ? (
               <motion.img
@@ -209,7 +209,7 @@ function BuildPreview({ activeStep, activePart, build, bottleneck, draw, orderBu
                 alt={activePart?.name || 'Selected build'}
                 width="520"
                 height="420"
-                className="relative z-10 h-64 w-full object-contain p-4"
+                className="relative z-10 h-56 w-full object-contain p-4"
                 decoding="async"
                 initial={reduceMotion ? false : { opacity: 0, filter: 'blur(6px)', transform: 'scale(0.96)' }}
                 animate={{ opacity: 1, filter: 'blur(0px)', transform: 'scale(1)' }}
@@ -237,7 +237,7 @@ function BuildPreview({ activeStep, activePart, build, bottleneck, draw, orderBu
             </div>
             <div className="price shrink-0 text-xl font-black">{formatINR(price)}</div>
           </div>
-          <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
+          <div className="h-1.5 overflow-hidden rounded-full bg-black/10">
             <motion.div className="h-full rounded-full bg-[var(--ink)]" animate={{ width: `${progress}%` }} transition={{ duration: 0.2, ease: easeOut }} />
           </div>
         </div>
@@ -251,7 +251,7 @@ function BuildPreview({ activeStep, activePart, build, bottleneck, draw, orderBu
 
       {bottleneck && (
         <motion.div
-          className="mt-3 flex gap-2 rounded-[18px] border border-[var(--warning)]/25 bg-white/[.035] p-3 text-xs font-bold text-[#ffdf8a]"
+          className="mt-3 flex gap-2 rounded-[18px] border border-[var(--warning)]/25 bg-[var(--accent-heat-soft)] p-3 text-xs font-bold text-[var(--warning)]"
           initial={reduceMotion ? false : { opacity: 0, transform: 'translateY(6px) scale(0.985)' }}
           animate={{ opacity: 1, transform: 'translateY(0px) scale(1)' }}
           transition={{ duration: 0.18, ease: easeOut }}
@@ -283,10 +283,10 @@ function BuildPreview({ activeStep, activePart, build, bottleneck, draw, orderBu
 
 function SpecRow({ step, part }) {
   return (
-    <div className="grid grid-cols-[58px_1fr_auto] items-center gap-2 rounded-[15px] border border-white/8 bg-white/[.025] px-3 py-2 text-xs">
+    <div className="grid grid-cols-[58px_1fr_auto] items-center gap-2 rounded-[15px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2 text-xs">
       <span className="font-black muted">{step.short}</span>
-      <span className="truncate font-bold text-white/72">{part?.name || 'Not selected'}</span>
-      {part ? <Check className="h-4 w-4 text-[var(--success)]" /> : <span className="h-1.5 w-1.5 rounded-full bg-white/20" />}
+      <span className="truncate font-bold text-[var(--ink-soft)]">{part?.name || 'Not selected'}</span>
+      {part ? <Check className="h-4 w-4 text-[var(--success)]" /> : <span className="h-1.5 w-1.5 rounded-full bg-black/20" />}
     </div>
   )
 }
@@ -299,14 +299,14 @@ function PartCard({ part, index, selected, onClick, reduceMotion }) {
       className={`group overflow-hidden rounded-[24px] border text-left transition-[transform,background,border-color,box-shadow] duration-200 active:scale-[.99] ${
         selected
           ? 'border-[var(--accent-blue)] bg-[var(--surface-2)] shadow-[0_0_0_1px_var(--accent-blue-soft)]'
-          : 'border-[var(--line)] bg-white/[.025] hover:-translate-y-0.5 hover:bg-white/[.055]'
+          : 'border-[var(--line)] bg-[var(--surface-2)] hover:-translate-y-0.5 hover:bg-[var(--surface-hover)]'
       }`}
       initial={reduceMotion ? false : { opacity: 0, transform: 'translateY(8px) scale(0.99)' }}
       animate={{ opacity: 1, transform: 'translateY(0px) scale(1)' }}
       transition={{ duration: 0.19, delay: reduceMotion ? 0 : Math.min(index * 0.025, 0.14), ease: easeOut }}
     >
-      <div className="product-image-box relative grid h-44 place-items-center border-b border-[var(--line)] bg-white">
-        <img src={part.image} alt={part.name} width="320" height="240" className="h-full w-full object-contain p-5 transition duration-200 group-hover:scale-[1.035]" loading="lazy" decoding="async" />
+      <div className="product-image-box relative grid h-36 place-items-center border-b border-[var(--line)] bg-white">
+        <img src={part.image} alt={part.name} width="320" height="240" className="h-full w-full object-contain p-4 transition duration-200 group-hover:scale-[1.035]" loading="lazy" decoding="async" />
         {selected && (
           <span className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-[var(--ink)] text-[var(--canvas)]">
             <CheckCircle2 className="h-4 w-4" />
@@ -316,7 +316,7 @@ function PartCard({ part, index, selected, onClick, reduceMotion }) {
       <div className="p-4">
         <div className="mb-3 flex items-center justify-between gap-2">
           <span className="truncate rounded-full bg-[var(--surface-2)] px-2.5 py-1 text-[10px] font-black uppercase tracking-wide muted">{part.brand || part.category}</span>
-          <span className="rounded-full bg-white/[.045] px-2.5 py-1 text-[10px] font-black text-white/60">{part.tier || 'catalog'}</span>
+          <span className="rounded-full bg-[var(--surface-2)] px-2.5 py-1 text-[10px] font-black text-[var(--ink-soft)]">{part.tier || 'catalog'}</span>
         </div>
         <h3 className="truncate-2 min-h-[44px] text-[15px] font-black leading-[22px]">{part.name}</h3>
         <div className="mt-4 flex items-end justify-between gap-3">
@@ -342,7 +342,7 @@ function Compatibility({ build, score, draw, psu }) {
   return (
     <div className="mt-4 grid grid-cols-2 gap-1.5">
       {rows.map(([label, value, ok]) => (
-        <div key={label} className="rounded-[15px] border border-[var(--line)] bg-white/[.02] p-2.5">
+        <div key={label} className="rounded-[15px] border border-[var(--line)] bg-[var(--surface-2)] p-2.5">
           <div className="text-[11px] font-black muted">{label}</div>
           <div className={`mt-1 truncate text-xs font-black ${ok ? 'text-[var(--success)]' : 'muted'}`}>{value}</div>
         </div>
@@ -353,7 +353,7 @@ function Compatibility({ build, score, draw, psu }) {
 
 function Metric({ value, label }) {
   return (
-    <div className="rounded-[16px] border border-white/10 bg-white/[.025] p-2.5">
+    <div className="rounded-[16px] border border-[var(--line)] bg-[var(--surface-2)] p-2.5">
       <div className="font-mono text-base font-black text-[var(--ink)]">{value}</div>
       <div className="text-[10px] font-black uppercase tracking-[.08em] muted">{label}</div>
     </div>
@@ -362,13 +362,13 @@ function Metric({ value, label }) {
 
 function PartSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[24px] border border-[var(--line)] bg-white/[.025]">
-      <div className="h-44 animate-pulse bg-white/8" />
+    <div className="overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--surface-2)]">
+      <div className="h-44 animate-pulse bg-black/10" />
       <div className="space-y-3 p-4">
-        <div className="h-3 w-24 animate-pulse rounded-full bg-white/8" />
-        <div className="h-5 w-full animate-pulse rounded-full bg-white/8" />
-        <div className="h-5 w-2/3 animate-pulse rounded-full bg-white/8" />
-        <div className="h-8 w-28 animate-pulse rounded-full bg-white/8" />
+        <div className="h-3 w-24 animate-pulse rounded-full bg-black/10" />
+        <div className="h-5 w-full animate-pulse rounded-full bg-black/10" />
+        <div className="h-5 w-2/3 animate-pulse rounded-full bg-black/10" />
+        <div className="h-8 w-28 animate-pulse rounded-full bg-black/10" />
       </div>
     </div>
   )

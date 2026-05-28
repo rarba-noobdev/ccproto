@@ -122,7 +122,7 @@ export function Header() {
                 >
                   <div className="grid gap-2 xl:grid-cols-3">
                     {groups.map((group) => (
-                      <div key={group.title} className="rounded-[22px] border border-[var(--line)] bg-[#15171c] p-3">
+                      <div key={group.title} className="rounded-[22px] border border-[var(--line)] bg-[var(--surface-2)] p-3">
                         <div className="mb-2 px-1">
                           <div className="text-sm font-black tracking-[-.02em]">{group.title}</div>
                           <p className="mt-1 line-clamp-2 text-xs leading-5 muted">{group.copy}</p>
@@ -135,14 +135,14 @@ export function Header() {
                               onClick={() => setShopOpen(false)}
                               className={({ isActive }) =>
                                 `group rounded-[16px] px-3 py-2 transition-colors duration-150 ${
-                                  isActive ? 'bg-[var(--ink)] text-[var(--canvas)]' : 'hover:bg-white/[.065]'
+                                  isActive ? 'bg-[var(--ink)] text-[var(--canvas)]' : 'hover:bg-[var(--surface-hover)]'
                                 }`
                               }
                             >
                               {({ isActive }) => (
                                 <>
                                   <div className={`text-sm font-black ${isActive ? 'text-[var(--canvas)]' : 'text-[var(--ink)]'}`}>{label}</div>
-                                  <div className={`mt-0.5 truncate text-[11px] font-bold ${isActive ? 'text-black/55' : 'muted'}`}>{copy}</div>
+                                  <div className={`mt-0.5 truncate text-[11px] font-bold ${isActive ? 'text-[var(--ink-muted)]' : 'muted'}`}>{copy}</div>
                                 </>
                               )}
                             </NavLink>
@@ -151,7 +151,7 @@ export function Header() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-2 flex items-center justify-between rounded-[20px] border border-[var(--line)] bg-[#1b1d22] px-4 py-3">
+                  <div className="mt-2 flex items-center justify-between rounded-[20px] border border-[var(--line)] bg-[var(--surface-2)] px-4 py-3">
                     <span className="text-sm font-black tracking-[-.02em]">Need the full catalog?</span>
                     <Link to="/accessories" onClick={() => setShopOpen(false)} className="btn-primary min-h-9 px-4 text-xs">
                       Browse all
@@ -188,7 +188,7 @@ export function Header() {
 
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <button type="button" className="absolute inset-0 bg-black/40 backdrop-blur-sm" aria-label="Close navigation menu" onClick={() => setOpen(false)} />
+          <button type="button" className="absolute inset-0 bg-black/20 backdrop-blur-sm" aria-label="Close navigation menu" onClick={() => setOpen(false)} />
           <div className="surface absolute right-0 top-3 h-[calc(100%-24px)] w-[min(88vw,360px)] rounded-l-3xl p-4">
             <div className="mb-5 flex items-center justify-between">
               <span className="grid h-9 w-9 place-items-center rounded-full bg-[var(--ink)] text-sm font-black text-[var(--canvas)]">CC</span>
@@ -210,7 +210,7 @@ export function Header() {
               </div>
               <div className="grid gap-3">
                 {groups.map((group) => (
-                  <div key={group.title} className="rounded-[22px] border border-[var(--line)] bg-white/[.025] p-2">
+                  <div key={group.title} className="rounded-[22px] border border-[var(--line)] bg-[var(--surface-2)] p-2">
                     <div className="px-2 py-2 text-sm font-black">{group.title}</div>
                     <nav className="grid grid-cols-2 gap-1">
                       {group.items.map(([label, to]) => (

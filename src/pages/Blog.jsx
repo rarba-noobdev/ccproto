@@ -17,21 +17,21 @@ export default function Blog() {
     <RetailLayout>
       <PageHeader
         kicker="Guides"
-        title="Practical buying advice"
-        description="No generic blog filler. These guides are written around component pricing, upgrade decisions, and common build mistakes."
+        title="Buying notes"
+        description="Short, practical guides for parts and upgrade decisions."
       />
-      <section className="container-max py-10">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-200">{error.message}</div>}
-        <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {loading && Array.from({ length: 3 }).map((_, i) => <div key={i} className="panel h-80 animate-pulse rounded-2xl" />)}
+      <section className="container-max py-8">
+        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {loading && Array.from({ length: 3 }).map((_, i) => <div key={i} className="h-80 animate-pulse rounded-[28px] border border-[var(--line)] bg-[var(--surface-1)]" />)}
           {data.map((post) => (
-            <article key={post.id} className="panel overflow-hidden rounded-2xl">
-              <img src={post.cover_image} alt={post.title} width="520" height="260" className="h-48 w-full object-cover" loading="lazy" decoding="async" />
+            <article key={post.id} className="overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_12px_36px_rgba(38,38,38,.07)]">
+              <img src={post.cover_image} alt={post.title} width="520" height="260" className="m-2 h-44 w-[calc(100%-16px)] rounded-[22px] object-cover" loading="lazy" decoding="async" />
               <div className="p-5">
-                <p className="mb-2 text-xs font-black uppercase tracking-wide text-white/45">{post.category} - {post.read_time}</p>
-                <h2 className="text-xl font-black tracking-tight">{post.title}</h2>
-                <p className="mt-3 text-sm leading-6 text-white/58">{post.excerpt}</p>
-                <p className="mt-5 border-t border-white/10 pt-4 text-sm leading-6 text-white/48">{post.body}</p>
+                <p className="mb-2 text-xs font-black uppercase tracking-wide text-[var(--ink-muted)]">{post.category} / {post.read_time}</p>
+                <h2 className="text-xl font-black tracking-[-.04em]">{post.title}</h2>
+                <p className="mt-3 truncate-2 text-sm font-semibold leading-6 text-[var(--ink-muted)]">{post.excerpt}</p>
+                <p className="mt-5 border-t border-[var(--line)] pt-4 text-sm leading-6 text-[var(--ink-muted)]">{post.body}</p>
               </div>
             </article>
           ))}

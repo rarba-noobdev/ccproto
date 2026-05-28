@@ -4,6 +4,7 @@ import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 import CatalogGrid from '@/components/retail/CatalogGrid'
 import CategoryRail from '@/components/retail/CategoryRail'
+import { ErrorBanner } from '@/components/retail/StatusPanel'
 import { fetchComponents } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { catalogCategories, catalogProducts } from '@/data/catalog'
@@ -14,7 +15,7 @@ const aliases = {
   'graphic-card': 'gpu',
   ssd: 'storage',
   cabinet: 'case',
-  prebuild: 'prebuild',
+  prebuilt: 'prebuild',
   'power-supply': 'psu',
 }
 
@@ -54,12 +55,12 @@ export default function CategoryShop() {
     <RetailLayout>
       <PageHeader
         kicker="Category"
-        title={title}
-        description={categoryMeta?.description || 'Browse by fit, price, and performance tier.'}
+        title={title + '.'}
+        description={categoryMeta?.description || 'Sorted by tier, fit, and current price.'}
       />
       <CategoryRail />
-      <section className="container-max py-8">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
+      <section className="container-max py-40">
+        {error && <ErrorBanner className="mb-24" message={error.message} />}
         <CatalogGrid products={products} loading={loading && products.length === 0} categories={false} />
       </section>
     </RetailLayout>

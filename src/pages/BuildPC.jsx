@@ -1,39 +1,38 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import {
   AlertTriangle,
   Check,
   CheckCircle2,
+  ChevronDown,
+  ChevronUp,
   Cpu,
   Gauge,
   HardDrive,
   MemoryStick,
   Monitor,
-  PackageCheck,
   Save,
   Search,
-  ShieldCheck,
-  ShoppingCart,
+  ShoppingBag,
   Snowflake,
   Zap,
 } from 'lucide-react'
 import RetailLayout from '@/components/retail/RetailLayout'
+import PageHeader from '@/components/retail/PageHeader'
+import { ErrorBanner } from '@/components/retail/StatusPanel'
 import { fetchComponents } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { formatINR } from '@/utils/currency'
 import useStore from '@/store/useStore'
 
-const builderHero = 'https://www.corsair.com/pc-builder/WYSIWYG/welcome_2023.webp'
-const showcaseImage = 'https://d1q3zw97enxzq2.cloudfront.net/images/WhiteAIR5400.width-1000.format-webp.webp'
-
 const steps = [
-  { key: 'case', label: 'Case', short: 'CASE', icon: Gauge },
-  { key: 'cpu', label: 'Processor', short: 'CPU', icon: Cpu },
-  { key: 'gpu', label: 'Graphics card', short: 'GPU', icon: Monitor },
-  { key: 'ram', label: 'Memory', short: 'RAM', icon: MemoryStick },
-  { key: 'storage', label: 'Storage', short: 'SSD', icon: HardDrive },
-  { key: 'cooler', label: 'Cooling', short: 'AIO', icon: Snowflake },
-  { key: 'psu', label: 'Power supply', short: 'PSU', icon: Zap },
+  { key: 'case', label: 'Case', icon: Gauge },
+  { key: 'cpu', label: 'Processor', icon: Cpu },
+  { key: 'gpu', label: 'Graphics', icon: Monitor },
+  { key: 'ram', label: 'Memory', icon: MemoryStick },
+  { key: 'storage', label: 'Storage', icon: HardDrive },
+  { key: 'cooler', label: 'Cooling', icon: Snowflake },
+  { key: 'psu', label: 'Power', icon: Zap },
 ]
 
 const wattage = { cpu: 125, gpu: 220, ram: 10, storage: 8, cooler: 18, case: 12, psu: 0 }
@@ -43,10 +42,13 @@ export default function BuildPC() {
   const [active, setActive] = useState('case')
   const [build, setBuild] = useState({})
   const [query, setQuery] = useState('')
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const reduceMotion = useReducedMotion()
   const { data: result = [], loading, error } = useSupabaseQuery(() => fetchComponents(), [])
   const data = Array.isArray(result) ? result : []
   const { addToCart, saveBuild, setBuilderComponent } = useStore()
+  const tabRefs = useRef([])
+  const liveRef = useRef(null)
 
   const grouped = useMemo(() => {
     return steps.reduce((acc, step) => {
@@ -62,15 +64,15 @@ export default function BuildPC() {
     }, {})
   }, [data])
 
-  const activeStep = steps.find((step) => step.key === active) || steps[0]
+  const activeIndex = steps.findIndex((step) => step.key === active)
+  const activeStep = steps[activeIndex] || steps[0]
   const selected = Object.values(build).filter(Boolean)
   const activeParts = (grouped[active] || []).filter((part) => {
     if (!query.trim()) return true
-    const haystack = `${part.name} ${part.brand} ${part.sub_category}`.toLowerCase()
-    return haystack.includes(query.toLowerCase())
+    return `${part.name} ${part.brand} ${part.sub_category}`.toLowerCase().includes(query.toLowerCase())
   })
   const activePart = build[active]
-  const previewImage = build.case?.image || activePart?.image || showcaseImage
+  const previewImage = build.case?.image || activePart?.image
   const price = selected.reduce((sum, part) => sum + part.price, 0)
   const draw = selected.reduce((sum, part) => sum + (part.wattage || wattage[part.category] || 25), 0)
   const psuHeadroom = build.psu?.wattage ? build.psu.wattage - draw : 0
@@ -79,20 +81,56 @@ export default function BuildPC() {
   const cpuScore = build.cpu?.score || 0
   const gpuScore = build.gpu?.score || 0
   const bottleneck = cpuScore && gpuScore && Math.abs(cpuScore - gpuScore) > 16
-    ? cpuScore < gpuScore ? 'Processor tier is behind the graphics card.' : 'Graphics card tier is behind the processor.'
+    ? cpuScore < gpuScore ? 'CPU tier trails GPU tier.' : 'GPU tier trails CPU tier.'
     : null
+  const ready = selected.length >= 3
+
+  // Announce step changes to assistive tech
+  useEffect(() => {
+    if (liveRef.current) {
+      liveRef.current.textContent = `Step ${activeIndex + 1} of ${steps.length}: ${activeStep.label}. ${activeParts.length} options.`
+    }
+  }, [activeIndex, activeStep.label, activeParts.length])
+
+  const moveTo = (key, focus = false) => {
+    setActive(key)
+    setQuery('')
+    if (focus) {
+      const idx = steps.findIndex((s) => s.key === key)
+      requestAnimationFrame(() => tabRefs.current[idx]?.focus())
+    }
+  }
+
+  const onTabKey = (event, currentIndex) => {
+    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+      event.preventDefault()
+      const next = (currentIndex + 1) % steps.length
+      moveTo(steps[next].key, true)
+    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+      event.preventDefault()
+      const next = (currentIndex - 1 + steps.length) % steps.length
+      moveTo(steps[next].key, true)
+    } else if (event.key === 'Home') {
+      event.preventDefault()
+      moveTo(steps[0].key, true)
+    } else if (event.key === 'End') {
+      event.preventDefault()
+      moveTo(steps[steps.length - 1].key, true)
+    }
+  }
 
   const selectPart = (part) => {
     setBuild((current) => ({ ...current, [active]: part }))
     setBuilderComponent(active, part)
-    const index = steps.findIndex((step) => step.key === active)
-    if (index < steps.length - 1) setActive(steps[index + 1].key)
+    if (activeIndex < steps.length - 1) {
+      setTimeout(() => moveTo(steps[activeIndex + 1].key), 120)
+    }
   }
 
   const orderBuild = () => {
     addToCart({
       id: `custom-${Date.now()}`,
-      name: 'Custom PC Build',
+      name: 'Custom build',
       price,
       image: previewImage,
       specs: build,
@@ -101,74 +139,129 @@ export default function BuildPC() {
 
   return (
     <RetailLayout>
-      <main className="container-max py-5 lg:py-7">
-        <section className="mb-4 overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_18px_52px_rgba(38,38,38,.08)]">
-          <div className="grid lg:grid-cols-[minmax(0,1fr)_420px]">
-            <div className="p-5 sm:p-7 lg:p-8">
-              <p className="kicker mb-3">PC Builder</p>
-              <h1 className="max-w-3xl text-[42px] font-bold leading-[.9] tracking-[-.07em] sm:text-[62px]">
-                Plan the build before the invoice.
-              </h1>
-              <div className="mt-5 grid max-w-3xl gap-2 sm:grid-cols-3">
-                {[
-                  [PackageCheck, 'Compatible picks'],
-                  [ShieldCheck, 'Live quote'],
-                  [Zap, 'Fast checkout'],
-                ].map(([Icon, label]) => (
-                  <div key={label} className="flex items-center gap-2 rounded-[18px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2.5">
-                    <Icon className="h-4 w-4 text-[var(--accent-heat)]" />
-                    <span className="text-xs font-bold">{label}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className="relative min-h-[220px] overflow-hidden bg-[#f3f0e9]">
-              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(38,38,38,.055)_0_1px,transparent_1px_20px)]" />
-              <img
-                src={builderHero}
-                alt="PC builder setup"
-                width="620"
-                height="380"
-                className="relative h-full min-h-[220px] w-full object-cover"
-                decoding="async"
-                fetchPriority="high"
-              />
-            </div>
+      <PageHeader
+        kicker="Issue 04 · Configurator"
+        title="Plan, then ship."
+        description="Compatible parts, live wattage, transparent quote."
+      />
+
+      <span ref={liveRef} role="status" aria-live="polite" className="sr-only" />
+
+      <main className="container-max py-24 pb-[120px] lg:pb-32">
+        {error && <ErrorBanner className="mb-16" message={error.message} />}
+
+        {/* Step tablist */}
+        <nav
+          role="tablist"
+          aria-label="Build steps"
+          aria-orientation="horizontal"
+          className="mb-16 grid gap-px border border-border-muted bg-line"
+          style={{ gridTemplateColumns: `repeat(${steps.length}, minmax(0, 1fr))` }}
+        >
+          {steps.map((step, index) => {
+            const Icon = step.icon
+            const isSelected = !!build[step.key]
+            const isActive = active === step.key
+            return (
+              <button
+                ref={(node) => { tabRefs.current[index] = node }}
+                type="button"
+                key={step.key}
+                role="tab"
+                id={`tab-${step.key}`}
+                aria-selected={isActive}
+                aria-controls="parts-panel"
+                tabIndex={isActive ? 0 : -1}
+                onClick={() => moveTo(step.key)}
+                onKeyDown={(event) => onTabKey(event, index)}
+                className={`group flex flex-col items-start justify-between gap-12 px-12 py-14 text-left transition focus:outline-none focus-visible:bg-ink focus-visible:text-canvas md:px-16 md:py-16 ${
+                  isActive
+                    ? 'bg-ink text-canvas'
+                    : isSelected
+                      ? 'bg-surface-1 text-ink hover:bg-canvas'
+                      : 'bg-surface-1 text-ink-soft hover:bg-canvas hover:text-ink'
+                }`}
+              >
+                <div className="flex w-full items-center justify-between">
+                  <span className={`meta ${isActive ? 'text-canvas/70' : ''}`}>{String(index + 1).padStart(2, '0')}</span>
+                  {isSelected && (
+                    <Check className={`h-12 w-12 ${isActive ? 'text-canvas' : 'text-ink'}`} aria-hidden="true" />
+                  )}
+                </div>
+                <div className="flex items-center gap-8">
+                  <Icon className="h-14 w-14 shrink-0" aria-hidden="true" />
+                  <span className="hidden text-body-medium font-medium md:inline">{step.label}</span>
+                  <span className="text-body-medium font-medium md:hidden">{step.label}</span>
+                </div>
+              </button>
+            )
+          })}
+        </nav>
+
+        {/* Progress strip */}
+        <div className="mb-24 flex items-center gap-12 border border-border-muted bg-surface-1 px-16 py-10">
+          <span className="meta whitespace-nowrap">Step {activeIndex + 1} / {steps.length}</span>
+          <div className="h-[3px] flex-1 overflow-hidden bg-line" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Build progress">
+            <div className="h-full bg-ink transition-all duration-4" style={{ width: `${progress}%` }} />
           </div>
-        </section>
+          <span className="meta whitespace-nowrap">{progress}%</span>
+        </div>
 
-        {error && <div className="panel mb-4 rounded-[20px] p-4 text-sm font-bold text-red-700">{error.message}</div>}
-
-        <section className="grid gap-4 xl:grid-cols-[220px_minmax(0,1fr)_360px]">
-          <StepRail active={active} build={build} grouped={grouped} progress={progress} setActive={setActive} />
-
-          <section className="min-w-0 rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] p-4 shadow-[0_14px_42px_rgba(38,38,38,.07)]">
-            <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+        <div className="grid gap-16 lg:grid-cols-[minmax(0,1fr)_380px] 2xl:grid-cols-[minmax(0,1fr)_420px]">
+          {/* Parts panel */}
+          <section
+            id="parts-panel"
+            role="tabpanel"
+            aria-labelledby={`tab-${active}`}
+            tabIndex={-1}
+            className="min-w-0 border border-border-muted bg-surface-1"
+          >
+            <div className="flex flex-col gap-12 border-b border-border-muted p-20 md:flex-row md:items-end md:justify-between">
               <div>
-                <p className="kicker mb-1">Choose component</p>
-                <h2 className="text-3xl font-bold tracking-[-.055em]">{activeStep.label}</h2>
+                <p className="meta">Pick a {activeStep.label.toLowerCase()}</p>
+                <h2 className="mt-6 text-title-h3 font-semibold tracking-[-.025em]">{activeStep.label}</h2>
               </div>
-              <label className="flex h-11 min-w-0 items-center gap-2 rounded-full border border-[var(--line)] bg-[var(--surface-2)] px-4 md:w-72">
-                <Search className="h-4 w-4 text-[var(--ink-muted)]" />
+              <label className="flex h-44 min-w-0 items-center gap-8 border border-border-muted bg-canvas px-14 md:w-[320px]">
+                <Search className="h-14 w-14 shrink-0 text-ink-muted" aria-hidden="true" />
+                <span className="sr-only">Filter {activeStep.label.toLowerCase()} parts</span>
                 <input
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Filter parts"
-                  className="min-w-0 flex-1 bg-transparent text-sm font-bold outline-none placeholder:text-[var(--ink-muted)]"
+                  onKeyDown={(event) => { if (event.key === 'Escape') setQuery('') }}
+                  placeholder={`Filter ${activeStep.label.toLowerCase()}`}
+                  className="min-w-0 flex-1 bg-transparent text-body-medium outline-none placeholder:text-ink-muted"
+                  aria-label={`Filter ${activeStep.label.toLowerCase()} parts`}
                 />
+                {query && (
+                  <button
+                    type="button"
+                    onClick={() => setQuery('')}
+                    className="meta text-ink hover:underline focus:outline-none focus-visible:underline"
+                    aria-label="Clear filter"
+                  >
+                    Clear
+                  </button>
+                )}
               </label>
             </div>
 
             <AnimatePresence mode="wait">
               <motion.div
                 key={active}
-                className="grid gap-3 sm:grid-cols-2 2xl:grid-cols-3"
-                initial={reduceMotion ? false : { opacity: 0, transform: 'translateY(8px)' }}
-                animate={{ opacity: 1, transform: 'translateY(0px)' }}
-                exit={{ opacity: 0, transform: 'translateY(-4px)' }}
+                className="grid gap-px bg-line xs:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4"
+                initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -4 }}
                 transition={{ duration: 0.2, ease: easeOut }}
               >
                 {loading && Array.from({ length: 8 }).map((_, index) => <PartSkeleton key={index} />)}
+                {!loading && activeParts.length === 0 && (
+                  <div className="col-span-full bg-surface-1 px-24 py-48 text-center">
+                    <p className="meta">No matches</p>
+                    <p className="mt-12 text-title-h5 font-semibold tracking-[-.02em]">Nothing in this filter</p>
+                    <p className="mt-8 text-body-medium text-ink-soft">Try a shorter query or clear the filter.</p>
+                  </div>
+                )}
                 {!loading && activeParts.map((part, index) => (
                   <PartCard
                     key={part.id}
@@ -183,166 +276,169 @@ export default function BuildPC() {
             </AnimatePresence>
           </section>
 
-          <BuildPreview
-            activeStep={activeStep}
-            activePart={activePart}
-            build={build}
-            bottleneck={bottleneck}
-            draw={draw}
-            orderBuild={orderBuild}
-            previewImage={previewImage}
-            price={price}
-            progress={progress}
-            psuHeadroom={psuHeadroom}
-            reduceMotion={reduceMotion}
-            saveBuild={() => saveBuild('Custom PC Build')}
-            score={score}
-            selected={selected}
-          />
-        </section>
+          {/* Desktop quote rail */}
+          <aside className="hidden lg:block">
+            <QuotePanel
+              activeStep={activeStep}
+              activePart={activePart}
+              build={build}
+              bottleneck={bottleneck}
+              draw={draw}
+              orderBuild={orderBuild}
+              previewImage={previewImage}
+              price={price}
+              psuHeadroom={psuHeadroom}
+              reduceMotion={reduceMotion}
+              saveBuild={() => saveBuild('Custom build')}
+              score={score}
+              selected={selected}
+              ready={ready}
+              sticky
+            />
+          </aside>
+        </div>
       </main>
+
+      {/* Mobile sticky quote bar */}
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border-muted bg-surface-1 lg:hidden">
+        <button
+          type="button"
+          onClick={() => setDrawerOpen((v) => !v)}
+          className="flex w-full items-center justify-between px-16 py-12 focus:outline-none focus-visible:bg-canvas"
+          aria-expanded={drawerOpen}
+          aria-controls="mobile-quote"
+        >
+          <span>
+            <span className="meta block">Quote · {selected.length}/{steps.length}</span>
+            <span className="price mt-2 block text-title-h5 font-semibold">{formatINR(price)}</span>
+          </span>
+          <span className="flex items-center gap-8">
+            <span className="meta">{drawerOpen ? 'Hide' : 'Review'}</span>
+            {drawerOpen ? <ChevronDown className="h-16 w-16" aria-hidden="true" /> : <ChevronUp className="h-16 w-16" aria-hidden="true" />}
+          </span>
+        </button>
+        <AnimatePresence>
+          {drawerOpen && (
+            <motion.div
+              id="mobile-quote"
+              initial={reduceMotion ? false : { height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22, ease: easeOut }}
+              className="overflow-hidden border-t border-border-muted"
+            >
+              <div className="max-h-[60vh] overflow-y-auto">
+                <QuotePanel
+                  activeStep={activeStep}
+                  activePart={activePart}
+                  build={build}
+                  bottleneck={bottleneck}
+                  draw={draw}
+                  orderBuild={() => { orderBuild(); setDrawerOpen(false) }}
+                  previewImage={previewImage}
+                  price={price}
+                  psuHeadroom={psuHeadroom}
+                  reduceMotion={reduceMotion}
+                  saveBuild={() => saveBuild('Custom build')}
+                  score={score}
+                  selected={selected}
+                  ready={ready}
+                />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
     </RetailLayout>
   )
 }
 
-function StepRail({ active, build, grouped, progress, setActive }) {
-  return (
-    <aside className="rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] p-3 shadow-[0_14px_42px_rgba(38,38,38,.07)] xl:sticky xl:top-24 xl:self-start">
-      <div className="mb-3 rounded-[22px] bg-[var(--surface-2)] p-4">
-        <div className="text-[11px] font-bold uppercase tracking-[.12em] muted">Progress</div>
-        <div className="mt-1 text-3xl font-bold tracking-[-.06em]">{progress}%</div>
-        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-black/10">
-          <div className="h-full rounded-full bg-[var(--ink)] transition-all duration-200" style={{ width: `${progress}%` }} />
-        </div>
-      </div>
-      <nav className="grid gap-1.5" aria-label="Build steps">
-        {steps.map((step, index) => {
-          const Icon = step.icon
-          const selected = build[step.key]
-          const options = grouped[step.key]?.length || 0
-          return (
-            <button
-              type="button"
-              key={step.key}
-              onClick={() => setActive(step.key)}
-              className={`group rounded-[18px] border px-3 py-2.5 text-left transition duration-200 active:scale-[.985] ${
-                active === step.key
-                  ? 'border-[var(--ink)] bg-[var(--ink)] text-[var(--canvas)]'
-                  : selected
-                    ? 'border-[var(--line)] bg-[var(--surface-2)]'
-                    : 'border-transparent hover:bg-[var(--surface-hover)]'
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="flex items-center gap-2">
-                  <Icon className="h-4 w-4" />
-                  <span className="text-sm font-bold">{step.short}</span>
-                </span>
-                {selected ? <Check className="h-4 w-4" /> : <span className="font-mono text-[10px] font-bold">{String(index + 1).padStart(2, '0')}</span>}
-              </div>
-              <div className={`mt-1 truncate text-[11px] font-bold ${active === step.key ? 'text-white/68' : 'muted'}`}>
-                {selected?.brand || `${options} options`}
-              </div>
-            </button>
-          )
-        })}
-      </nav>
-    </aside>
-  )
-}
-
-function BuildPreview({ activeStep, activePart, build, bottleneck, draw, orderBuild, previewImage, price, progress, psuHeadroom, reduceMotion, saveBuild, score, selected }) {
+function QuotePanel({ activeStep, activePart, build, bottleneck, draw, orderBuild, previewImage, price, psuHeadroom, reduceMotion, saveBuild, score, selected, ready, sticky = false }) {
   const Icon = activeStep.icon
-  const ready = selected.length >= 3
-
   return (
-    <aside className="overflow-hidden rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] p-3 shadow-[0_14px_42px_rgba(38,38,38,.08)] xl:sticky xl:top-24 xl:self-start">
-      <div className="relative overflow-hidden rounded-[24px] border border-[var(--line)] bg-[#f3f0e9]">
-        <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(38,38,38,.055)_0_1px,transparent_1px_20px)]" />
-        <div className="relative grid min-h-[238px] place-items-center p-5">
-          <AnimatePresence mode="wait">
-            {previewImage ? (
-              <motion.img
-                key={previewImage}
-                src={previewImage}
-                alt={activePart?.name || 'Selected build'}
-                width="520"
-                height="420"
-                className="relative z-10 h-52 w-full object-contain drop-shadow-[0_18px_20px_rgba(0,0,0,.16)]"
-                decoding="async"
-                initial={reduceMotion ? false : { opacity: 0, filter: 'blur(6px)', transform: 'scale(0.96)' }}
-                animate={{ opacity: 1, filter: 'blur(0px)', transform: 'scale(1)' }}
-                exit={{ opacity: 0, filter: 'blur(3px)', transform: 'scale(0.985)' }}
-                transition={{ duration: 0.22, ease: easeOut }}
-              />
-            ) : (
-              <motion.div
-                key={activeStep.key}
-                className="relative z-10 grid h-28 w-28 place-items-center rounded-full bg-white/60"
-                initial={reduceMotion ? false : { opacity: 0, transform: 'scale(0.95)' }}
-                animate={{ opacity: 1, transform: 'scale(1)' }}
-                transition={{ duration: 0.18, ease: easeOut }}
-              >
-                <Icon className="h-10 w-10" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
+    <div className={`flex flex-col border border-border-muted bg-surface-1 ${sticky ? 'lg:sticky lg:top-24' : ''}`}>
+      <div className="flex items-center justify-between border-b border-border-muted px-20 py-12">
+        <p className="meta">Preview · {activeStep.label}</p>
+        <p className="meta">{selected.length}/{7}</p>
+      </div>
+      <div className="product-image-box relative grid min-h-[200px] place-items-center px-20 py-24">
+        <AnimatePresence mode="wait">
+          {previewImage ? (
+            <motion.img
+              key={previewImage}
+              src={previewImage}
+              alt={activePart?.name || 'Build preview'}
+              width="520"
+              height="420"
+              className="relative max-h-[180px] w-full object-contain drop-shadow-[0_18px_22px_rgba(0,0,0,.16)]"
+              decoding="async"
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.985 }}
+              transition={{ duration: 0.22, ease: easeOut }}
+            />
+          ) : (
+            <motion.div
+              key={activeStep.key}
+              className="grid h-[100px] w-[100px] place-items-center border border-border-muted bg-surface-1 text-ink-muted"
+              initial={reduceMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.18 }}
+            >
+              <Icon className="h-32 w-32" aria-hidden="true" />
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      <div className="p-2 pt-4">
-        <div className="mb-3 flex items-start justify-between gap-4">
+      <div className="border-t border-border-muted px-20 py-16">
+        <div className="flex items-start justify-between gap-16">
           <div className="min-w-0">
-            <div className="text-[11px] font-bold uppercase tracking-[.12em] muted">Quote</div>
-            <div className="mt-1 truncate text-lg font-bold tracking-[-.04em]">{activePart?.name || activeStep.label}</div>
+            <p className="meta">Quote</p>
+            <p className="mt-6 truncate text-body-medium font-semibold">{activePart?.name || 'Pick a part'}</p>
           </div>
-          <div className="price shrink-0 text-xl font-bold">{formatINR(price)}</div>
+          <p className="price shrink-0 text-title-h4 font-semibold">{formatINR(price)}</p>
         </div>
 
-        <div className="grid grid-cols-3 gap-2 text-center">
-          <Metric value={score || '-'} label="Score" />
-          <Metric value={draw ? `${draw}W` : '-'} label="Draw" />
-          <Metric value={build.psu ? `${Math.max(0, psuHeadroom)}W` : '-'} label="Spare" />
+        <div className="mt-16 grid grid-cols-3 gap-px border border-border-muted bg-line">
+          <Metric value={score || '—'} label="Score" />
+          <Metric value={draw ? `${draw}W` : '—'} label="Draw" />
+          <Metric value={build.psu ? `${Math.max(0, psuHeadroom)}W` : '—'} label="Spare" />
         </div>
 
         {bottleneck && (
-          <motion.div
-            className="mt-3 flex gap-2 rounded-[16px] border border-[var(--warning)]/25 bg-[var(--accent-heat-soft)] p-3 text-xs font-bold text-[var(--warning)]"
-            initial={reduceMotion ? false : { opacity: 0, transform: 'translateY(6px) scale(0.985)' }}
-            animate={{ opacity: 1, transform: 'translateY(0px) scale(1)' }}
-            transition={{ duration: 0.18, ease: easeOut }}
-          >
-            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+          <div role="status" className="mt-12 flex items-start gap-8 border border-accent-heat bg-surface-1 px-12 py-10 text-label-x-small font-medium text-ink">
+            <AlertTriangle className="mt-1 h-14 w-14 shrink-0 text-accent-heat" aria-hidden="true" />
             <span>{bottleneck}</span>
-          </motion.div>
+          </div>
         )}
 
-        <div className="mt-3 grid gap-1.5">
+        <ul className="mt-16 divide-y divide-border-muted border-y border-border-muted">
           {steps.map((step) => (
             <SpecRow key={step.key} step={step} part={build[step.key]} />
           ))}
-        </div>
+        </ul>
 
-        <div className="mt-4 grid gap-2">
-          <button type="button" disabled={!ready} onClick={orderBuild} className="btn-primary w-full active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40">
-            <ShoppingCart className="h-4 w-4" /> Add build
+        <div className="mt-16 grid gap-8">
+          <button type="button" disabled={!ready} onClick={orderBuild} className="btn-primary w-full disabled:opacity-40" data-tone="heat">
+            <ShoppingBag className="h-14 w-14" aria-hidden="true" /> Add build
           </button>
-          <button type="button" disabled={!selected.length} onClick={saveBuild} className="btn-secondary w-full active:scale-[.98] disabled:cursor-not-allowed disabled:opacity-40">
-            <Save className="h-4 w-4" /> Save
+          <button type="button" disabled={!selected.length} onClick={saveBuild} className="btn-secondary w-full disabled:opacity-40">
+            <Save className="h-14 w-14" aria-hidden="true" /> Save
           </button>
         </div>
       </div>
-    </aside>
+    </div>
   )
 }
 
 function SpecRow({ step, part }) {
   return (
-    <div className="grid grid-cols-[46px_1fr_auto] items-center gap-2 rounded-[14px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2 text-xs">
-      <span className="font-bold muted">{step.short}</span>
-      <span className="truncate font-bold text-[var(--ink-soft)]">{part?.name || 'Not selected'}</span>
-      {part ? <Check className="h-4 w-4 text-[var(--success)]" /> : <span className="h-1.5 w-1.5 rounded-full bg-black/20" />}
-    </div>
+    <li className="flex items-center justify-between gap-8 py-10 text-label-x-small">
+      <span className="meta">{step.label}</span>
+      <span className="min-w-0 flex-1 truncate text-right text-ink-soft">{part?.name || '—'}</span>
+      {part && <Check className="h-12 w-12 shrink-0 text-ink" aria-hidden="true" />}
+    </li>
   )
 }
 
@@ -351,35 +447,37 @@ function PartCard({ part, index, selected, onClick, reduceMotion }) {
     <motion.button
       type="button"
       onClick={onClick}
-      className={`group grid grid-cols-[104px_1fr] overflow-hidden rounded-[22px] border text-left transition duration-200 active:scale-[.99] ${
-        selected
-          ? 'border-[var(--ink)] bg-[var(--surface-2)] shadow-[0_0_0_1px_var(--ink)]'
-          : 'border-[var(--line)] bg-[var(--surface-2)] hover:-translate-y-0.5 hover:bg-[var(--surface-hover)]'
+      aria-pressed={selected}
+      className={`group flex min-w-0 flex-col text-left transition focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ink ${
+        selected ? 'bg-ink text-canvas' : 'bg-surface-1 text-ink hover:bg-canvas'
       }`}
-      initial={reduceMotion ? false : { opacity: 0, transform: 'translateY(8px) scale(0.99)' }}
-      animate={{ opacity: 1, transform: 'translateY(0px) scale(1)' }}
+      initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.19, delay: reduceMotion ? 0 : Math.min(index * 0.02, 0.12), ease: easeOut }}
     >
-      <div className="relative grid min-h-[128px] place-items-center border-r border-[var(--line)] bg-white">
-        <img src={part.image} alt={part.name} width="220" height="180" className="h-full max-h-[104px] w-full object-contain p-3 transition duration-200 group-hover:scale-[1.035]" loading="lazy" decoding="async" />
-        {selected && (
-          <span className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-[var(--ink)] text-[var(--canvas)]">
-            <CheckCircle2 className="h-4 w-4" />
-          </span>
-        )}
+      <div className={`flex items-center justify-between px-14 py-10 ${selected ? 'border-b border-canvas/15' : 'border-b border-border-muted'}`}>
+        <span className={`meta ${selected ? 'text-canvas/70' : ''}`}>{part.brand || part.category}</span>
+        {selected && <CheckCircle2 className="h-14 w-14" aria-hidden="true" />}
       </div>
-      <div className="flex min-w-0 flex-col p-3">
-        <div className="mb-2 flex items-center justify-between gap-2">
-          <span className="truncate text-[10px] font-bold uppercase tracking-wide muted">{part.brand || part.category}</span>
-          <span className="rounded-full bg-white px-2 py-0.5 text-[10px] font-bold text-[var(--ink-soft)]">{part.tier || 'catalog'}</span>
-        </div>
-        <h3 className="line-clamp-2 min-h-[38px] text-[13px] font-bold leading-[19px]">{part.name}</h3>
-        <div className="mt-auto flex items-end justify-between gap-3 pt-3">
+      <div className={`relative grid h-[140px] place-items-center overflow-hidden ${selected ? 'bg-ink' : 'product-image-box'}`}>
+        <img
+          src={part.image}
+          alt={part.name}
+          width="220"
+          height="180"
+          className="relative max-h-[104px] w-[78%] max-w-[180px] object-contain transition duration-4 group-hover:scale-[1.03] motion-reduce:transform-none motion-reduce:transition-none"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <div className="flex flex-1 flex-col gap-8 p-14">
+        <h3 className={`line-clamp-2 min-h-[40px] text-body-small font-semibold leading-20 ${selected ? 'text-canvas' : 'text-ink'}`}>{part.name}</h3>
+        <div className="mt-auto flex items-end justify-between gap-8 pt-8">
           <div>
-            <div className="price text-lg font-bold">{formatINR(part.price)}</div>
-            {part.mrp && <div className="price text-[11px] font-semibold muted line-through">{formatINR(part.mrp)}</div>}
+            <p className={`price text-body-medium font-semibold leading-none ${selected ? 'text-canvas' : ''}`}>{formatINR(part.price)}</p>
+            {part.mrp && <p className={`price mt-4 text-label-x-small font-normal line-through ${selected ? 'text-canvas/60' : 'text-ink-muted'}`}>{formatINR(part.mrp)}</p>}
           </div>
-          <span className="text-[11px] font-bold muted">{part.in_stock ? 'In stock' : 'Check stock'}</span>
+          <span className={`meta ${selected ? 'text-canvas/70' : ''}`}>{part.in_stock ? 'In stock' : '—'}</span>
         </div>
       </div>
     </motion.button>
@@ -388,22 +486,24 @@ function PartCard({ part, index, selected, onClick, reduceMotion }) {
 
 function Metric({ value, label }) {
   return (
-    <div className="rounded-[14px] border border-[var(--line)] bg-[var(--surface-2)] p-2">
-      <div className="font-mono text-sm font-bold text-[var(--ink)]">{value}</div>
-      <div className="text-[9px] font-bold uppercase tracking-[.08em] muted">{label}</div>
+    <div className="bg-surface-1 px-8 py-12 text-center">
+      <p className="text-body-medium font-semibold leading-none">{value}</p>
+      <p className="meta mt-6">{label}</p>
     </div>
   )
 }
 
 function PartSkeleton() {
   return (
-    <div className="grid grid-cols-[104px_1fr] overflow-hidden rounded-[22px] border border-[var(--line)] bg-[var(--surface-2)]">
-      <div className="min-h-[128px] animate-pulse bg-black/10" />
-      <div className="space-y-3 p-3">
-        <div className="h-3 w-20 animate-pulse rounded-full bg-black/10" />
-        <div className="h-4 w-full animate-pulse rounded-full bg-black/10" />
-        <div className="h-4 w-2/3 animate-pulse rounded-full bg-black/10" />
-        <div className="h-7 w-24 animate-pulse rounded-full bg-black/10" />
+    <div className="bg-surface-1">
+      <div className="border-b border-border-muted px-14 py-10">
+        <div className="h-12 w-20 animate-pulse bg-surface-2" />
+      </div>
+      <div className="h-[140px] animate-pulse bg-surface-2" />
+      <div className="space-y-10 p-14">
+        <div className="h-14 w-full animate-pulse bg-surface-2" />
+        <div className="h-14 w-2/3 animate-pulse bg-surface-2" />
+        <div className="h-12 w-1/2 animate-pulse bg-surface-2" />
       </div>
     </div>
   )

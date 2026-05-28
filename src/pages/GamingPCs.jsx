@@ -2,6 +2,7 @@ import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 import CatalogGrid from '@/components/retail/CatalogGrid'
 import CategoryRail from '@/components/retail/CategoryRail'
+import { ErrorBanner } from '@/components/retail/StatusPanel'
 import { fetchComponents } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 
@@ -13,13 +14,13 @@ export default function GamingPCs() {
   return (
     <RetailLayout>
       <PageHeader
-        kicker="Components"
-        title="Parts library"
-        description="Core hardware, filtered for quick comparison."
+        kicker="Parts library"
+        title="Components."
+        description="Core hardware, filtered for direct comparison."
       />
       <CategoryRail />
-      <section className="container-max py-8">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
+      <section className="container-max py-40">
+        {error && <ErrorBanner className="mb-24" message={error.message} />}
         <CatalogGrid products={priority} loading={loading} />
       </section>
     </RetailLayout>

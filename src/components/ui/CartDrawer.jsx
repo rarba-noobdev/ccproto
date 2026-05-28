@@ -1,64 +1,130 @@
+import { useRef, useState } from 'react'
 import { X, Trash2 } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import useStore from '@/store/useStore'
 import { formatINR } from '@/utils/currency'
+import useDismissable from '@/hooks/useDismissable'
+import ConfirmDialog from '@/components/ui/ConfirmDialog'
 
 export default function CartDrawer() {
   const { cart, isCartOpen, setCartOpen, removeFromCart, clearCart, cartTotal } = useStore()
+  const drawerRef = useRef(null)
+  const [confirmingClear, setConfirmingClear] = useState(false)
+  const reduceMotion = useReducedMotion()
 
-  if (!isCartOpen) return null
+  useDismissable({ open: isCartOpen, onDismiss: () => setCartOpen(false), containerRef: drawerRef })
 
   return (
-    <div className="fixed inset-0 z-[70]">
-      <button type="button" className="absolute inset-0 bg-black/20 backdrop-blur-sm" aria-label="Close cart" onClick={() => setCartOpen(false)} />
-      <aside className="absolute right-3 top-3 flex h-[calc(100%-24px)] w-[min(calc(100%-24px),440px)] overscroll-contain flex-col overflow-hidden rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_24px_80px_rgba(38,38,38,.22)]" role="dialog" aria-modal="true" aria-labelledby="cart-title">
-        <div className="flex h-18 items-center justify-between border-b border-[var(--line)] px-5 py-4">
-          <div>
-            <h2 id="cart-title" className="text-xl font-black tracking-[-.04em]">Cart</h2>
-            <p className="text-xs font-bold text-[var(--ink-muted)]">{cart.length} selected</p>
-          </div>
-          <button type="button" onClick={() => setCartOpen(false)} className="icon-btn" aria-label="Close cart">
-            <X className="h-4 w-4" />
-          </button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4">
-          {cart.length === 0 ? (
-            <div className="grid h-full place-items-center text-center">
-              <div>
-                <p className="font-black">Your cart is empty</p>
-                <p className="mt-1 text-sm text-[var(--ink-muted)]">Add a prebuilt PC or a custom configuration.</p>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {cart.map((item) => (
-                <div key={item.id} className="rounded-[22px] border border-[var(--line)] bg-[var(--surface-2)] p-2">
-                  <div className="flex gap-3">
-                    {item.image && <img src={item.image} alt={item.name} width="72" height="72" className="h-[72px] w-[72px] rounded-[18px] border border-[var(--line)] bg-white object-contain p-2" loading="lazy" decoding="async" />}
-                    <div className="min-w-0 flex-1">
-                      <h3 className="truncate-2 text-sm font-black">{item.name}</h3>
-                      <p className="mt-1 text-xs font-bold text-[var(--ink-muted)]">Qty {item.quantity}</p>
-                      <p className="price mt-2 font-black text-[var(--ink)]">{formatINR(item.price * item.quantity)}</p>
-                    </div>
-                    <button type="button" onClick={() => removeFromCart(item.id)} className="grid h-9 w-9 place-items-center rounded-full border border-[var(--line)] bg-white text-[var(--ink-soft)] transition hover:text-[var(--ink)]" aria-label={`Remove ${item.name}`}>
-                      <Trash2 className="h-4 w-4" />
-                    </button>
-                  </div>
+    <>
+      <AnimatePresence>
+        {isCartOpen && (
+          <div className="fixed inset-0 z-[70]">
+            <motion.button
+              type="button"
+              className="absolute inset-0 bg-ink/40 backdrop-blur-sm"
+              aria-label="Close cart"
+              onClick={() => setCartOpen(false)}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: reduceMotion ? 0 : 0.18 }}
+            />
+            <motion.aside
+              ref={drawerRef}
+              className="absolute right-0 top-0 flex h-full w-[min(100%,460px)] flex-col bg-canvas"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="cart-title"
+              initial={reduceMotion ? false : { x: 32, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: 16, opacity: 0 }}
+              transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
+            >
+              <div className="flex items-end justify-between border-b border-border-muted px-24 py-20">
+                <div>
+                  <p className="meta">Cart</p>
+                  <h2 id="cart-title" className="mt-4 text-title-h3 font-semibold tracking-[-.02em]">
+                    {cart.length} {cart.length === 1 ? 'item' : 'items'}
+                  </h2>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
+                <button type="button" onClick={() => setCartOpen(false)} className="icon-btn" aria-label="Close cart">
+                  <X className="h-16 w-16" aria-hidden="true" />
+                </button>
+              </div>
 
-        <div className="border-t border-[var(--line)] bg-[var(--surface-2)] p-5">
-          <div className="mb-4 flex items-center justify-between">
-            <span className="text-sm font-bold text-[var(--ink-soft)]">Estimated total</span>
-            <span className="price text-2xl font-black">{formatINR(cartTotal())}</span>
+              <div className="flex-1 overflow-y-auto">
+                {cart.length === 0 ? (
+                  <div className="grid h-full place-items-center px-24 text-center">
+                    <div>
+                      <p className="meta mb-8">Empty</p>
+                      <p className="text-title-h5 font-semibold tracking-[-.02em]">Nothing selected</p>
+                      <p className="mt-8 text-body-medium text-ink-soft">Add a system, configure a build, or browse parts.</p>
+                    </div>
+                  </div>
+                ) : (
+                  <ul>
+                    {cart.map((item) => (
+                      <li key={item.id} className="border-b border-border-muted">
+                        <div className="flex gap-16 px-24 py-20">
+                          {item.image && (
+                            <div className="product-image-box grid h-[72px] w-[72px] shrink-0 place-items-center border border-border-muted">
+                              <img src={item.image} alt={item.name} width="72" height="72" className="h-full w-full object-contain p-8" loading="lazy" decoding="async" />
+                            </div>
+                          )}
+                          <div className="min-w-0 flex-1">
+                            <h3 className="truncate-2 text-body-medium font-semibold leading-20">{item.name}</h3>
+                            <p className="meta mt-6">Qty {item.quantity}</p>
+                            <p className="price mt-8 text-body-medium font-semibold">{formatINR(item.price * item.quantity)}</p>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => removeFromCart(item.id)}
+                            className="grid h-36 w-36 shrink-0 place-items-center border border-border-muted text-ink-soft transition hover:border-ink hover:text-ink"
+                            aria-label={`Remove ${item.name}`}
+                          >
+                            <Trash2 className="h-14 w-14" aria-hidden="true" />
+                          </button>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+
+              <div className="border-t border-border-muted px-24 py-20">
+                <div className="mb-16 flex items-end justify-between">
+                  <span className="meta">Estimated total</span>
+                  <span className="price text-title-h3 font-semibold">{formatINR(cartTotal())}</span>
+                </div>
+                <button type="button" className="btn-primary w-full" data-tone="heat">Request invoice</button>
+                {cart.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setConfirmingClear(true)}
+                    className="mt-12 w-full text-body-small font-medium text-ink-muted transition hover:text-ink"
+                  >
+                    Clear cart
+                  </button>
+                )}
+              </div>
+            </motion.aside>
           </div>
-          <button type="button" className="btn-primary w-full">Request Invoice</button>
-          {cart.length > 0 && <button type="button" onClick={() => window.confirm('Clear all cart items?') && clearCart()} className="mt-3 w-full text-sm font-bold text-[var(--ink-muted)]">Clear Cart</button>}
-        </div>
-      </aside>
-    </div>
+        )}
+      </AnimatePresence>
+
+      <ConfirmDialog
+        open={confirmingClear}
+        title="Clear cart"
+        description="This removes every item from your cart."
+        confirmLabel="Clear cart"
+        cancelLabel="Keep items"
+        destructive
+        onConfirm={() => {
+          clearCart()
+          setConfirmingClear(false)
+        }}
+        onCancel={() => setConfirmingClear(false)}
+      />
+    </>
   )
 }

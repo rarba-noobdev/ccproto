@@ -1,8 +1,10 @@
 import { Link } from 'react-router-dom'
+import { ArrowUpRight } from 'lucide-react'
 import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 import CatalogGrid from '@/components/retail/CatalogGrid'
 import { shopCategories } from '@/components/retail/CategoryRail'
+import { ErrorBanner } from '@/components/retail/StatusPanel'
 import { fetchComponents } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { catalogProducts } from '@/data/catalog'
@@ -15,27 +17,25 @@ export default function Accessories() {
   return (
     <RetailLayout>
       <PageHeader
-        kicker="Shop"
-        title="Browse the catalog"
-        description="Parts, systems, peripherals, and upgrades in one clean view."
+        kicker="Catalogue"
+        title="Everything in stock."
+        description="Parts, peripherals, prebuilt systems, accessories."
       />
-      <section className="container-max py-10">
-        {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
-        <div className="mb-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <section className="container-max py-40">
+        {error && <ErrorBanner className="mb-24" message={error.message} />}
+
+        <div className="mb-32 grid gap-px border border-border-muted bg-line sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-7">
           {shopCategories.map(({ label, to, icon: Icon }) => (
-            <Link key={label} to={to} className="group rounded-[26px] border border-[var(--line)] bg-[var(--surface-1)] p-3 shadow-[0_10px_30px_rgba(38,38,38,.06)] transition hover:-translate-y-0.5 hover:border-[var(--line-strong)]">
-              <span className="flex items-center gap-3">
-                <span className="grid h-12 w-12 place-items-center rounded-[18px] bg-[var(--surface-2)] text-[var(--ink)] transition group-hover:bg-[var(--ink)] group-hover:text-[var(--canvas)]">
-                  <Icon className="h-4 w-4" aria-hidden="true" />
-                </span>
-                <span>
-                  <span className="block font-black tracking-[-.02em]">{label}</span>
-                  <span className="mt-0.5 block text-xs font-bold muted">Open catalog</span>
-                </span>
+            <Link key={label} to={to} className="group flex items-center justify-between gap-8 bg-surface-1 px-16 py-14 transition hover:bg-canvas">
+              <span className="flex items-center gap-10">
+                <Icon className="h-14 w-14 text-ink-muted transition group-hover:text-ink" aria-hidden="true" />
+                <span className="text-body-small font-medium">{label}</span>
               </span>
+              <ArrowUpRight className="h-12 w-12 text-ink-muted transition group-hover:text-ink" aria-hidden="true" />
             </Link>
           ))}
         </div>
+
         <CatalogGrid products={catalog} loading={loading && catalog.length === 0} />
       </section>
     </RetailLayout>

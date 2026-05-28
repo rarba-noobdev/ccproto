@@ -1,289 +1,679 @@
+# Firecrawl Design System Documentation
+
+This document provides a comprehensive overview of the new design system structure implemented in the Firecrawl web application. The design system is built on top of modern web technologies including Tailwind CSS, shadcn/ui, and custom component libraries.
+
+## Table of Contents
+
+1. [Overview](#overview)
+2. [Color System](#color-system)
+3. [Tailwind Configuration](#tailwind-configuration)
+4. [Component Architecture](#component-architecture)
+5. [Brand Assets](#brand-assets)
+6. [Development Guidelines](#development-guidelines)
+
 ## Overview
 
-Framer's marketing canvas is a near-pure black artboard. The dominant surface is `{colors.canvas}` — almost pure black with a faint warmth — and on top of it sits oversized white display type set in **GT Walsheim Medium** with letter-spacing pulled to extreme negative values (-5.5px on the 110px display, -4.25px on the 85px hero). The page reads like a poster: one assertive statement per band, generous breathing room above and below.
-
-The single accent is `{colors.accent-blue}` — used scarcely, mostly for hyperlinks, selection halos, and a subtle blue-tinted shadow ring on focused inputs. The brand chrome itself is monochrome: white pill buttons, charcoal cards, gray secondary text. What makes Framer distinctive is the rhythm break — every few sections the page drops in a **vibrant gradient atmosphere card**: a magenta-violet spotlight, a sunset-orange wash, a coral-pink panel. These aren't section backgrounds; they're individual cards arranged in a card grid, each one a small living poster that shows what Framer can produce.
-
-Body type is **Inter Variable**, with Framer leaning hard into Inter's character variants (`cv01`, `cv05`, `cv09`, `cv11`, `ss03`, `ss07`, `dlig`) — the result is a body voice that feels custom-tuned, with single-storey "a", straight-leg "l", and tabular figures. There's no light mode on the marketing site; the brand IS dark.
-
-**Key Characteristics:**
-- Black-canvas marketing system: `{colors.canvas}` is the surface for hero, body, pricing, FAQ, and footer alike — no light interludes.
-- Massive negative letter-spacing on display sizes (-5.5px / -4.25px / -3.1px) creates a poster-grade headline cadence.
-- White pill (`{components.button-primary}`) is the only primary CTA shape across the site; secondary actions live as charcoal pills (`{components.button-secondary}`) or text links.
-- Oversized **gradient spotlight cards** (violet, magenta, orange, coral) act as showcase tiles inside the dark grid; they are individual cards, not section backgrounds.
-- Inter Variable with bespoke OpenType character variants (`cv01/05/09/11`, `ss03/ss07`, `dlig`) used everywhere body type appears — the typographic voice is unmistakable.
-- Border radius scale runs from 4px utility chips up to 100px pills and full circles, with 15–20px the default for cards and 30px for atmospheric gradient cards.
-- A single chromatic accent `{colors.accent-blue}` reserved for hyperlinks, focus, and selection — never decorative.
-
-## Colors
-
-> Source pages: framer.com (home), /ai/, /startups/, /marketplace/templates/nudge/, /gallery/a16z-speedrun-×-tonik, /pricing.
-
-### Brand & Accent
-- **Pure White** ({colors.primary}): The brand primary surface. Every primary CTA pill, every display headline, every body line on canvas.
-- **Sky Blue** ({colors.accent-blue}): The single chromatic accent. Hyperlinks, focused-input rings, and a few selection states. Never used for backgrounds or as a brand fill.
-
-### Surface
-- **Canvas** ({colors.canvas}): Default page background — near-black with a faint warmth. Footer, pricing, hero, and FAQ all sit on it.
-- **Surface 1** ({colors.surface-1}): One step above canvas — pricing cards, secondary buttons, mockup tiles.
-- **Surface 2** ({colors.surface-2}): Two steps above — featured pricing card, hero pill backdrop, selected pricing tab.
-- **Hairline** ({colors.hairline}): 1px borders on input groups, comparison-table dividers.
-- **Hairline Soft** ({colors.hairline-soft}): Subtler dividers — between FAQ rows and footer column rules.
-- **Inverse Canvas** ({colors.inverse-canvas}): Pure white — used as the surface of light-on-dark pill CTAs and a small set of light-mode template thumbnails embedded in the showcase grid.
-
-### Text
-- **Ink** ({colors.ink}): All headline and emphasized body type — pure white.
-- **Ink Muted** ({colors.ink-muted}): Secondary type — gray (#999999) used for meta info, footer columns, comparison-row labels, deselected pricing tabs. Hierarchy on the dark canvas is carried by ink → ink-muted contrast, not by weight changes.
-
-### Semantic
-- **Success Green** ({colors.semantic-success}): Pricing comparison-table checkmarks. Glyph fill, not surface.
-
-### Brand Gradient (signature)
-- **Gradient Magenta** ({colors.gradient-magenta}): Spotlight card variant.
-- **Gradient Violet** ({colors.gradient-violet}): Spotlight card variant — most common.
-- **Gradient Orange** ({colors.gradient-orange}): Spotlight card variant — sunset wash.
-- **Gradient Coral** ({colors.gradient-coral}): Spotlight card variant — coral/pink.
-
-These four sit as oversized atmospheric tiles inside otherwise monochrome card grids — a dark canvas with one or two glowing spotlight cards is a recurring page signature.
-
-## Typography
-
-### Font Family
-
-- **GT Walsheim Framer Medium** / **GT Walsheim Medium** — Framer's display typeface. Geometric, slightly humanist, very confident at large sizes with extreme negative tracking. Fallbacks: `GT Walsheim Medium Placeholder` system font.
-- **Inter Variable** — System body typeface. Used with extensive OpenType character variants: `cv01` (alternate "1"), `cv05` (alternate "g"), `cv09` (alternate "i" / "l"), `cv11` (alternate "0"), `ss03` / `ss07` stylistic sets, `dlig` discretionary ligatures, and `tnum` for numerics in tabular contexts. The result is a body voice that feels bespoke without commissioning a custom face.
-- **Inter** — Used selectively for `{typography.headline}` (the 22px / 20px tier). The non-variable cut catches small tracking targets that the variable file rounds.
-
-### Hierarchy
-
-| Token | Size | Weight | Line Height | Letter Spacing | Use |
-|---|---|---|---|---|---|
-| `{typography.display-xxl}` | 110px | 500 | 0.85 | -5.5px | Largest hero headline (home, AI page) |
-| `{typography.display-xl}` | 85px | 500 | 0.95 | -4.25px | Section opener headlines |
-| `{typography.display-lg}` | 62px | 500 | 1.00 | -3.1px | Sub-section openers |
-| `{typography.display-md}` | 32px | 500 | 1.13 | -1.0px | Card titles, smaller display |
-| `{typography.headline}` | 22px | 700 | 1.20 | -0.8px | Pricing tier headlines, FAQ category titles |
-| `{typography.subhead}` | 24px | 400 | 1.30 | -0.01px | Lead body next to display headlines |
-| `{typography.body-lg}` | 18px | 400 | 1.30 | -0.18px | Hero subhead, lead paragraphs |
-| `{typography.body}` | 15px | 400 | 1.30 | -0.15px | Default body, card descriptions |
-| `{typography.body-sm}` | 14px | 500 | 1.40 | -0.14px | Pricing comparison rows, dense data |
-| `{typography.caption}` | 13px | 500 | 1.20 | -0.13px | Eyebrows, footer columns, meta |
-| `{typography.micro}` | 12px | 400 | 1.20 | -0.12px | Disclaimer, footnote |
-| `{typography.button}` | 14px | 500 | 1.0 | -0.14px | Pill buttons |
-
-### Principles
-
-- **Letter-spacing scales with size, hard.** Display-xxl pulls -5.5px (5% of size); body sticks to about -1% (-0.15px on 15px). The result: posters at the top, comfortable reading at body.
-- **OpenType character variants are the brand voice.** Switching off `cv11`, `ss03`, etc. visibly changes the body voice — the brand depends on them.
-- **Weight stays in a narrow band.** Display sits at 500, body at 400, body-sm/caption at 500. Hierarchy is carried by size + tracking, not by 700/900 ramps.
-- **Tight line-heights everywhere.** Even body runs at 1.30 — Framer's editorial tone is denser than typical SaaS marketing.
-
-### Note on Font Substitutes
-
-If implementing without GT Walsheim Medium, suitable open-source substitutes include **Mona Sans**, **Geist**, or **Inter** at weight 600–700 with manually tightened tracking. Mona Sans's hairline weights at 100–300 are particularly close to Framer's cleaner section openers. Inter Variable is open-source — keep it as-is and preserve the documented OpenType variants.
-
-## Layout
-
-### Spacing System
-
-- **Base unit**: 5px (Framer uses non-standard 5/10/15/20/30 increments rather than the more common 4/8/16/24).
-- **Tokens (front matter)**: `{spacing.hair}` 1px · `{spacing.xxs}` 4px · `{spacing.xs}` 8px · `{spacing.sm}` 12px · `{spacing.md}` 15px · `{spacing.lg}` 20px · `{spacing.xl}` 30px · `{spacing.xxl}` 40px · `{spacing.section}` 96px.
-- Card interior padding: `{spacing.lg}` 20px on pricing cards; `{spacing.xl}` 30px on gradient spotlight cards.
-- Pill button padding: 10px vertical · 15px horizontal — `{components.button-primary}`.
-- Section padding (vertical): roughly `{spacing.section}` 96px on home; tighter (~64px) on pricing comparison.
-
-### Grid & Container
-
-- Max content width sits around the 1199px breakpoint, with side gutters that scale toward `{spacing.xl}` on desktop.
-- Card grids on the home gallery use 2-up at desktop, collapsing to 1-up below 810px.
-- Pricing tier grid is 4-up across the documented breakpoints; comparison table beneath it uses fixed-width left column with horizontally scrolling tier columns at narrow widths.
-
-### Whitespace Philosophy
-
-The dark canvas IS the whitespace. Where lighter brands lean on white air to separate sections, Framer leans on long stretches of black with a single oversized statement floating in the middle. Sections separate by mode change: a band of charcoal cards, then a band of black with a gradient spotlight, then back to charcoal — like cuts in a dark film.
-
-## Elevation & Depth
-
-| Level | Treatment | Use |
-|---|---|---|
-| 0 (flat) | No shadow, no border | Default for canvas-mounted display type, FAQ rows, footer |
-| 1 (charcoal) | `{colors.surface-1}` lift on canvas | Pricing cards, mockup tiles, secondary buttons |
-| 2 (light-edge) | `rgba(255,255,255,0.10)` 0.5px top edge + `rgba(0,0,0,0.25)` 0px 10px 30px drop | Floating product cards, modal cards |
-| 3 (selected) | `rgba(0,153,255,0.15)` 0px 0px 0px 1px ring | Focused inputs, selected option |
-
-Four shadow signatures recur across the homepage: a 1px subtle drop, a translucent blue ring, a thick near-black 2px outline (used as the active-element marker on sub-nav), and the layered light-edge + drop-shadow used for floating cards.
-
-### Decorative Depth
-
-- **Gradient spotlight cards** are the dominant depth device — color saturation against black canvas substitutes for shadow-driven elevation.
-- **Layered product mockups** (browser frames containing live Framer-built sites) sit inside `{colors.surface-1}` cards with the level-2 light-edge treatment.
-- **Subtle blue ring (focus / selected)** is the only chromatic depth signal — used to mark the active state of input groups and pricing tier toggles without changing the underlying surface.
-
-## Shapes
-
-### Border Radius Scale
-
-Framer's extracted radius set is unusually granular (1px, 4px, 5px, 6px, 8px, 10px, 12px, 15px, 20px, 30px, 40px, 100px). The named scale below picks the levels the marketing surface actually consumes.
-
-| Token | Value | Use |
-|---|---|---|
-| `{rounded.xs}` | 4px | Small chip / utility radius |
-| `{rounded.sm}` | 6px | Inline tag, badge |
-| `{rounded.md}` | 10px | Form input, list item |
-| `{rounded.lg}` | 15px | Template card thumbnails |
-| `{rounded.xl}` | 20px | Pricing cards, mockup tiles |
-| `{rounded.xxl}` | 30px | Gradient spotlight cards, oversized panels |
-| `{rounded.pill}` | 100px | All primary text CTAs |
-| `{rounded.full}` | 9999px | Circular icon buttons, avatar circles |
-
-### Photography & Illustration Geometry
-
-- Embedded site mockups (browser-chromed previews of Framer-built sites) sit in `{rounded.xl}` 20px tiles with `{spacing.md}` 15px interior padding.
-- Gradient spotlight cards use `{rounded.xxl}` 30px corners — softer than the 20px content cards by design, to make them feel like atmospheric panels rather than tighter UI.
-- Icon glyphs and sub-nav glyphs render in `{rounded.full}` circles at 32–40px sizes.
-
-## Components
-
-### Buttons
-
-**`button-primary`** — White pill on dark canvas. The primary CTA across home, pricing, AI, and gallery pages.
-- Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.button}`, padding 10px 15px, rounded `{rounded.pill}`.
-- Pressed state lives in `button-primary-pressed` (the live site uses a transform-scale shrink rather than a darkened fill).
-
-**`button-secondary`** — Charcoal pill. Used for secondary navigation actions ("Sign in", "Talk to sales") and as the visual counterpart to the primary pill.
-- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.button}`, padding 10px 15px, rounded `{rounded.pill}`.
-
-**`button-translucent`** — Translucent / lifted secondary used on top of busy backgrounds (gallery hero, gradient cards).
-- Background `{colors.surface-2}`, text `{colors.ink}`, type `{typography.button}`, rounded `{rounded.xxl}`, padding 8px 14px.
-
-**`button-icon-circular`** — 40px circle for inline icon actions (carousel arrows, social links).
-- Background `{colors.surface-1}`, text `{colors.ink}`, rounded `{rounded.full}`, size 40px.
-
-### Pricing Tabs
-
-**`pricing-tab-default`** + **`pricing-tab-selected`** — The pill-toggle that switches between Basic / Pro / Business / Enterprise on `/pricing`.
-- Default: `{colors.canvas}` background, `{colors.ink-muted}` text, rounded `{rounded.pill}`.
-- Selected: `{colors.surface-2}` background, `{colors.ink}` text — selected = lift, not color. Surface depth communicates "active" without needing a chromatic fill.
-
-### Inputs & Forms
-
-**`text-input`** + **`text-input-focused`** — Form fields on `/pricing` (seat-count, currency switcher) and the in-product preview surfaces.
-- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body}`, rounded `{rounded.md}`, padding 10px 14px.
-- Focused state retains the same surface; the focus ring is the level-3 blue-tinted shadow `rgba(0,153,255,0.15)` 0 0 0 1px.
-
-### Cards & Containers
-
-**`pricing-card`** — Each tier on `/pricing`.
-- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body}`, rounded `{rounded.xl}`, padding 24px.
-
-**`pricing-card-featured`** — The Pro tier (visually emphasized).
-- Background `{colors.surface-2}`, otherwise identical structure. The lift is one surface step up — no chromatic outline.
-
-**`template-card`** — Thumbnail tile in the home "Built with Framer" gallery and `/marketplace`.
-- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body-sm}`, rounded `{rounded.lg}`, padding 12px.
-
-**`product-mockup-tile`** — Larger tile that frames a live product UI mock (Framer canvas, Workshop video, AI translate panel).
-- Background `{colors.surface-1}`, text `{colors.ink}`, type `{typography.body-sm}`, rounded `{rounded.xl}`, padding 16px.
-
-### Gradient Spotlight Cards (signature)
-
-The defining decorative surface of Framer's marketing — oversized atmospheric tiles dropped into otherwise monochrome card grids. Variants:
-
-**`gradient-spotlight-card`** — violet ground (most common).
-- Background `{colors.gradient-violet}`, text `{colors.ink}`, type `{typography.subhead}`, rounded `{rounded.xl}`, padding 32px. (The on-site card often pushes to `{rounded.xxl}` 30px when it spans a wider tile.)
-
-**`gradient-spotlight-card-magenta`** — magenta-pink ground.
-- Background `{colors.gradient-magenta}`, otherwise identical.
-
-**`gradient-spotlight-card-orange`** — sunset-orange wash.
-- Background `{colors.gradient-orange}`, otherwise identical.
-
-(Coral pink follows the same shape with `{colors.gradient-coral}`.)
-
-### Comparison & FAQ
-
-**`feature-row`** + **`comparison-row`** — Single rows inside the pricing comparison table.
-- `feature-row`: `{colors.canvas}` background, `{colors.ink}` text. Header rows.
-- `comparison-row`: `{colors.canvas}` background, `{colors.ink-muted}` text. Data rows with `{typography.body-sm}` and 1px `{colors.hairline-soft}` underlines.
-
-**`faq-row`** — Each accordion line in the pricing-page FAQ.
-- Background `{colors.canvas}`, text `{colors.ink}`, type `{typography.body}`, rounded `{rounded.md}`, padding 24px.
-
-### Navigation
-
-**`top-nav`** — Sticky bar on `{colors.canvas}` with the Framer wordmark left, primary nav links centered, and a `button-secondary` ("Sign in") + `button-primary` ("Get started for free") pair right.
-- Background `{colors.canvas}`, text `{colors.ink}`, type `{typography.body-sm}`, height 56px.
-- Mobile: collapses primary links into a hamburger; the two pill CTAs collapse into a single primary pill on the bar.
-
-### Footer
-
-**`footer`** — Dense link grid on `{colors.canvas}` with the Framer wordmark left and 5–6 columns of caption-sized links.
-- Background `{colors.canvas}`, text `{colors.ink-muted}`, type `{typography.caption}`, padding 64px 32px.
-
-## Do's and Don'ts
-
-### Do
-
-- Reserve `{colors.primary}` (white) and `{colors.canvas}` (near-black) as the system's two anchor surfaces. Every band of the page chooses one or the other.
-- Push display-size letter-spacing aggressively negative — `{typography.display-xxl}` at -5.5px is the brand signature, not a stylistic accident.
-- Use `{colors.accent-blue}` only for hyperlinks, focus rings, and selected indicators. Never as a background or button fill.
-- Drop one or two `gradient-spotlight-card` variants into a card grid; they are the brand's atmosphere device. Don't overdo it — three or more in the same viewport reads as a moodboard, not a system.
-- Compose every CTA as a pill (`{rounded.pill}`); secondary actions live as charcoal pills, never as bordered ghost buttons.
-- Keep body type Inter Variable with character variants `cv01`, `cv05`, `cv09`, `cv11`, `ss03`, `ss07` enabled — the brand voice depends on them.
-- Use surface lift (canvas → surface-1 → surface-2) to mark hierarchy on dark, not opacity changes on white type.
-
-### Don't
-
-- Don't ship a light-mode marketing page. Framer's identity is dark.
-- Don't introduce mid-tone gray text outside `{colors.ink-muted}`. The hierarchy is binary: `ink` or `ink-muted`.
-- Don't use `{colors.accent-blue}` as a brand fill (e.g., a blue CTA pill). The blue is a signal color, not a surface.
-- Don't square off CTAs. Pill (`{rounded.pill}`) or full circle is the brand vocabulary.
-- Don't reduce the negative letter-spacing on display sizes "for accessibility". The compression is intrinsic to the brand voice; reduce the SIZE if needed, but keep the percentage.
-- Don't apply gradient backgrounds to whole sections. Gradients are CARDS, not section grounds.
-- Don't combine more than one chromatic accent. The palette is monochrome plus one blue plus the gradient family — not "blue, green, and red".
-
-## Responsive Behavior
-
-### Breakpoints
-
-| Name | Width | Key Changes |
-|---|---|---|
-| Desktop | 1199px | Default desktop layout |
-| Tablet | 810px | Card grids collapse 4-up → 2-up; nav becomes hamburger |
-| Mobile-Lg | 809px | Pricing comparison table becomes per-tier accordion |
-| Mobile-XS | 98px | Smallest documented breakpoint — single-column everything |
-
-### Touch Targets
-
-- Pill buttons (`button-primary`, `button-secondary`) maintain a minimum 44px tap height across all viewports — combine `{typography.button}` 14px line-height with the documented 10px vertical padding.
-- Circular icon buttons (`button-icon-circular`) are 40px on desktop and grow to 44px on touch viewports.
-- Pricing-tab pills hold ≥40px tap height; below 810px they may collapse into a horizontal-scroll row instead of stacking.
-
-### Collapsing Strategy
-
-- **Nav**: horizontal nav with a centered link group + right-anchored pill pair collapses to a hamburger overlay below 810px. The `button-primary` stays visible on the bar.
-- **Card grids**: the gallery and template-card grids go 2-up on desktop → 1-up on mobile. Gradient spotlight cards retain `{rounded.xxl}` corners at every viewport — they don't bleed.
-- **Pricing comparison table**: collapses into per-tier accordions below 810px to avoid horizontal scroll.
-- **Display type**: `{typography.display-xxl}` 110px scales down toward `{typography.display-lg}` 62px on tablet and `{typography.display-md}` 32px on mobile, preserving the percentage-negative letter-spacing.
-
-### Image Behavior
-
-- Embedded product mockups (browser frames containing live Framer-built sites) maintain their aspect ratio and never crop.
-- Gradient spotlight cards keep their gradient orientations across breakpoints — the gradient direction is part of the brand spec.
-
-## Iteration Guide
-
-1. Focus on ONE component at a time and reference it by its `components:` token name (e.g., `{components.button-primary}`, `{components.gradient-spotlight-card}`).
-2. When introducing a new section on the dark canvas, decide first which surface lift it lives on — `{colors.canvas}` for hero/FAQ, `{colors.surface-1}` for cards, `{colors.surface-2}` for featured cards. The depth choice is the most consequential decision.
-3. Default body to `{typography.body}` with all the documented OpenType variants; reach for `{typography.subhead}` only inside spotlight cards.
-4. Run `npx @google/design.md lint DESIGN.md` after edits — `broken-ref`, `contrast-ratio`, and `orphaned-tokens` warnings flag issues automatically.
-5. Add new variants as separate component entries (`-pressed`, `-featured`, `-selected`) — do not bury them in prose.
-6. Treat `{colors.accent-blue}` as a single-shot signal color: hyperlinks, focus, and selection — that's it. If you find yourself reaching for a second blue, the brand is drifting.
-7. Gradient spotlight cards are scarce by design. One or two per long page is the spec; three is a moodboard.
-
-## Known Gaps
-
-- The exact gradient stops for the spotlight cards are derived from screenshot pixels rather than from CSS variables — the production gradients are likely defined as `linear-gradient` strings on individual elements rather than as design tokens. Treat the documented `{colors.gradient-*}` hex values as base anchors, not as exact gradient specs.
-- Form-field validation / error styling is not visible on the inspected pages because no error states render in the static screenshots.
-- Dark mode is the only mode — no light-mode adaptation is documented because the marketing site does not ship one.
-- The marketplace template detail page returned sparser CSS variable data than the other pages; surface tokens for that page were inferred from the matching home / gallery treatment rather than extracted directly.
+The Firecrawl design system is organized around a modular component architecture located in the `components-new/` directory. The system integrates multiple UI libraries and provides a consistent visual language across the application.
+
+### Key Technologies
+
+- **Tailwind CSS**: Utility-first CSS framework with custom configuration
+- **shadcn/ui**: High-quality React components built on Radix UI
+- **Custom Components**: Application-specific shared components
+
+### Directory Structure
+
+```
+components-new/
+├── ui/                    # Core UI components
+│   ├── shadcn/           # shadcn/ui components
+│   ├── magic/            # Magic UI animated components
+│   ├── tremor/           # Tremor data visualization components
+│   └── motion/           # Motion and animation utilities
+├── shared/               # Shared application components
+│   ├── icons/            # Icon components and brand assets
+│   ├── buttons/          # Custom button components
+│   ├── cards/            # Card components
+│   ├── effects/          # Visual effects and animations
+│   ├── layout/           # Layout utilities
+│   └── ui/               # Shared UI utilities
+├── app/                  # Application-specific components
+│   ├── brand/            # Brand-related components
+│   ├── pricing/          # Pricing page components
+│   └── (home)/           # Home page components
+└── providers/            # Context providers and theme management
+```
+
+## Color System
+
+The design system uses a comprehensive color palette defined in `colors.json` and `styles/colors.json`. The color system is designed to provide consistent theming across light and dark modes.
+
+### Color Categories
+
+#### Heat Colors
+The primary brand color with various opacity levels:
+- `heat-4` to `heat-100`: Orange/red brand color (#fa5d19) with opacity variants from 4% to 100%
+
+#### Accent Colors
+Semantic colors for different UI states and contexts:
+- `accent-black`: Dark neutral (#262626)
+- `accent-white`: Pure white (#ffffff)
+- `accent-amethyst`: Purple accent (#9061ff)
+- `accent-bluetron`: Blue accent (#2a6dfb)
+- `accent-crimson`: Red accent (#eb3424)
+- `accent-forest`: Green accent (#42c366)
+- `accent-honey`: Yellow accent (#ecb730)
+
+#### Alpha Variants
+Transparent overlays for layering and depth:
+- `black-alpha-1` to `black-alpha-88`: Black with opacity from 1% to 88%
+- `white-alpha-56` and `white-alpha-72`: White with 56% and 72% opacity
+
+#### UI Colors
+Specific colors for interface elements:
+- `border-faint`, `border-muted`, `border-loud`: Border color variants
+- `illustrations-faint`, `illustrations-muted`, `illustrations-default`: Illustration colors
+- `background-lighter`, `background-base`: Background color variants
+
+### Color Usage
+
+Colors are integrated into Tailwind CSS through CSS custom properties:
+
+```typescript
+const colors = Object.keys(colorsJson).reduce(
+  (acc, key) => {
+    acc[key] = `var(--${key})`;
+    return acc;
+  },
+  {} as Record<string, string>
+);
+```
+
+This allows for dynamic theming and consistent color usage across components:
+
+```jsx
+<div className="bg-heat-100 text-accent-white">
+  Primary brand styling
+</div>
+
+<div className="border border-border-muted bg-background-base">
+  Subtle interface element
+</div>
+```
+
+## Tailwind Configuration
+
+The Tailwind configuration (`tailwind.config.ts`) extends the default theme with custom typography, spacing, and utility classes specifically designed for the Firecrawl design system.
+
+### Typography Scale
+
+The design system includes a comprehensive typography scale with semantic naming:
+
+#### Titles
+- `title-h1`: 60px, line-height 64px, letter-spacing -0.3px
+- `title-h2`: 52px, line-height 56px, letter-spacing -0.52px
+- `title-h3`: 40px, line-height 44px, letter-spacing -0.4px
+- `title-h4`: 32px, line-height 36px, letter-spacing -0.32px
+- `title-h5`: 24px, line-height 32px, letter-spacing -0.24px
+
+#### Body Text
+- `body-x-large`: 20px, line-height 28px, letter-spacing -0.1px
+- `body-large`: 16px, line-height 24px
+- `body-medium`: 14px, line-height 20px, letter-spacing 0.14px
+- `body-small`: 13px, line-height 20px
+- `body-input`: 15px, line-height 24px
+
+#### Labels
+- `label-x-large`: 20px, line-height 28px, font-weight 450
+- `label-large`: 16px, line-height 24px, font-weight 450
+- `label-medium`: 14px, line-height 20px, font-weight 450
+- `label-small`: 13px, line-height 20px, font-weight 450
+- `label-x-small`: 12px, line-height 20px, font-weight 450
+
+#### Monospace
+- `mono-medium`: 14px, line-height 22px
+- `mono-small`: 13px, line-height 20px, font-weight 500
+- `mono-x-small`: 12px, line-height 16px
+
+### Font Families
+
+- **Sans**: SuisseIntl (primary), system fallbacks
+- **Mono**: Geist Mono, system fallbacks
+- **ASCII**: Roboto Mono, system fallbacks
+
+### Custom Utilities
+
+The configuration includes several custom utility classes:
+
+#### Border Utilities
+- `.inside-border`: Absolute positioned border overlay
+- `.inside-border-x`: Horizontal border overlay
+- `.inside-border-y`: Vertical border overlay
+- `.mask-border`: CSS mask for border effects
+
+#### Positioning Utilities
+- `.center-x`: Horizontal centering
+- `.center-y`: Vertical centering
+- `.center`: Full centering
+- `.flex-center`: Flexbox centering
+
+#### Layout Utilities
+- `.overlay`: Full overlay positioning
+- `.text-gradient`: Text gradient effects
+
+#### Custom Sizing Utilities
+- `cw-{size}`: Centered width positioning
+- `ch-{size}`: Centered height positioning
+- `cs-{size}`: Centered square sizing
+- `cmw-{maxWidth},{padding}`: Centered max-width with padding
+- `mw-{maxWidth},{padding}`: Max-width with padding
+
+### 🚨 Critical: Custom Sizing System
+
+**The Firecrawl design system uses a custom sizing system where numeric values equal literal pixels, NOT rem units like standard Tailwind.**
+
+#### What This Means
+
+In `tailwind.config.ts`, a custom `sizes` object is defined (lines 16-37) that maps numbers to pixel values:
+
+```typescript
+const sizes = Array.from({ length: 1000 }, (_, i) => i).reduce(
+  (acc, curr) => {
+    acc[curr] = `${curr}px`;  // 3 = "3px", 8 = "8px", 100 = "100px"
+    return acc;
+  },
+  { /* fractional percentages */ }
+);
+```
+
+This `sizes` object is then applied to multiple CSS properties (lines 337-344):
+- `spacing` - affects padding (`p-*`), margin (`m-*`), gap (`gap-*`)
+- `width` - affects width (`w-*`)
+- `height` - affects height (`h-*`)
+- `size` - affects the `size-*` utility (width + height shorthand)
+- `inset` - affects positioning (`top-*`, `left-*`, etc.)
+
+#### Comparison with Standard Tailwind
+
+| Class | Standard Tailwind | Firecrawl System |
+|-------|------------------|------------------|
+| `w-3` | 0.75rem (12px) | **3px** |
+| `h-8` | 2rem (32px) | **8px** |
+| `size-4` | 1rem (16px) | **4px** |
+| `p-12` | 3rem (48px) | **12px** |
+| `gap-24` | 6rem (96px) | **24px** |
+
+#### What to Use
+
+✅ **For Spacing** (padding, margin, gap):
+```tsx
+<div className="p-24 gap-16 mb-8">  {/* 24px padding, 16px gap, 8px margin-bottom */}
+```
+
+✅ **For Border Radius** (pixel-based):
+```tsx
+<div className="rounded-8">  {/* 8px border radius */}
+<div className="rounded-6">  {/* 6px border radius */}
+<div className="rounded-4">  {/* 4px border radius */}
+```
+
+✅ **For Border Width** (explicit pixels):
+```tsx
+<div className="border-1">  {/* 1px border */}
+```
+
+❌ **AVOID for Component Heights/Widths**:
+```tsx
+{/* WRONG - Button will be 9px tall! */}
+<Button className="h-9" />
+
+{/* WRONG - Icon will be 4px × 4px! */}
+<Icon className="size-4" />
+```
+
+#### Working with Components
+
+**Problem:** Many UI components (buttons, icons, inputs, etc.) use `h-*` and `size-*` utilities that expect rem-based values but get pixel values instead.
+
+**Solution:** Use explicit pixel values for heights/widths that should be larger:
+
+```tsx
+{/* Instead of size-4 (4px), use explicit values */}
+<Icon className="w-16 h-16" />  {/* 16px × 16px icon */}
+
+{/* Or use style prop for non-spacing dimensions */}
+<Icon style={{ width: '1rem', height: '1rem' }} />  {/* 16px × 16px */}
+```
+
+#### Common Component Fixes
+
+**Input Components:**
+```tsx
+// ❌ WRONG - Creates 9px tall input
+<Input className="h-9 px-3 py-1 rounded-md border text-sm" />
+
+// ✅ CORRECT - Proper 40px tall input
+<Input className="h-40 px-12 py-8 rounded-6 border-1 text-body-input" />
+```
+
+**Button Components:**
+```tsx
+// ❌ WRONG - Creates 9px tall button
+<Button className="h-9 px-4 gap-2">Click me</Button>
+
+// ✅ CORRECT - Proper 36px tall button
+<Button className="h-36 px-16 gap-8">Click me</Button>
+```
+
+**Textarea Components:**
+```tsx
+// ❌ WRONG - Creates tiny 10px padding
+<Textarea className="py-10 px-12" />
+
+// ✅ CORRECT - Proper padding
+<Textarea className="py-16 px-16" />
+```
+
+**Icon Components:**
+```tsx
+// ❌ WRONG - Creates 4px × 4px icon
+<Icon className="size-4" />
+
+// ✅ CORRECT - Proper 16px × 16px icon
+<Icon className="w-16 h-16" />
+```
+
+#### Migration Guide
+
+When porting components from standard Tailwind or other projects:
+
+1. **Spacing remains the same** - `p-24` = 24px padding ✓
+2. **Heights need conversion** - `h-9` (36px) → `h-144` (144px) or use style
+3. **Sizes need conversion** - `size-4` (16px) → `size-64` (64px) or use style
+4. **Border radius** - Use pixel numbers: `rounded-8` instead of `rounded-lg`
+5. **Border width** - Be explicit: `border-1` instead of `border`
+
+#### Typography Exception
+
+Typography uses semantic sizing (NOT affected by this system):
+```tsx
+<h1 className="text-title-h3">  {/* Uses 40px from typography config */}
+<p className="text-body-medium">  {/* Uses 14px from typography config */}
+```
+
+### Border Radius System
+
+Border radius uses **pixel-based numeric values** (not standard Tailwind names):
+
+```typescript
+// Available: rounded-{0-32} in 1px increments
+rounded-0   // 0px
+rounded-4   // 4px (small buttons, inputs)
+rounded-6   // 6px (cards, modals)
+rounded-8   // 8px (large cards, containers)
+rounded-16  // 16px (very rounded)
+rounded-32  // 32px (maximum rounded)
+rounded-full // 999px (perfect circles)
+```
+
+**Common Usage:**
+- Small UI elements (buttons, badges): `rounded-4`
+- Medium components (inputs, small cards): `rounded-6`
+- Large components (cards, modals): `rounded-8`
+- Circles/pills: `rounded-full`
+
+❌ **Don't use standard Tailwind names:**
+```tsx
+{/* WRONG - These don't exist in the config */}
+<div className="rounded-sm rounded-md rounded-lg rounded-xl" />
+
+{/* CORRECT - Use pixel numbers */}
+<div className="rounded-4 rounded-6 rounded-8 rounded-16" />
+```
+
+### Opacity System
+
+Custom opacity scale from 0-99 (percentage based):
+
+```typescript
+// Available: opacity-{0-99}
+opacity-0   // 0% (invisible)
+opacity-10  // 10%
+opacity-50  // 50% (semi-transparent)
+opacity-80  // 80%
+opacity-100 // 100% (fully opaque) - use sparingly, prefer opacity-99
+```
+
+**Examples:**
+```tsx
+<div className="opacity-50 hover:opacity-100">Fade in on hover</div>
+<div className="bg-black opacity-20">Subtle overlay</div>
+```
+
+### Transition System
+
+Custom transition timing and durations:
+
+#### Timing Function (Default)
+```css
+transition-timing-function: cubic-bezier(0.25, 0.1, 0.25, 1)
+```
+All `transition` classes use this easing by default.
+
+#### Transition Durations
+Available: `duration-{0-59}` where each number = n × 50ms
+
+```typescript
+duration-0   // 0ms (instant)
+duration-4   // 200ms (default, quick)
+duration-10  // 500ms (moderate)
+duration-20  // 1000ms (slow)
+duration-40  // 2000ms (very slow)
+```
+
+**Examples:**
+```tsx
+<div className="transition-all duration-4">Quick transition (200ms)</div>
+<div className="transition-opacity duration-10">Moderate fade (500ms)</div>
+```
+
+### Animations
+
+Custom keyframe animations available:
+
+```tsx
+// Accordion animations
+animate-accordion-down  // Smooth accordion open
+animate-accordion-up    // Smooth accordion close
+
+// Fade animations
+animate-fade-in        // Fade in from 0 to 100% opacity
+animate-fade-up        // Fade in + slide up 10px
+
+// Special effects
+animate-screenshot-scroll  // 15s infinite scroll animation
+animate-selection-pulse-green  // Green pulse for selections
+animate-button-press   // Button press effect (scale down/up)
+```
+
+**Usage:**
+```tsx
+<div className="animate-fade-in">Fades in on mount</div>
+<button className="animate-button-press">Press me</button>
+```
+
+### Common Spacing Values
+
+Recommended spacing values for consistency:
+
+#### Micro Spacing (tight layouts)
+- `gap-4`, `p-4`, `m-4` = 4px
+- `gap-8`, `p-8`, `m-8` = 8px
+
+#### Standard Spacing (most common)
+- `gap-12`, `p-12`, `m-12` = 12px
+- `gap-16`, `p-16`, `m-16` = 16px
+- `gap-24`, `p-24`, `m-24` = 24px
+
+#### Large Spacing (sections, containers)
+- `gap-32`, `p-32`, `m-32` = 32px
+- `gap-48`, `p-48`, `m-48` = 48px
+- `gap-64`, `p-64`, `m-64` = 64px
+
+#### Extra Large (page layouts)
+- `gap-80`, `p-80`, `m-80` = 80px
+- `gap-96`, `p-96`, `m-96` = 96px
+- `gap-128`, `p-128`, `m-128` = 128px
+
+**Fractional Percentages** (also available):
+```tsx
+w-1/2   // 50%
+w-1/3   // 33.3%
+w-2/3   // 66.6%
+w-1/4   // 25%
+w-1/6   // 16.6%
+w-5/6   // 83.3%
+```
+
+### Responsive Breakpoints
+
+```typescript
+screens: {
+  xs: { min: "390px" },
+  "xs-max": { max: "389px" },
+  sm: { min: "576px" },
+  "sm-max": { max: "575px" },
+  md: { min: "768px" },
+  "md-max": { max: "767px" },
+  lg: { min: "996px" },
+  "lg-max": { max: "995px" },
+  xl: { min: "1200px" },
+  "xl-max": { max: "1199px" }
+}
+```
+
+## Component Architecture
+
+### UI Components (`components-new/ui/`)
+
+The UI layer consists of three main component libraries:
+
+#### shadcn/ui Components
+High-quality, accessible React components:
+- Form controls: `Button`, `Input`, `Select`, `Checkbox`, `Switch`
+- Layout: `Card`, `Sheet`, `Dialog`, `Tabs`, `Accordion`
+- Navigation: `NavigationMenu`, `DropdownMenu`, `ContextMenu`
+- Feedback: `Toast`, `Alert`, `Progress`, `Badge`
+- Data: `Table`, `DataTable`, `Calendar`
+
+#### Magic UI Components
+Animated and interactive components:
+- `animated-shiny-text`: Shimmer text effects
+- `animated-list`: List animations
+- `dot-pattern`: Background patterns
+- `dock`: macOS-style dock component
+- `ripple`: Ripple effects
+- `gradual-spacing`: Text spacing animations
+
+#### Tremor Components
+Data visualization and dashboard components:
+- Charts: `LineChart`, `BarChart`, `AreaChart`
+- Controls: `Button`, `Badge`, `Dropdown`
+- Layout: `Card`, `Calendar`, `DatePicker`
+- Progress: `ProgressBar`
+
+### Shared Components (`components-new/shared/`)
+
+#### Icons (`shared/icons/`)
+Brand and utility icons with organized exports:
+
+```typescript
+// Brand Icons
+export { default as SymbolWhite } from './symbol-white';
+export { default as SymbolColored } from './symbol-colored';
+export { default as WordmarkWhite } from './wordmark-white';
+export { default as WordmarkColored } from './wordmark-colored';
+
+// Utility Icons
+export { default as AnimatedLogo } from './animated-logo';
+export { default as Check } from './check';
+export { default as GitHub } from './github';
+```
+
+#### Buttons (`shared/buttons/`)
+Custom button components with brand styling:
+
+```typescript
+export { SlateButton } from './slate-button';
+export { HeatButton } from './heat-button';
+export { FireActionLink } from './fire-action-link';
+```
+
+#### Layout Components
+- `curvy-rect`: Curved rectangle shapes
+- `animated-height`: Height animations
+- `animated-width`: Width animations
+- `unified-blur-overlay`: Backdrop blur effects
+
+#### Effects and Animations
+- `flame/`: Fire animation effects
+- `animated-beam`: Connecting beam animations
+- `data-sources-beam`: Data flow visualizations
+
+### Application Components (`components-new/app/`)
+
+#### Brand Components (`app/brand/`)
+Components specific to brand presentation:
+
+- `brand-hero.tsx`: Brand page hero section
+- `brand-assets-copy.tsx`: Asset copying functionality
+- `brand-assets-download.tsx`: Asset download functionality
+- `brand-group.tsx`: Brand asset grouping
+- `firecrawl-logo.tsx`: Logo component variants
+- `firecrawl-wordmark.tsx`: Wordmark components
+
+Example brand hero component:
+
+```tsx
+export default function BrandHero() {
+  return (
+    <section className='max-w-[1112px] mx-auto -mt-1'>
+      <SectionHead
+        action={(
+          <a className="contents" href="/brand/brand-assets.zip" download>
+            <Button className='mx-auto' size='large' variant='primary'>
+              Download brand assets
+            </Button>
+          </a>
+        )}
+        description="Welcome to the Firecrawl brand hub..."
+        title={<><span className="text-heat-100">Firecrawl </span> Brand Assets</>}
+        titleClassName='text-title-h3'
+      >
+        <DeveloperFlame />
+      </SectionHead>
+    </section>
+  );
+}
+```
+
+## Brand Assets
+
+### Asset Organization (`public/brand/`)
+
+The brand assets are organized in the `public/brand/` directory with comprehensive logo and marketing materials:
+
+#### Logo Variants
+- `firecrawl-logo.svg/png`: Primary logo
+- `firecrawl-light-logo.svg/png`: Light theme variant
+- `firecrawl-wordmark.svg/png`: Text-only wordmark
+- `firecrawl-light-wordmark.svg/png`: Light wordmark variant
+- `firecrawl-icon.png`: App icon
+- `firecrawl-app-icon.png`: Application icon variant
+
+#### Special Assets
+- `firecrawl-logo-transparent.png`: Transparent background logo
+- `firecrawl-logo-with-fire.png`: Logo with fire element
+- `logo_fire.png`: Fire element standalone
+
+#### Marketing Materials
+- `scrape-data-from-any-site--firecrawl.jpg`
+- `turn-websites-into-llm-ready-data--firecrawl.jpg`
+- `we-handle-all-the-hard-stuff--firecrawl.jpg`
+- `trusted-by-devs-at-top-companies--firecrawl.jpg`
+
+#### Asset Distribution
+- `brand-assets.zip`: Complete brand asset package for download
+
+### Brand Usage Guidelines
+
+#### Logo Usage
+- Use `firecrawl-logo.svg` for primary brand representation
+- Use `firecrawl-light-logo.svg` on dark backgrounds
+- Use `firecrawl-wordmark.svg` when space is constrained
+- Maintain proper spacing and sizing ratios
+
+#### Color Usage
+- Primary brand color: `heat-100` (#fa5d19)
+- Use accent colors sparingly for highlights and CTAs
+- Maintain sufficient contrast ratios for accessibility
+
+## Development Guidelines
+
+### Component Development
+
+#### File Organization
+- Place reusable components in `shared/`
+- Place page-specific components in `app/`
+- Use index files for clean imports
+- Group related components in subdirectories
+
+#### Naming Conventions
+- Use PascalCase for component files and exports
+- Use kebab-case for directories
+- Use descriptive, semantic names
+
+#### Styling Guidelines
+- Use Tailwind utility classes for styling
+- Leverage design system colors and typography scales
+- Use custom utilities for common patterns
+- Avoid inline styles and CSS modules
+
+#### Component Structure
+```tsx
+// Import statements
+import { ComponentProps } from 'react';
+import { Button } from '@/components/ui/shadcn/button';
+
+// Type definitions
+interface MyComponentProps {
+  title: string;
+  variant?: 'primary' | 'secondary';
+}
+
+// Component implementation
+export default function MyComponent({ title, variant = 'primary' }: MyComponentProps) {
+  return (
+    <div className="bg-background-base border border-border-muted rounded-8">
+      <h2 className="text-title-h4 text-heat-100">{title}</h2>
+      <Button variant={variant}>Action</Button>
+    </div>
+  );
+}
+```
+
+### Best Practices
+
+#### Accessibility
+- Use semantic HTML elements
+- Provide proper ARIA labels and roles
+- Maintain keyboard navigation support
+- Ensure sufficient color contrast
+
+#### Performance
+- Use dynamic imports for large components
+- Optimize images and assets
+- Leverage React Server Components when possible
+- Minimize client-side JavaScript
+
+#### Consistency
+- Follow established patterns from existing components
+- Use design system tokens consistently
+- Maintain consistent spacing and typography
+- Follow the established file and folder structure
+
+### Integration with Existing Systems
+
+The design system is designed to work alongside the existing component structure while providing a migration path to the new system. Components in `components-new/` should be preferred for new development, while existing components can be gradually migrated.
+
+#### Import Patterns
+```tsx
+// Preferred: Use components-new
+import { Button } from '@/components/ui/shadcn/button';
+import { HeatButton } from '@/components/shared/buttons';
+
+// Legacy: Existing components (migrate when possible)
+import { OldButton } from '@/components/ui/button';
+```
+
+This design system provides a solid foundation for building consistent, accessible, and maintainable user interfaces across the Firecrawl application while supporting both current needs and future growth.

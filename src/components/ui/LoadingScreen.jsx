@@ -23,29 +23,29 @@ export default function LoadingScreen({ onComplete }) {
 
   return (
     <motion.div
-      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-[var(--canvas)]"
+      className="fixed inset-0 z-[9999] flex flex-col items-center justify-center overflow-hidden bg-background-base"
       exit={{ opacity: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <div className="absolute inset-x-0 top-0 h-px bg-black/10" />
+      <div className="absolute inset-x-0 top-0 h-1 bg-black/10" />
 
       {/* Logo */}
       <motion.div
-        className="relative mb-12 text-center"
+        className="relative mb-48 text-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.2 }}
       >
-        <div className="font-display text-5xl font-medium tracking-[-2.5px] text-[var(--ink)] mb-2">
+        <div className="font-display text-[48px] leading-[1] font-medium tracking-[-2.5px] text-ink mb-8">
           Challenger Computers
         </div>
-        <div className="text-xs tracking-[-0.12px] text-[var(--ink-muted)]">
+        <div className="text-label-x-small tracking-[-0.12px] text-ink-muted">
           GAMING SYSTEMS
         </div>
 
         {/* Animated underline */}
         <motion.div
-          className="mt-4 h-px bg-black/10"
+          className="mt-16 h-1 bg-black/10"
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
@@ -54,32 +54,32 @@ export default function LoadingScreen({ onComplete }) {
 
       {/* Loading bar */}
       <motion.div
-        className="w-80 space-y-3"
+        className="w-[320px] space-y-12"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
-        <div className="h-1 overflow-hidden rounded-full bg-black/10">
+        <div className="h-4 overflow-hidden rounded-full bg-black/10">
           <motion.div
-            className="relative h-full rounded-full bg-[var(--accent-heat)]"
+            className="relative h-full rounded-full bg-heat-100"
             style={{ width: `${progress}%` }}
             transition={{ duration: 0.1 }}
           >
-            <div className="absolute right-0 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-[var(--accent-heat)]" />
+            <div className="absolute right-0 top-1/2 h-8 w-8 -translate-y-1/2 rounded-full bg-heat-100" />
           </motion.div>
         </div>
 
         <div className="flex justify-between items-center">
-          <span className="text-[10px] tracking-[-0.1px] text-[var(--ink-muted)]">
+          <span className="text-[10px] tracking-[-0.1px] text-ink-muted">
             {phase}
           </span>
-          <span className="font-mono text-[10px] text-[var(--ink-muted)]">
+          <span className="font-mono text-[10px] text-ink-muted">
             {Math.round(progress)}%
           </span>
         </div>
       </motion.div>
 
-      <motion.div className="absolute inset-x-0 bottom-0 h-px bg-black/10" />
+      <motion.div className="absolute inset-x-0 bottom-0 h-1 bg-black/10" />
     </motion.div>
   )
 }

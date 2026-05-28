@@ -3,47 +3,62 @@ import toast from 'react-hot-toast'
 import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 
+const channels = [
+  [Phone, 'Sales', '+91 98765 43210'],
+  [Mail, 'Email', 'support@challengercomputers.in'],
+  [MapPin, 'Studio', 'Bengaluru, Karnataka'],
+  [MessageSquare, 'Reply within', '2 business hours'],
+]
+
 export default function Contact() {
   const submit = (event) => {
     event.preventDefault()
-    toast.success('Enquiry received')
+    toast.success('Message sent.')
     event.currentTarget.reset()
   }
 
   return (
     <RetailLayout>
       <PageHeader
-        kicker="Support"
-        title="Talk to a builder"
-        description="Quotes, saved build reviews, and support tickets."
+        kicker="Issue 06 · Contact"
+        title="Talk to the workshop."
+        description="Quotes, build reviews, warranty service."
       />
-      <section className="container-max grid gap-5 py-8 lg:grid-cols-[.82fr_1.18fr]">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
-          {[
-            [Phone, 'Sales line', '+91 98765 43210'],
-            [Mail, 'Email', 'support@challengercomputers.in'],
-            [MapPin, 'Store desk', 'Bengaluru, Karnataka'],
-            [MessageSquare, 'Response SLA', 'Under 2 business hours'],
-          ].map(([Icon, label, value]) => (
-            <div key={label} className="flex items-center gap-4 rounded-[24px] border border-[var(--line)] bg-[var(--surface-1)] p-4 shadow-[0_10px_30px_rgba(38,38,38,.06)]">
-              <span className="grid h-11 w-11 place-items-center rounded-[16px] bg-[var(--surface-2)]">
-                <Icon className="h-5 w-5 text-[var(--ink)]" />
-              </span>
-              <div>
-                <div className="text-xs font-black uppercase tracking-wide text-[var(--ink-muted)]">{label}</div>
-                <div className="font-black">{value}</div>
-              </div>
-            </div>
-          ))}
+      <section className="container-max grid gap-px border border-border-muted bg-line py-0 lg:grid-cols-[1fr_1.4fr]">
+        <div className="bg-surface-1">
+          <ul>
+            {channels.map(([Icon, label, value], i) => (
+              <li key={label} className={`flex items-center gap-16 px-24 py-20 ${i !== channels.length - 1 ? 'border-b border-border-muted' : ''}`}>
+                <Icon className="h-18 w-18 shrink-0 text-ink" aria-hidden="true" />
+                <div className="min-w-0">
+                  <p className="meta">{label}</p>
+                  <p className="mt-4 text-body-medium font-semibold">{value}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
-        <form onSubmit={submit} className="rounded-[30px] border border-[var(--line)] bg-[var(--surface-1)] p-5 shadow-[0_14px_42px_rgba(38,38,38,.08)]">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <label className="grid gap-2 text-sm font-black">Name<input className="input-base" name="name" autoComplete="name" /></label>
-            <label className="grid gap-2 text-sm font-black">Phone<input className="input-base" name="phone" type="tel" inputMode="tel" autoComplete="tel" /></label>
-            <label className="grid gap-2 text-sm font-black sm:col-span-2">Email<input className="input-base" name="email" type="email" inputMode="email" autoComplete="email" spellCheck={false} /></label>
-            <label className="grid gap-2 text-sm font-black sm:col-span-2">Build brief<textarea className="min-h-32 rounded-[20px] border border-[var(--line)] bg-[var(--surface-2)] p-4 transition-[border-color,box-shadow] focus-visible:border-[var(--accent-blue)] focus-visible:ring-4 focus-visible:ring-[var(--accent-blue-soft)]" name="message" autoComplete="off" /></label>
+        <form onSubmit={submit} className="bg-surface-1 p-24 md:p-32">
+          <p className="meta mb-20">Send a message</p>
+          <div className="grid gap-16 sm:grid-cols-2">
+            <label className="grid gap-8 text-body-small font-semibold">
+              Name
+              <input className="input-base" name="name" autoComplete="name" required />
+            </label>
+            <label className="grid gap-8 text-body-small font-semibold">
+              Phone
+              <input className="input-base" name="phone" type="tel" inputMode="tel" autoComplete="tel" />
+            </label>
+            <label className="grid gap-8 text-body-small font-semibold sm:col-span-2">
+              Email
+              <input className="input-base" name="email" type="email" inputMode="email" autoComplete="email" spellCheck={false} required />
+            </label>
+            <label className="grid gap-8 text-body-small font-semibold sm:col-span-2">
+              Message
+              <textarea className="input-base min-h-[160px]" name="message" autoComplete="off" />
+            </label>
           </div>
-          <button type="submit" className="btn-primary mt-5 w-full">Send</button>
+          <button type="submit" className="btn-primary mt-24" data-tone="heat">Send</button>
         </form>
       </section>
     </RetailLayout>

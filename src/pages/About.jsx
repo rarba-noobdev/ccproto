@@ -2,29 +2,34 @@ import { Database, ShieldCheck, Truck, Wrench } from 'lucide-react'
 import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 
+const principles = [
+  [Database, 'Component-level pricing', 'Every part listed by name, tier, and current price.'],
+  [Wrench, 'Compatibility checks', 'Configurator validates socket, memory, wattage, clearance.'],
+  [ShieldCheck, 'Three-year warranty', 'On-site service across Bengaluru, courier elsewhere.'],
+  [Truck, 'India-wide delivery', 'Insured, signature-on-delivery, GST invoice included.'],
+]
+
 export default function About() {
   return (
     <RetailLayout>
       <PageHeader
-        kicker="About"
-        title="Built around trust"
-        description="Clear pricing, balanced builds, and warranty-first support."
+        kicker="Issue 05 · About"
+        title="A workshop, not a marketplace."
+        description="Challenger Computers assembles, tests, and ships gaming and creator systems from Bengaluru."
       />
-      <section className="container-max grid gap-4 py-8 sm:grid-cols-2 lg:grid-cols-4">
-        {[
-          [Database, 'Curated catalog', 'Clean product data with image, price, MRP, stock, score, and tier.'],
-          [Wrench, 'Builder logic', 'The configurator computes price, wattage headroom, score, and component balance from selected parts.'],
-          [ShieldCheck, 'Warranty first', 'The UI emphasizes GST billing, clear specifications, and service workflows instead of fake futuristic claims.'],
-          [Truck, 'India ready', 'INR pricing, Indian-market copy, delivery cues, and support language are used across the app.'],
-        ].map(([Icon, title, copy]) => (
-          <article key={title} className="rounded-[28px] border border-[var(--line)] bg-[var(--surface-1)] p-5 shadow-[0_12px_36px_rgba(38,38,38,.07)]">
-            <span className="mb-5 grid h-12 w-12 place-items-center rounded-[18px] bg-[var(--surface-2)]">
-              <Icon className="h-6 w-6 text-[var(--ink)]" />
-            </span>
-            <h2 className="text-xl font-black tracking-[-.04em]">{title}</h2>
-            <p className="mt-3 text-sm font-semibold leading-6 text-[var(--ink-muted)]">{copy}</p>
-          </article>
-        ))}
+      <section className="container-max py-48">
+        <div className="grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-4 border border-border-muted">
+          {principles.map(([Icon, title, copy], i) => (
+            <article key={title} className="flex flex-col gap-16 bg-surface-1 p-24">
+              <div className="flex items-center justify-between">
+                <Icon className="h-20 w-20 text-ink" aria-hidden="true" />
+                <span className="meta">{String(i + 1).padStart(2, '0')}</span>
+              </div>
+              <h2 className="text-title-h5 font-semibold tracking-[-.02em]">{title}</h2>
+              <p className="text-body-medium leading-[1.55] text-ink-soft">{copy}</p>
+            </article>
+          ))}
+        </div>
       </section>
     </RetailLayout>
   )

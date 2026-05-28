@@ -1,48 +1,90 @@
-import { Heart, Plus, Star, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
+import { Heart, Plus, Star, ImageOff } from 'lucide-react'
 import clsx from 'clsx'
 import useStore from '@/store/useStore'
 import { formatINR } from '@/utils/currency'
 
+function formatRating(rating) {
+  const n = Number(rating)
+  if (!Number.isFinite(n)) return null
+  return n.toFixed(1)
+}
+
 export function ProductCard({ product, compact = false }) {
   const { addToCart, toggleWishlist, isWishlisted } = useStore()
+  const [imgError, setImgError] = useState(false)
   const mrp = product.mrp || product.originalPrice
   const discount = product.discount_pct || (mrp ? Math.max(0, Math.round(((mrp - product.price) / mrp) * 100)) : 0)
-
-  const score = product.rating || (product.price > 60000 ? '4.9' : '4.7')
+  const wishlisted = isWishlisted(product.id)
+  const rating = formatRating(product.rating)
+  const label = product.brand || product.category || 'Part'
 
   return (
-    <article className="group overflow-hidden rounded-[26px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_12px_34px_rgba(38,38,38,.07)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_18px_44px_rgba(38,38,38,.10)]">
-      <div className={clsx('product-image-box relative mx-2 mt-2 grid place-items-center overflow-hidden rounded-[22px] border border-[var(--line)]', compact ? 'h-40' : 'h-48')}>
-        <div className="absolute inset-x-3 top-3 z-10 flex items-center justify-between">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-white/80 px-2.5 py-1 text-[11px] font-black text-[var(--ink-soft)] shadow-sm backdrop-blur">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--success)]" aria-label="In stock" />
-            Stock
+    <article className="group flex min-w-0 flex-col bg-surface-1 transition duration-4 hover:bg-canvas motion-reduce:transition-none">
+      <div className={clsx('product-image-box relative overflow-hidden', compact ? 'h-176' : 'h-208')}>
+        {discount > 0 && (
+          <span className="absolute right-12 top-12 z-10 bg-ink px-8 py-2 text-label-x-small font-semibold text-canvas">
+            −{discount}%
           </span>
-          {discount > 0 && <span className="rounded-full bg-[var(--ink)] px-2.5 py-1 text-[11px] font-black text-[var(--canvas)]">-{discount}%</span>}
-        </div>
-        <button type="button" onClick={() => toggleWishlist(product)} className="icon-btn absolute bottom-3 right-3 z-10 h-9 w-9 bg-white/85 shadow-sm backdrop-blur" aria-label={`${isWishlisted(product.id) ? 'Remove from' : 'Add to'} wishlist`}>
-          <Heart className={clsx('h-4 w-4', isWishlisted(product.id) && 'fill-[var(--ink)] text-[var(--ink)]')} />
+        )}
+        <button
+          type="button"
+          onClick={() => toggleWishlist(product)}
+          className="absolute bottom-12 right-12 z-10 grid h-32 w-32 place-items-center border border-line-strong bg-surface-1 text-ink-soft transition hover:border-ink hover:text-ink"
+          aria-pressed={wishlisted}
+          aria-label={`${wishlisted ? 'Remove from' : 'Add to'} wishlist`}
+        >
+          <Heart className={clsx('h-12 w-12', wishlisted && 'fill-ink text-ink')} aria-hidden="true" />
         </button>
-        <img src={product.image} alt={product.name} width="320" height="240" className="relative z-[1] h-full w-full object-contain p-5 transition duration-300 group-hover:scale-[1.04]" loading="lazy" decoding="async" />
+        {imgError || !product.image ? (
+          <div className="grid h-full w-full place-items-center bg-surface-2 text-ink-muted">
+            <ImageOff className="h-24 w-24" aria-hidden="true" />
+          </div>
+        ) : (
+          <img
+            src={product.image}
+            alt={product.name}
+            width="320"
+            height="240"
+            onError={() => setImgError(true)}
+            className="relative h-full w-full object-contain p-20 transition duration-6 group-hover:scale-[1.02] motion-reduce:transform-none motion-reduce:transition-none"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
       </div>
 
-      <div className="space-y-3 p-4 pt-3">
-        <div className="flex items-center justify-between gap-3">
-          <span className="truncate text-[11px] font-black uppercase tracking-[.12em] muted">{product.brand || product.category || 'Part'}</span>
-          <span className="inline-flex items-center gap-1 rounded-full bg-[var(--surface-2)] px-2 py-1 text-[11px] font-black text-[var(--warning)]"><Star className="h-3 w-3 fill-current" />{score}</span>
+      <div className="flex min-w-0 flex-1 flex-col border-t border-border-muted p-16">
+        <div className="flex items-center justify-between gap-8">
+          <span className="meta truncate">{label}</span>
+          {rating && (
+            <span className="inline-flex items-center gap-4 text-label-x-small font-medium text-ink-soft">
+              <Star className="h-12 w-12 fill-current text-ink" aria-hidden="true" />
+              {rating}
+            </span>
+          )}
         </div>
-        <h3 className="truncate-2 min-h-[42px] text-[15px] font-black leading-[21px] tracking-[-.02em]">{product.name}</h3>
-        <div className="flex items-center gap-2 text-[11px] font-black muted">
-          <TrendingUp className="h-3.5 w-3.5 text-[var(--accent-heat)]" aria-hidden="true" />
-          <span>{(product.category || 'Component').toString().replace('-', ' ')}</span>
-        </div>
-        <div className="flex items-end justify-between gap-3">
-          <div>
-            <div className="price text-[21px] font-black">{formatINR(product.price)}</div>
-            {mrp && <div className="price text-xs font-semibold muted line-through">{formatINR(mrp)}</div>}
+
+        <h3 className="truncate-2 mt-8 min-h-[40px] text-body-medium font-semibold leading-20 tracking-[-.005em]">
+          {product.name}
+        </h3>
+
+        <div className="mt-auto flex items-end justify-between gap-12 pt-16">
+          <div className="min-w-0">
+            <div className="price truncate text-title-h5 font-semibold leading-none">{formatINR(product.price)}</div>
+            {mrp && (
+              <div className="price mt-4 truncate text-label-x-small font-normal text-ink-muted line-through">
+                {formatINR(mrp)}
+              </div>
+            )}
           </div>
-          <button type="button" onClick={() => addToCart(product)} className="grid h-11 w-11 place-items-center rounded-full bg-[var(--accent-heat)] text-white shadow-[0_10px_20px_rgba(250,93,25,.22)] transition group-hover:scale-[1.04]" aria-label={`Add ${product.name} to cart`}>
-            <Plus className="h-4 w-4" />
+          <button
+            type="button"
+            onClick={() => addToCart(product)}
+            className="grid h-36 w-36 shrink-0 place-items-center border border-ink bg-ink text-canvas transition hover:bg-accent-heat hover:border-accent-heat motion-reduce:transition-none"
+            aria-label={`Add ${product.name} to cart`}
+          >
+            <Plus className="h-14 w-14" aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -52,13 +94,15 @@ export function ProductCard({ product, compact = false }) {
 
 export function ProductSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[26px] border border-[var(--line)] bg-[var(--surface-1)] p-2">
-      <div className="h-48 animate-pulse rounded-[22px] bg-black/5" />
-      <div className="space-y-3 p-4">
-        <div className="h-3 w-16 rounded-full bg-black/10" />
-        <div className="h-5 w-full rounded-full bg-black/10" />
-        <div className="h-5 w-2/3 rounded-full bg-black/10" />
-        <div className="h-9 w-full rounded-full bg-black/10" />
+    <div className="bg-surface-1">
+      <div className="h-208 animate-pulse bg-surface-2" />
+      <div className="space-y-12 border-t border-border-muted p-16">
+        <div className="h-12 w-1/3 animate-pulse bg-surface-2" />
+        <div className="h-16 w-3/4 animate-pulse bg-surface-2" />
+        <div className="flex items-center justify-between pt-12">
+          <div className="h-20 w-24 animate-pulse bg-surface-2" />
+          <div className="h-36 w-36 animate-pulse bg-surface-2" />
+        </div>
       </div>
     </div>
   )

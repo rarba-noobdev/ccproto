@@ -1,15 +1,9 @@
 import { useMemo, useState } from 'react'
-import {
-  Cpu,
-  Gauge,
-  MemoryStick,
-  Monitor,
-  PackageCheck,
-  ShieldCheck,
-  ShoppingCart,
-} from 'lucide-react'
+import { Cpu, MemoryStick, Monitor, ShoppingBag } from 'lucide-react'
 import RetailLayout from '@/components/retail/RetailLayout'
+import PageHeader from '@/components/retail/PageHeader'
 import SelectMenu from '@/components/ui/SelectMenu'
+import { ErrorBanner, EmptyPanel } from '@/components/retail/StatusPanel'
 import { fetchPrebuilts } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { formatINR } from '@/utils/currency'
@@ -21,9 +15,9 @@ export default function Prebuilt() {
   const data = Array.isArray(result) ? result : []
   const { addToCart } = useStore()
   const sortItems = [
-    { value: 'price-asc', label: 'Price: low to high' },
-    { value: 'price-desc', label: 'Price: high to low' },
-    { value: 'stock', label: 'Most stock' },
+    { value: 'price-asc', label: 'Price · low to high' },
+    { value: 'price-desc', label: 'Price · high to low' },
+    { value: 'stock', label: 'Stock' },
   ]
 
   const pcs = useMemo(() => {
@@ -34,202 +28,110 @@ export default function Prebuilt() {
     })
   }, [data, sort])
 
-  const featured = pcs[0]
-  const heroImage = featured?.image || featured?.case?.image || featured?.gpu?.image || featured?.cpu?.image
-
   return (
     <RetailLayout>
-      <main>
-        <section className="container-max pt-8">
-          <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_390px]">
-            <div className="relative overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] p-6 shadow-[0_24px_80px_rgba(38,38,38,.12)] sm:p-8 lg:p-10">
-              <div className="absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-black/15 to-transparent" />
-              <p className="kicker mb-5">Prebuilt PCs</p>
-              <h1 className="max-w-4xl text-[54px] font-black leading-[.86] tracking-[-.08em] sm:text-[84px]">
-                Performance PCs without the part hunt.
-              </h1>
-              <p className="mt-6 max-w-2xl text-base font-semibold leading-7 text-[var(--ink-muted)]">
-                Curated gaming and creator systems with visible components, stock status, and checkout-ready pricing.
-              </p>
-              <div className="mt-7 grid gap-2 sm:grid-cols-3">
-                {[
-                  [PackageCheck, 'Bench ready', 'Assembly & QC path'],
-                  [ShieldCheck, 'Support backed', 'Help after checkout'],
-                  [Gauge, 'Thermal aware', 'Balanced airflow'],
-                ].map(([Icon, title, copy]) => (
-                  <div key={title} className="rounded-[20px] border border-[var(--line)] bg-[var(--surface-2)] p-4">
-                    <Icon className="mb-4 h-5 w-5 text-[var(--accent-heat)]" />
-                    <div className="text-sm font-black tracking-[-.02em]">{title}</div>
-                    <div className="mt-1 text-xs font-bold text-[var(--ink-muted)]">{copy}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
+      <PageHeader
+        kicker="Issue 02 · Systems"
+        title="Ready-to-ship builds."
+        description="Assembled, benched, and shipped from Bengaluru."
+      >
+        <SelectMenu ariaLabel="Sort systems" className="w-full sm:w-[260px]" options={sortItems} value={sort} onChange={setSort} />
+      </PageHeader>
 
-            <aside className="flex h-full overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_24px_80px_rgba(38,38,38,.10)]">
-              <div className="flex min-w-0 flex-1 flex-col">
-              <div className="relative grid min-h-[230px] place-items-center overflow-hidden bg-[#f6f3ed] p-6">
-                <span className="absolute left-5 top-5 rounded-full bg-[var(--accent-heat)] px-3 py-1 text-[11px] font-black uppercase tracking-[.08em] text-white">
-                  {featured?.badge || 'Featured'}
-                </span>
-                <div className="absolute inset-x-10 bottom-5 h-10 rounded-full bg-black/10 blur-xl" aria-hidden="true" />
-                {heroImage && <img src={heroImage} alt={featured?.name || 'Featured ready system'} width="420" height="320" className="relative max-h-[195px] w-[80%] max-w-[300px] object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,.18)]" decoding="async" fetchPriority="high" />}
-              </div>
-              <div className="flex flex-1 flex-col p-5">
-                <div className="mb-3 flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <h2 className="truncate text-2xl font-black tracking-[-.055em]">{featured?.name || 'Prebuilt PC'}</h2>
-                    <p className="mt-1 truncate text-xs font-bold text-[var(--ink-muted)]">{featured?.tagline || 'Configured for performance'}</p>
-                  </div>
-                  <div className="price shrink-0 text-2xl font-black">{formatINR(featured?.price || 0)}</div>
-                </div>
+      <section className="container-max py-40">
+        {error && <ErrorBanner className="mb-24" message={error.message} />}
 
-                <div className="grid gap-2">
-                  <FeaturedSpec icon={Cpu} label="CPU" value={featured?.cpu?.name} />
-                  <FeaturedSpec icon={Monitor} label="GPU" value={featured?.gpu?.name} />
-                  <FeaturedSpec icon={MemoryStick} label="Memory" value={featured?.ram?.name} />
-                </div>
-
-                <div className="mt-3 grid grid-cols-2 gap-2 text-center">
-                  <Metric value={featured?.stock} label="Stock" />
-                  <Metric value={featured?.rating || 4.8} label="Rating" />
-                </div>
-
-                <button
-                  type="button"
-                  disabled={!featured}
-                  onClick={() => featured && addToCart({ ...featured, image: heroImage })}
-                  className="btn-primary mt-auto w-full disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  <ShoppingCart className="h-4 w-4" /> Add featured
-                </button>
-              </div>
-              </div>
-            </aside>
+        {loading && (
+          <div className="grid gap-px bg-line sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
+            {Array.from({ length: 8 }).map((_, index) => <SystemSkeleton key={index} />)}
           </div>
-        </section>
+        )}
 
-        <section className="container-max py-8">
-          <div className="mb-5 flex flex-col gap-4 border-b border-[var(--line)] pb-5 md:flex-row md:items-end md:justify-between">
-            <div>
-              <p className="kicker mb-2">Catalog</p>
-              <h2 className="text-4xl font-black leading-none tracking-[-.065em]">Ready-to-ship builds</h2>
-            </div>
-            <SelectMenu ariaLabel="Sort prebuilts" className="w-full sm:w-64" options={sortItems} value={sort} onChange={setSort} />
+        {!loading && pcs.length === 0 && (
+          <EmptyPanel title="No systems available" copy="Inventory sync running. Check back soon." />
+        )}
+
+        {!loading && pcs.length > 0 && (
+          <div className="grid gap-px bg-line sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
+            {pcs.map((pc, index) => {
+              const image = pc.image || pc.case?.image || pc.gpu?.image || pc.cpu?.image
+              return <SystemCard key={pc.id} pc={pc} image={image} index={index} addToCart={addToCart} />
+            })}
           </div>
-
-          {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
-
-          {loading && (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {Array.from({ length: 6 }).map((_, index) => <SystemSkeleton key={index} />)}
-            </div>
-          )}
-
-          {!loading && pcs.length === 0 && (
-            <div className="panel grid min-h-64 place-items-center rounded-[30px] p-8 text-center">
-              <div>
-                <p className="text-2xl font-black tracking-[-.05em]">No systems available</p>
-                <p className="mt-2 text-sm font-semibold text-[var(--ink-muted)]">Check back after inventory sync finishes.</p>
-              </div>
-            </div>
-          )}
-
-          {!loading && pcs.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              {pcs.map((pc, index) => {
-                const image = pc.image || pc.case?.image || pc.gpu?.image || pc.cpu?.image
-                return <SystemCard key={pc.id} pc={pc} image={image} index={index} addToCart={addToCart} />
-              })}
-            </div>
-          )}
-        </section>
-      </main>
+        )}
+      </section>
     </RetailLayout>
   )
 }
 
 function SystemCard({ pc, image, index, addToCart }) {
   return (
-    <article className="group flex overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_10px_28px_rgba(38,38,38,.065)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_16px_38px_rgba(38,38,38,.10)]">
-      <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative m-2 grid h-28 place-items-center overflow-hidden rounded-[20px] border border-[var(--line)] bg-[#f6f3ed] p-2.5">
-          <div className="absolute inset-x-9 bottom-2 h-6 rounded-full bg-black/10 blur-xl" aria-hidden="true" />
-          <span className="absolute left-2.5 top-2.5 rounded-full bg-[var(--ink)] px-2 py-0.5 text-[9px] font-black uppercase tracking-[.08em] text-[var(--canvas)]">
-            {index === 0 ? 'Best pick' : pc.badge || `P${index + 1}`}
-          </span>
-          <span className="absolute right-2.5 top-2.5 inline-flex items-center gap-1 rounded-full border border-[var(--line)] bg-white px-2 py-0.5 text-[9px] font-black text-[var(--ink-muted)]">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> {pc.stock || 0}
-          </span>
-          {image && <img src={image} alt={pc.name} width="320" height="210" className="relative max-h-[86px] w-[72%] max-w-[180px] object-contain drop-shadow-[0_10px_12px_rgba(0,0,0,.14)] transition duration-300 group-hover:scale-[1.025]" loading="lazy" decoding="async" />}
-        </div>
-
-        <div className="flex flex-1 flex-col p-3.5 pt-1">
-          <div className="mb-2 min-w-0">
-            <h2 className="line-clamp-1 text-[18px] font-black leading-6 tracking-[-.05em]">{pc.name}</h2>
-            <p className="mt-0.5 line-clamp-1 text-[11px] font-bold uppercase tracking-[.08em] text-[var(--ink-muted)]">{pc.tagline}</p>
+    <article className="group flex min-w-0 flex-col bg-surface-1 transition hover:bg-canvas">
+      <div className="flex items-center justify-between px-16 pt-12">
+        <span className="meta">#{String(index + 1).padStart(2, '0')} · {pc.badge || 'System'}</span>
+        <span className="meta">Stock {pc.stock || 0}</span>
+      </div>
+      <div className="product-image-box relative grid h-[200px] place-items-center overflow-hidden">
+        {image && (
+          <img
+            src={image}
+            alt={pc.name}
+            width="320"
+            height="240"
+            className="relative max-h-[160px] w-[80%] max-w-[240px] object-contain drop-shadow-[0_14px_18px_rgba(0,0,0,.18)] transition duration-4 group-hover:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+      </div>
+      <div className="flex min-w-0 flex-1 flex-col gap-10 border-t border-border-muted p-16">
+        <h2 className="line-clamp-2 min-h-[40px] text-body-medium font-semibold leading-20 tracking-[-.005em]">{pc.name}</h2>
+        <ul className="grid min-w-0 gap-4 text-label-x-small text-ink-soft">
+          {pc.cpu?.name && <Spec icon={Cpu} value={pc.cpu.name} />}
+          {pc.gpu?.name && <Spec icon={Monitor} value={pc.gpu.name} />}
+          {pc.ram?.name && <Spec icon={MemoryStick} value={pc.ram.name} />}
+        </ul>
+        <div className="mt-auto flex items-end justify-between gap-8 border-t border-border-muted pt-12">
+          <div className="min-w-0">
+            <p className="price text-title-h5 font-semibold leading-none">{formatINR(pc.price)}</p>
+            {pc.mrp && <p className="price mt-4 text-label-x-small font-normal text-ink-muted line-through">{formatINR(pc.mrp)}</p>}
           </div>
-
-          <div className="grid gap-1.5">
-            <SummarySpec icon={Monitor} value={pc.gpu?.name} />
-            <SummarySpec icon={Cpu} value={pc.cpu?.name} />
-          </div>
-
-          <div className="mt-3 flex items-end justify-between gap-2 border-t border-[var(--line)] pt-3">
-            <div className="min-w-0">
-              <div className="price text-xl font-black leading-none">{formatINR(pc.price)}</div>
-              {pc.mrp && <div className="price mt-0.5 text-xs font-bold text-[var(--ink-muted)] line-through">{formatINR(pc.mrp)}</div>}
-            </div>
-            <button type="button" onClick={() => addToCart({ ...pc, image })} className="btn-primary min-h-9 px-3 text-xs">
-              <ShoppingCart className="h-4 w-4" /> Add
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={() => addToCart({ ...pc, image })}
+            className="grid h-40 w-40 shrink-0 place-items-center border border-ink bg-ink text-canvas transition hover:bg-accent-heat hover:border-accent-heat"
+            aria-label={`Add ${pc.name} to cart`}
+          >
+            <ShoppingBag className="h-14 w-14" aria-hidden="true" />
+          </button>
         </div>
       </div>
     </article>
   )
 }
 
-function SummarySpec({ icon: Icon, value }) {
+function Spec({ icon: Icon, value }) {
   return (
-    <div className="flex min-w-0 items-center gap-2 rounded-[12px] bg-[var(--surface-2)] px-2.5 py-1.5">
-      <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--ink-muted)]" aria-hidden="true" />
-      <span className="truncate text-[11px] font-black text-[var(--ink-soft)]">{value || 'Configured part'}</span>
-    </div>
-  )
-}
-
-function FeaturedSpec({ icon: Icon, label, value }) {
-  return (
-    <div className="grid min-w-0 grid-cols-[30px_64px_1fr] items-center gap-2 rounded-[16px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2.5">
-      <span className="grid h-7 w-7 place-items-center rounded-full bg-white text-[var(--ink-soft)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-      </span>
-      <span className="text-[10px] font-black uppercase tracking-wide text-[var(--ink-muted)]">{label}</span>
-      <span className="truncate text-xs font-black text-[var(--ink-soft)]">{value || 'Configured part'}</span>
-    </div>
-  )
-}
-
-function Metric({ value, label }) {
-  return (
-    <div className="rounded-[14px] border border-[var(--line)] bg-white p-2 shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
-      <div className="font-mono text-base font-black leading-none text-[var(--ink)]">{value || '-'}</div>
-      <div className="mt-1 text-[9px] font-black uppercase tracking-[.05em] text-[var(--ink-muted)]">{label}</div>
-    </div>
+    <li className="flex min-w-0 items-center gap-8">
+      <Icon className="h-12 w-12 shrink-0 text-ink-muted" aria-hidden="true" />
+      <span className="min-w-0 flex-1 truncate">{value}</span>
+    </li>
   )
 }
 
 function SystemSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[24px] border border-[var(--line)] bg-[var(--surface-1)]">
-      <div className="m-2 h-28 animate-pulse rounded-[20px] bg-black/5" />
-      <div className="space-y-2.5 p-3.5 pt-1">
-        <div className="h-5 w-4/5 animate-pulse rounded-full bg-black/10" />
-        <div className="h-3 w-1/2 animate-pulse rounded-full bg-black/10" />
-        <div className="space-y-1.5">
-          <div className="h-3 w-full animate-pulse rounded-full bg-black/10" />
-          <div className="h-3 w-3/4 animate-pulse rounded-full bg-black/10" />
+    <div className="bg-surface-1">
+      <div className="px-16 pt-12">
+        <div className="h-12 w-24 animate-pulse bg-surface-2" />
+      </div>
+      <div className="h-[200px] animate-pulse bg-surface-2" />
+      <div className="space-y-8 border-t border-border-muted p-16">
+        <div className="h-16 w-4/5 animate-pulse bg-surface-2" />
+        <div className="h-12 w-1/2 animate-pulse bg-surface-2" />
+        <div className="flex items-center justify-between pt-12">
+          <div className="h-20 w-24 animate-pulse bg-surface-2" />
+          <div className="h-40 w-40 animate-pulse bg-surface-2" />
         </div>
       </div>
     </div>

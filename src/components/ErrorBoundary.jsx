@@ -1,5 +1,6 @@
 import { Component } from 'react'
 import { Link } from 'react-router-dom'
+import { AlertTriangle } from 'lucide-react'
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -21,14 +22,17 @@ export default class ErrorBoundary extends Component {
     if (!this.state.error) return this.props.children
 
     return (
-      <div className="retail-shell grid min-h-screen place-items-center p-6">
-        <div className="panel max-w-lg rounded-2xl p-6 text-center">
-          <p className="kicker mb-3 justify-center">Route error</p>
-          <h1 className="text-2xl font-black">Something failed to render</h1>
-          <p className="mt-3 text-sm leading-6 text-[var(--ink-muted)]">
-            {this.state.error?.message || 'The page hit a runtime error.'}
+      <div className="retail-shell grid min-h-screen place-items-center p-24">
+        <div className="max-w-[480px] border border-border-muted bg-surface-1 p-32 text-center">
+          <div className="mx-auto mb-20 grid h-44 w-44 place-items-center border border-accent-heat text-accent-heat">
+            <AlertTriangle className="h-18 w-18" aria-hidden="true" />
+          </div>
+          <p className="meta mb-12">Route error</p>
+          <h1 className="text-title-h4 font-semibold tracking-[-.02em]">Page failed to render</h1>
+          <p className="mt-12 text-body-medium leading-6 text-ink-soft">
+            {this.state.error?.message || 'A runtime error occurred.'}
           </p>
-          <Link to="/" className="btn-primary mt-6">Back to home</Link>
+          <Link to="/" className="btn-primary mt-24">Back to home</Link>
         </div>
       </div>
     )

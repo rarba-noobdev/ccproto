@@ -25,6 +25,8 @@ import { ErrorBanner } from '@/components/retail/StatusPanel'
 import { fetchHomeData } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { formatINR } from '@/utils/currency'
+import { brandLogos } from '@/components/ui/BrandLogos'
+import { AnimatedNumber } from '@/components/ui/Hud'
 
 const easeOut = [0.23, 1, 0.32, 1]
 
@@ -36,8 +38,6 @@ const categoryTiles = [
   { label: 'Peripherals',   sub: 'Keys · mice · audio', to: '/accessories', Icon: Keyboard },
   { label: 'Configurator',  sub: 'Build to order',    to: '/build',         Icon: Wrench },
 ]
-
-const brandStrip = ['NVIDIA', 'AMD', 'Intel', 'Corsair', 'ASUS', 'MSI', 'Samsung', 'Logitech']
 
 const trustBar = [
   { Icon: Truck,       title: 'Free shipping',  sub: 'Pan-India · orders ₹2,500+' },
@@ -94,18 +94,26 @@ export default function Home() {
             >
               <div className="poster-grain absolute inset-0" aria-hidden="true" />
               <div className="relative grid gap-24 p-32 md:grid-cols-[1.1fr_1fr] md:items-center md:p-48">
-                <div>
+                <div className="relative z-10">
                   <span className="inline-flex items-center gap-8 border border-canvas/30 px-10 py-4 text-label-x-small font-medium uppercase tracking-[0.08em] text-canvas/82">
-                    <span className="h-6 w-6 rounded-full bg-accent-heat" /> New season · Issue 01
+                    <span className="relative h-6 w-6 rounded-full bg-accent-heat">
+                      <span className="absolute inset-0 rounded-full bg-accent-heat" style={{ animation: 'pulse-ring 1.8s ease-out infinite' }} />
+                    </span>
+                    New season · Issue 01
                   </span>
                   <h1 className="mt-20 text-title-h1 font-semibold leading-[1.02] tracking-[-.03em] md:text-display-large">
-                    Custom rigs,<br /><span className="text-accent-heat">benched & boxed.</span>
+                    <span className="word-reveal"><span style={{ animationDelay: '.05s' }}>Custom</span></span>{' '}
+                    <span className="word-reveal"><span style={{ animationDelay: '.18s' }}>rigs,</span></span>
+                    <br />
+                    <span className="word-reveal"><span className="text-accent-heat" style={{ animationDelay: '.32s' }}>benched</span></span>{' '}
+                    <span className="word-reveal"><span className="text-accent-heat" style={{ animationDelay: '.42s' }}>&amp;</span></span>{' '}
+                    <span className="word-reveal"><span className="text-accent-heat" style={{ animationDelay: '.5s' }}>boxed.</span></span>
                   </h1>
                   <p className="mt-20 max-w-[440px] text-body-large leading-[1.5] text-canvas/72">
                     Component-level pricing for gaming, creator, and production builds. Live compatibility checks, 3-year warranty, ships across India.
                   </p>
                   <div className="mt-28 flex flex-wrap items-center gap-12">
-                    <Link to="/build" className="btn-primary" data-tone="heat">
+                    <Link to="/build" className="btn-primary magnetic" data-tone="heat">
                       Start configurator <ArrowRight className="h-16 w-16" aria-hidden="true" />
                     </Link>
                     <Link to="/prebuilt" className="inline-flex min-h-[44px] items-center gap-8 rounded-8 border border-canvas/40 px-18 font-semibold text-canvas transition hover:border-canvas hover:bg-canvas/10">
@@ -113,24 +121,33 @@ export default function Home() {
                     </Link>
                   </div>
                   <dl className="mt-32 grid max-w-[360px] grid-cols-3 gap-16 border-t border-canvas/15 pt-20">
-                    <HeroStat label="Builds" value="2,400+" />
-                    <HeroStat label="Reviews" value="4.9 ★" />
-                    <HeroStat label="Warranty" value="3 yrs" />
+                    <HeroStat label="Builds" valueNode={<><AnimatedNumber value={2400} duration={1600} />+</>} />
+                    <HeroStat label="Reviews" valueNode={<><AnimatedNumber value={49} duration={1400} suffix="" />/50 ★</>} />
+                    <HeroStat label="Warranty" valueNode="3 yrs" />
                   </dl>
                 </div>
-                <div className="relative aspect-[5/4] w-full bg-gradient-to-br from-canvas/10 via-canvas/4 to-transparent">
+                <div className="relative aspect-[5/4] w-full overflow-hidden bg-gradient-to-br from-canvas/10 via-canvas/4 to-transparent">
+                  <div className="heat-orb" style={{ left: '50%', top: '50%', transform: 'translate(-50%,-50%)' }} aria-hidden="true" />
+                  <span className="spark" style={{ left: '22%', top: '78%', animationDelay: '0s' }} aria-hidden="true" />
+                  <span className="spark" style={{ left: '38%', top: '82%', animationDelay: '1.2s' }} aria-hidden="true" />
+                  <span className="spark" style={{ left: '58%', top: '76%', animationDelay: '2.4s' }} aria-hidden="true" />
+                  <span className="spark" style={{ left: '72%', top: '84%', animationDelay: '3.6s' }} aria-hidden="true" />
                   <div className="absolute inset-0 grid place-items-center p-24">
                     {loading ? (
                       <div className="h-[200px] w-[260px] animate-pulse bg-canvas/10" />
                     ) : heroImage && (
-                      <img
+                      <motion.img
                         src={heroImage}
                         alt={heroPc?.name || 'Featured PC'}
                         width="640"
                         height="520"
-                        className="max-h-[320px] w-[88%] object-contain drop-shadow-[0_24px_28px_rgba(0,0,0,.45)]"
+                        className="relative max-h-[320px] w-[88%] object-contain drop-shadow-[0_24px_28px_rgba(0,0,0,.55)]"
                         decoding="async"
                         fetchpriority="high"
+                        initial={reduceMotion ? false : { opacity: 0, scale: 0.9, y: 20 }}
+                        animate={{ opacity: 1, scale: 1, y: 0 }}
+                        transition={{ duration: 0.9, ease: easeOut, delay: 0.2 }}
+                        whileHover={reduceMotion ? undefined : { y: -6, transition: { duration: 0.4 } }}
                       />
                     )}
                   </div>
@@ -200,9 +217,9 @@ export default function Home() {
                 >
                   <Link
                     to={to}
-                    className="group flex h-full flex-col justify-between gap-24 bg-surface-1 p-20 transition hover:bg-canvas"
+                    className="tilt-card group flex h-full flex-col justify-between gap-24 bg-surface-1 p-20 transition hover:bg-canvas"
                   >
-                    <Icon className="h-24 w-24 text-ink-soft transition group-hover:text-accent-heat" aria-hidden="true" />
+                    <Icon className="h-24 w-24 text-ink-soft transition-transform duration-300 group-hover:scale-110 group-hover:rotate-[-6deg] group-hover:text-accent-heat" aria-hidden="true" />
                     <div>
                       <p className="text-body-medium font-semibold leading-tight tracking-[-.005em]">{label}</p>
                       <p className="meta mt-6">{sub}</p>
@@ -233,7 +250,7 @@ export default function Home() {
                 {dealPct > 0 && <span className="border border-accent-heat px-10 py-4 text-label-x-small font-semibold uppercase tracking-[0.08em] text-accent-heat">Save {dealPct}%</span>}
                 <span className="inline-flex items-center gap-6 text-label-x-small text-canvas/60"><Clock className="h-12 w-12" aria-hidden="true" /> Ends Sunday</span>
               </div>
-              <Link to="/gaming-pcs" className="btn-primary" data-tone="heat">
+              <Link to="/gaming-pcs" className="btn-primary magnetic" data-tone="heat">
                 Grab it <ArrowRight className="h-16 w-16" aria-hidden="true" />
               </Link>
             </div>
@@ -271,7 +288,7 @@ export default function Home() {
                   Pick case, processor, graphics, memory, storage, cooling, and power. Live compatibility, wattage, and pricing as you choose.
                 </p>
                 <div className="mt-28 flex flex-wrap items-center gap-12">
-                  <Link to="/build" className="btn-primary" data-tone="heat">
+                  <Link to="/build" className="btn-primary magnetic" data-tone="heat">
                     Open configurator <ArrowRight className="h-16 w-16" aria-hidden="true" />
                   </Link>
                   <Link to="/prebuilt" className="inline-flex min-h-[44px] items-center gap-8 rounded-8 border border-canvas/40 px-18 font-semibold text-canvas transition hover:border-canvas hover:bg-canvas/10">
@@ -314,21 +331,21 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Brand strip */}
+        {/* Brand marquee */}
         <section className="border-b border-border-muted bg-canvas-soft">
-          <div className="container-max py-24">
-            <div className="flex items-center justify-between gap-12">
-              <p className="meta">Stocked brands</p>
-              <Link to="/accessories" className="meta inline-flex items-center gap-6 transition hover:text-ink">
-                Browse <ArrowUpRight className="h-12 w-12" aria-hidden="true" />
+          <div className="container-max py-28">
+            <div className="mb-16 flex items-center justify-between gap-12">
+              <p className="meta">Stocked brands · official partners</p>
+              <Link to="/accessories" className="meta link-sweep inline-flex items-center gap-6 transition hover:text-ink">
+                Browse all <ArrowUpRight className="h-12 w-12" aria-hidden="true" />
               </Link>
             </div>
-            <div className="mt-16 grid grid-cols-4 gap-px overflow-hidden border border-border-muted bg-line md:grid-cols-8">
-              {brandStrip.map((b) => (
-                <div key={b} className="grid h-56 place-items-center bg-canvas text-body-small font-semibold tracking-[-.005em] text-ink-soft transition hover:bg-surface-1 hover:text-ink">
-                  {b}
-                </div>
-              ))}
+            <div className="marquee border-y border-border-muted bg-canvas py-20">
+              <div className="marquee__track">
+                {[...brandLogos, ...brandLogos].map(({ name, Logo }, i) => (
+                  <Logo key={`${name}-${i}`} className="marquee__logo" />
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -395,7 +412,7 @@ export default function Home() {
                 placeholder="you@studio.com"
                 className="input-base flex-1"
               />
-              <button type="submit" className="btn-primary" data-tone="heat">
+              <button type="submit" className="btn-primary magnetic" data-tone="heat">
                 Subscribe <ChevronRight className="h-16 w-16" aria-hidden="true" />
               </button>
             </form>
@@ -406,11 +423,11 @@ export default function Home() {
   )
 }
 
-function HeroStat({ label, value }) {
+function HeroStat({ label, value, valueNode }) {
   return (
     <div>
       <dt className="text-label-x-small uppercase tracking-[0.08em] text-canvas/55">{label}</dt>
-      <dd className="mt-4 text-body-large font-semibold tracking-[-.01em] text-canvas">{value}</dd>
+      <dd className="mt-4 text-body-large font-semibold tracking-[-.01em] text-canvas tabular-nums">{valueNode ?? value}</dd>
     </div>
   )
 }

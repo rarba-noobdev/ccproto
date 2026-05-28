@@ -3,7 +3,6 @@ import { motion, useReducedMotion } from 'framer-motion'
 import {
   ArrowRight,
   ArrowUpRight,
-  Star,
   Truck,
   ShieldCheck,
   CreditCard,
@@ -24,6 +23,7 @@ import RetailLayout from '@/components/retail/RetailLayout'
 import { ProductSkeleton } from '@/components/retail/ProductCard'
 import ProductDialog from '@/components/retail/ProductDialog'
 import { ErrorBanner } from '@/components/retail/StatusPanel'
+import RatingStars from '@/components/ui/RatingStars'
 import { fetchHomeData } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { formatINR } from '@/utils/currency'
@@ -79,7 +79,7 @@ export default function Home() {
               <span aria-hidden="true">·</span>
               <Link to="/contact" className="transition hover:text-canvas">Help</Link>
               <span aria-hidden="true">·</span>
-              <span>Bengaluru showroom</span>
+              <span>Chennai showroom</span>
             </div>
           </div>
         </div>
@@ -380,11 +380,7 @@ export default function Home() {
                 { id: 'fallback-3', initials: 'KP', body: 'Quiet workstation, clean cable run, accurate thermals.', author: 'K. Pillai · Editor' },
               ]).map((t) => (
                 <blockquote key={t.id} className="flex h-full flex-col gap-16 bg-canvas p-28">
-                  <div className="flex items-center gap-2">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className="h-14 w-14 fill-accent-heat text-accent-heat" aria-hidden="true" />
-                    ))}
-                  </div>
+                  <RatingStars rating={t.rating || 5} size={14} />
                   <p className="flex-1 text-body-large font-medium leading-[1.5] text-ink">"{t.body}"</p>
                   <p className="meta">{t.author || t.initials || 'Customer'}</p>
                 </blockquote>
@@ -550,14 +546,8 @@ function ProductCard({ pc, index }) {
       <div className="flex flex-1 flex-col gap-10 border-t border-border-muted p-16">
         <p className="meta">{pc.badge || pc.tagline || 'Custom build'}</p>
         <h3 className="line-clamp-2 min-h-[40px] text-body-medium font-semibold leading-20 tracking-[-.005em]">{pc.name}</h3>
-        <div className="flex items-center gap-6 text-label-x-small text-ink-muted">
-          <span className="flex items-center gap-2">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star key={i} className="h-10 w-10 fill-accent-heat text-accent-heat" aria-hidden="true" />
-            ))}
-          </span>
-          <span>4.9 · 128</span>
-        </div>
+        <RatingStars rating={pc.rating || 4.9} size={11} showValue reviewCount={pc.review_count || 128} />
+
         <div className="mt-auto flex items-end justify-between gap-8 pt-10">
           <div>
             <p className="price text-title-h5 font-semibold leading-none">{formatINR(pc.price)}</p>

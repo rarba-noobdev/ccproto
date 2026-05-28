@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { X, Heart, ShoppingBag, Star, Truck, ShieldCheck, CreditCard, Check } from 'lucide-react'
+import { X, Heart, ShoppingBag, Truck, ShieldCheck, CreditCard, Check } from 'lucide-react'
 import clsx from 'clsx'
 import useStore from '@/store/useStore'
 import { formatINR } from '@/utils/currency'
 import { GBadge, StockBar, PulseDot, HudMeter } from '@/components/ui/Hud'
+import RatingStars from '@/components/ui/RatingStars'
 
 const easeOut = [0.23, 1, 0.32, 1]
 
@@ -121,13 +122,7 @@ export default function ProductDialog({ product, open, onClose }) {
                   {product.name}
                 </h2>
                 <div className="mt-12 flex flex-wrap items-center gap-x-16 gap-y-6 text-label-x-small text-ink-soft">
-                  <span className="inline-flex items-center gap-4">
-                    {Array.from({ length: 5 }).map((_, i) => (
-                      <Star key={i} className={clsx('h-12 w-12', i < Math.round(rating) ? 'fill-accent-heat text-accent-heat' : 'text-line-strong')} aria-hidden="true" />
-                    ))}
-                    <span className="ml-4 font-medium text-ink">{rating.toFixed(1)}</span>
-                    <span className="text-ink-muted">· {reviewCount} reviews</span>
-                  </span>
+                  <RatingStars rating={rating} size={14} showValue reviewCount={`${reviewCount} reviews`} />
                   {product.warranty && <span>· {product.warranty} warranty</span>}
                 </div>
               </motion.div>

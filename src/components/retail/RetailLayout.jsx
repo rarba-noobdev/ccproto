@@ -234,7 +234,7 @@ export function Footer() {
               decoding="async"
               loading="lazy"
             />
-            <p className="meta mt-12">Bengaluru, IN · Est. 2014</p>
+            <p className="meta mt-12">Chennai, IN · Est. 2014</p>
           </div>
           <nav className="flex flex-wrap gap-28 text-body-small font-medium text-ink-soft" aria-label="Footer">
             <Link to="/build" className="hover:text-ink">Configurator</Link>

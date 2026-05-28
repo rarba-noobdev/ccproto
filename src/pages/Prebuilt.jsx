@@ -34,7 +34,7 @@ export default function Prebuilt() {
       <PageHeader
         kicker="Issue 02 · Systems"
         title="Ready-to-ship builds."
-        description="Assembled, benched, and shipped from Bengaluru."
+        description="Assembled, benched, and shipped from Chennai."
       >
         <SelectMenu ariaLabel="Sort systems" className="w-full sm:w-[260px]" options={sortItems} value={sort} onChange={setSort} />
       </PageHeader>

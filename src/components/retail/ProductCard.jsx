@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { Heart, Plus, Star, ImageOff, Flame, Sparkles } from 'lucide-react'
+import { Heart, Plus, ImageOff, Flame, Sparkles } from 'lucide-react'
 import clsx from 'clsx'
 import useStore from '@/store/useStore'
 import { formatINR } from '@/utils/currency'
 import { GBadge, StockBar, PulseDot } from '@/components/ui/Hud'
+import RatingStars from '@/components/ui/RatingStars'
 import ProductDialog from '@/components/retail/ProductDialog'
 
 function formatRating(rating) {
@@ -78,12 +79,7 @@ export function ProductCard({ product, compact = false }) {
         <div className="flex min-w-0 flex-1 flex-col border-t border-border-muted p-16">
           <div className="flex items-center justify-between gap-8">
             <span className="meta truncate">{label}</span>
-            {rating && (
-              <span className="inline-flex items-center gap-4 text-label-x-small font-medium text-ink-soft">
-                <Star className="h-12 w-12 fill-accent-heat text-accent-heat" aria-hidden="true" />
-                {rating}
-              </span>
-            )}
+            {rating && <RatingStars rating={rating} size={12} showValue />}
           </div>
 
           <h3 className="truncate-2 mt-8 min-h-[40px] text-body-medium font-semibold leading-20 tracking-[-.005em]">

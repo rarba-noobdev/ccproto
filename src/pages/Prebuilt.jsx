@@ -74,11 +74,12 @@ export default function Prebuilt() {
             </div>
 
             <aside className="overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_24px_80px_rgba(38,38,38,.10)]">
-              <div className="relative grid min-h-[280px] place-items-center bg-[#f6f3ed] p-6">
+              <div className="relative grid min-h-[240px] place-items-center overflow-hidden bg-[#f6f3ed] p-6">
                 <span className="absolute left-5 top-5 rounded-full bg-[var(--accent-heat)] px-3 py-1 text-[11px] font-black uppercase tracking-[.08em] text-white">
                   {featured?.badge || 'Featured'}
                 </span>
-                {heroImage && <img src={heroImage} alt={featured?.name || 'Featured ready system'} width="420" height="320" className="h-64 w-full object-contain" decoding="async" fetchPriority="high" />}
+                <div className="absolute inset-x-10 bottom-5 h-10 rounded-full bg-black/10 blur-xl" aria-hidden="true" />
+                {heroImage && <img src={heroImage} alt={featured?.name || 'Featured ready system'} width="420" height="320" className="relative max-h-[205px] w-[82%] max-w-[320px] object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,.18)]" decoding="async" fetchPriority="high" />}
               </div>
               <div className="p-5">
                 <div className="mb-3 flex items-start justify-between gap-4">
@@ -145,45 +146,46 @@ function SystemCard({ pc, image, index, addToCart }) {
   return (
     <article className="group flex overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_16px_46px_rgba(38,38,38,.08)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_22px_56px_rgba(38,38,38,.12)]">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative grid h-60 place-items-center border-b border-[var(--line)] bg-[#f6f3ed] p-5">
+        <div className="relative grid h-44 place-items-center overflow-hidden border-b border-[var(--line)] bg-[#f6f3ed] p-4">
+          <div className="absolute inset-x-8 bottom-4 h-8 rounded-full bg-black/10 blur-xl" aria-hidden="true" />
           <span className="absolute left-4 top-4 rounded-full bg-[var(--ink)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[.08em] text-[var(--canvas)]">
             {index === 0 ? 'Best pick' : pc.badge || `P${index + 1}`}
           </span>
           <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border border-[var(--line)] bg-white px-2.5 py-1 text-[10px] font-black text-[var(--ink-muted)]">
             <Star className="h-3 w-3 fill-[var(--warning)] text-[var(--warning)]" /> 4.7
           </span>
-          {image && <img src={image} alt={pc.name} width="420" height="300" className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.025]" loading="lazy" decoding="async" />}
+          {image && <img src={image} alt={pc.name} width="420" height="300" className="relative max-h-[138px] w-[78%] max-w-[260px] object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,.16)] transition duration-300 group-hover:scale-[1.025]" loading="lazy" decoding="async" />}
         </div>
 
-        <div className="flex flex-1 flex-col p-5">
-          <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="flex flex-1 flex-col p-4">
+          <div className="mb-3 flex items-start justify-between gap-4">
             <div className="min-w-0">
               <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[.12em] text-[var(--ink-muted)]">
                 <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
                 Ready system
               </p>
-              <h2 className="line-clamp-2 min-h-14 text-2xl font-black leading-7 tracking-[-.055em]">{pc.name}</h2>
-              <p className="mt-2 line-clamp-2 text-sm font-semibold leading-6 text-[var(--ink-muted)]">{pc.tagline}</p>
+              <h2 className="line-clamp-1 text-xl font-black leading-6 tracking-[-.05em]">{pc.name}</h2>
+              <p className="mt-1 line-clamp-1 text-sm font-semibold text-[var(--ink-muted)]">{pc.tagline}</p>
             </div>
           </div>
 
-          <div className="grid gap-2">
+          <div className="grid gap-1.5">
             <Spec icon={Cpu} label="CPU" value={pc.cpu?.name} />
             <Spec icon={Monitor} label="GPU" value={pc.gpu?.name} />
             <Spec icon={MemoryStick} label="RAM" value={pc.ram?.name} />
             <Spec icon={HardDrive} label="SSD" value={pc.storage?.name} />
           </div>
 
-          <div className="mt-4 grid grid-cols-4 gap-2 text-center">
+          <div className="mt-3 grid grid-cols-4 gap-1.5 text-center">
             <Metric value={pc.fps_1080p} label="1080p" />
             <Metric value={pc.fps_1440p} label="1440p" />
             <Metric value={pc.fps_4k} label="4K" />
             <Metric value={pc.stock} label="Stock" />
           </div>
 
-          <div className="mt-5 flex items-end justify-between gap-4 border-t border-[var(--line)] pt-4">
+          <div className="mt-4 flex items-end justify-between gap-4 border-t border-[var(--line)] pt-4">
             <div>
-              <div className="price text-3xl font-black leading-none">{formatINR(pc.price)}</div>
+              <div className="price text-2xl font-black leading-none">{formatINR(pc.price)}</div>
               {pc.mrp && <div className="price mt-1 text-sm font-bold text-[var(--ink-muted)] line-through">{formatINR(pc.mrp)}</div>}
             </div>
             <button type="button" onClick={() => addToCart({ ...pc, image })} className="btn-primary min-h-11 px-5 text-sm">

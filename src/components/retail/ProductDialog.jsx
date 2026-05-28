@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react'
+import { createPortal } from 'react-dom'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { X, Heart, ShoppingBag, Star, Truck, ShieldCheck, CreditCard, Check } from 'lucide-react'
 import clsx from 'clsx'
@@ -43,7 +44,9 @@ export default function ProductDialog({ product, open, onClose }) {
     onClose()
   }
 
-  return (
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-[80] grid place-items-center px-12 py-12 sm:px-24 sm:py-24">
@@ -254,7 +257,8 @@ export default function ProductDialog({ product, open, onClose }) {
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   )
 }
 

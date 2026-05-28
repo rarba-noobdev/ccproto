@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react'
 import {
-  ArrowRight,
   Cpu,
   Gauge,
   HardDrive,
@@ -11,7 +10,6 @@ import {
   ShoppingCart,
   Sparkles,
   Star,
-  Zap,
 } from 'lucide-react'
 import RetailLayout from '@/components/retail/RetailLayout'
 import SelectMenu from '@/components/ui/SelectMenu'
@@ -129,7 +127,7 @@ export default function Prebuilt() {
           {error && <div className="panel mb-6 rounded-xl p-5 text-red-700">{error.message}</div>}
 
           {loading && (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {Array.from({ length: 6 }).map((_, index) => <SystemSkeleton key={index} />)}
             </div>
           )}
@@ -144,7 +142,7 @@ export default function Prebuilt() {
           )}
 
           {!loading && pcs.length > 0 && (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {pcs.map((pc, index) => {
                 const image = pc.image || pc.case?.image || pc.gpu?.image || pc.cpu?.image
                 return <SystemCard key={pc.id} pc={pc} image={image} index={index} addToCart={addToCart} />
@@ -159,51 +157,46 @@ export default function Prebuilt() {
 
 function SystemCard({ pc, image, index, addToCart }) {
   return (
-    <article className="group flex overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_16px_46px_rgba(38,38,38,.08)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_22px_56px_rgba(38,38,38,.12)]">
+    <article className="group flex overflow-hidden rounded-[26px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_12px_34px_rgba(38,38,38,.07)] transition duration-200 hover:-translate-y-0.5 hover:border-[var(--line-strong)] hover:shadow-[0_18px_44px_rgba(38,38,38,.10)]">
       <div className="flex min-w-0 flex-1 flex-col">
-        <div className="relative grid h-44 place-items-center overflow-hidden border-b border-[var(--line)] bg-[#f6f3ed] p-4">
-          <div className="absolute inset-x-8 bottom-4 h-8 rounded-full bg-black/10 blur-xl" aria-hidden="true" />
-          <span className="absolute left-4 top-4 rounded-full bg-[var(--ink)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[.08em] text-[var(--canvas)]">
+        <div className="relative m-2 grid h-36 place-items-center overflow-hidden rounded-[22px] border border-[var(--line)] bg-[#f6f3ed] p-3">
+          <div className="absolute inset-x-8 bottom-3 h-7 rounded-full bg-black/10 blur-xl" aria-hidden="true" />
+          <span className="absolute left-3 top-3 rounded-full bg-[var(--ink)] px-2.5 py-1 text-[10px] font-black uppercase tracking-[.08em] text-[var(--canvas)]">
             {index === 0 ? 'Best pick' : pc.badge || `P${index + 1}`}
           </span>
-          <span className="absolute right-4 top-4 inline-flex items-center gap-1 rounded-full border border-[var(--line)] bg-white px-2.5 py-1 text-[10px] font-black text-[var(--ink-muted)]">
+          <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full border border-[var(--line)] bg-white px-2.5 py-1 text-[10px] font-black text-[var(--ink-muted)]">
             <Star className="h-3 w-3 fill-[var(--warning)] text-[var(--warning)]" /> 4.7
           </span>
-          {image && <img src={image} alt={pc.name} width="420" height="300" className="relative max-h-[138px] w-[78%] max-w-[260px] object-contain drop-shadow-[0_14px_16px_rgba(0,0,0,.16)] transition duration-300 group-hover:scale-[1.025]" loading="lazy" decoding="async" />}
+          {image && <img src={image} alt={pc.name} width="360" height="240" className="relative max-h-[104px] w-[74%] max-w-[210px] object-contain drop-shadow-[0_12px_14px_rgba(0,0,0,.14)] transition duration-300 group-hover:scale-[1.025]" loading="lazy" decoding="async" />}
         </div>
 
-        <div className="flex flex-1 flex-col p-4">
-          <div className="mb-3 flex items-start justify-between gap-4">
+        <div className="flex flex-1 flex-col p-4 pt-2">
+          <div className="mb-3 min-w-0">
+            <p className="mb-1 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[.12em] text-[var(--ink-muted)]">
+              <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
+              Ready system
+            </p>
+            <h2 className="line-clamp-1 text-[19px] font-black leading-6 tracking-[-.05em]">{pc.name}</h2>
+            <p className="mt-1 line-clamp-1 text-xs font-bold text-[var(--ink-muted)]">{pc.tagline}</p>
+          </div>
+
+          <div className="grid gap-1.5 rounded-[18px] border border-[var(--line)] bg-[var(--surface-2)] p-2.5">
+            <SummarySpec icon={Monitor} value={pc.gpu?.name} />
+            <SummarySpec icon={Cpu} value={pc.cpu?.name} />
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            <Chip icon={MemoryStick} value={compactPart(pc.ram?.name, 'DDR5')} />
+            <Chip icon={HardDrive} value={compactPart(pc.storage?.name, 'SSD')} />
+            <Chip icon={Gauge} value={`${pc.fps_1440p || '-'} FPS`} />
+          </div>
+
+          <div className="mt-4 flex items-end justify-between gap-3 border-t border-[var(--line)] pt-3">
             <div className="min-w-0">
-              <p className="mb-2 inline-flex items-center gap-1.5 text-[10px] font-black uppercase tracking-[.12em] text-[var(--ink-muted)]">
-                <Sparkles className="h-3.5 w-3.5" aria-hidden="true" />
-                Ready system
-              </p>
-              <h2 className="line-clamp-1 text-xl font-black leading-6 tracking-[-.05em]">{pc.name}</h2>
-              <p className="mt-1 line-clamp-1 text-sm font-semibold text-[var(--ink-muted)]">{pc.tagline}</p>
-            </div>
-          </div>
-
-          <div className="grid gap-1.5">
-            <Spec icon={Cpu} label="CPU" value={pc.cpu?.name} />
-            <Spec icon={Monitor} label="GPU" value={pc.gpu?.name} />
-            <Spec icon={MemoryStick} label="RAM" value={pc.ram?.name} />
-            <Spec icon={HardDrive} label="SSD" value={pc.storage?.name} />
-          </div>
-
-          <div className="mt-3 grid grid-cols-4 gap-1.5 text-center">
-            <Metric value={pc.fps_1080p} label="1080p" />
-            <Metric value={pc.fps_1440p} label="1440p" />
-            <Metric value={pc.fps_4k} label="4K" />
-            <Metric value={pc.stock} label="Stock" />
-          </div>
-
-          <div className="mt-4 flex items-end justify-between gap-4 border-t border-[var(--line)] pt-4">
-            <div>
-              <div className="price text-2xl font-black leading-none">{formatINR(pc.price)}</div>
+              <div className="price text-[22px] font-black leading-none">{formatINR(pc.price)}</div>
               {pc.mrp && <div className="price mt-1 text-sm font-bold text-[var(--ink-muted)] line-through">{formatINR(pc.mrp)}</div>}
             </div>
-            <button type="button" onClick={() => addToCart({ ...pc, image })} className="btn-primary min-h-11 px-5 text-sm">
+            <button type="button" onClick={() => addToCart({ ...pc, image })} className="btn-primary min-h-10 px-4 text-sm">
               <ShoppingCart className="h-4 w-4" /> Add
             </button>
           </div>
@@ -213,15 +206,28 @@ function SystemCard({ pc, image, index, addToCart }) {
   )
 }
 
-function Spec({ icon: Icon, label, value }) {
+function compactPart(value, fallback) {
+  const text = value || fallback
+  const capacity = text.match(/\b\d+\s?GB\b/i)?.[0]
+  const speed = text.match(/\b\d{4,5}\s?(?:MT\/s|MTS|MHz)\b/i)?.[0]
+  return [capacity, speed].filter(Boolean).join(' ') || fallback
+}
+
+function SummarySpec({ icon: Icon, value }) {
   return (
-    <div className="grid min-w-0 grid-cols-[26px_44px_1fr] items-center gap-2 rounded-[14px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2">
-      <span className="grid h-6 w-6 place-items-center rounded-full bg-white text-[var(--ink-soft)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
-        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-      </span>
-      <span className="text-[10px] font-black uppercase tracking-wide text-[var(--ink-muted)]">{label}</span>
-      <span className="truncate text-xs font-black text-[var(--ink-soft)]">{value || 'Selected part'}</span>
+    <div className="flex min-w-0 items-center gap-2">
+      <Icon className="h-3.5 w-3.5 shrink-0 text-[var(--ink-muted)]" aria-hidden="true" />
+      <span className="truncate text-xs font-black text-[var(--ink-soft)]">{value || 'Configured part'}</span>
     </div>
+  )
+}
+
+function Chip({ icon: Icon, value }) {
+  return (
+    <span className="inline-flex min-h-7 items-center gap-1.5 rounded-full bg-[var(--surface-2)] px-2.5 text-[11px] font-black text-[var(--ink-muted)]">
+      <Icon className="h-3 w-3" aria-hidden="true" />
+      {value}
+    </span>
   )
 }
 
@@ -248,14 +254,18 @@ function Metric({ value, label }) {
 
 function SystemSkeleton() {
   return (
-    <div className="overflow-hidden rounded-[28px] border border-[var(--line)] bg-[var(--surface-1)]">
-      <div className="h-60 animate-pulse bg-black/5" />
-      <div className="space-y-3 p-5">
+    <div className="overflow-hidden rounded-[26px] border border-[var(--line)] bg-[var(--surface-1)]">
+      <div className="m-2 h-36 animate-pulse rounded-[22px] bg-black/5" />
+      <div className="space-y-3 p-4 pt-2">
         <div className="h-4 w-20 animate-pulse rounded-full bg-black/10" />
-        <div className="h-7 w-full animate-pulse rounded-full bg-black/10" />
-        <div className="h-5 w-2/3 animate-pulse rounded-full bg-black/10" />
-        <div className="grid grid-cols-4 gap-2">
-          {Array.from({ length: 4 }).map((_, index) => <div key={index} className="h-14 animate-pulse rounded-[14px] bg-black/10" />)}
+        <div className="h-6 w-4/5 animate-pulse rounded-full bg-black/10" />
+        <div className="h-4 w-1/2 animate-pulse rounded-full bg-black/10" />
+        <div className="space-y-2 rounded-[18px] border border-[var(--line)] bg-[var(--surface-2)] p-3">
+          <div className="h-3 w-full animate-pulse rounded-full bg-black/10" />
+          <div className="h-3 w-3/4 animate-pulse rounded-full bg-black/10" />
+        </div>
+        <div className="flex gap-2">
+          {Array.from({ length: 3 }).map((_, index) => <div key={index} className="h-7 w-16 animate-pulse rounded-full bg-black/10" />)}
         </div>
       </div>
     </div>

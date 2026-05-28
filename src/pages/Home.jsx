@@ -53,6 +53,8 @@ export default function Home() {
   const bestsellers = prebuilts.slice(0, 5)
   const deals = components.slice(0, 8)
   const featureParts = components.slice(8, 12)
+  const heroPrice = heroPc?.price || 0
+  const heroSavings = heroPc?.mrp ? Math.max(0, heroPc.mrp - heroPc.price) : 0
 
   return (
     <RetailLayout>
@@ -64,7 +66,7 @@ export default function Home() {
             transition={{ duration: 0.32, ease: easeOut }}
             className="relative overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_28px_80px_rgba(38,38,38,.12)]"
           >
-            <div className="grid lg:grid-cols-[minmax(0,1fr)_420px]">
+            <div className="grid lg:grid-cols-[minmax(0,1.08fr)_minmax(360px,.92fr)]">
               <div className="p-6 sm:p-8 lg:p-10">
                 <p className="kicker mb-5"><Sparkles className="h-4 w-4" /> Custom PCs, clear prices</p>
                 <h1 className="max-w-4xl text-[54px] font-bold leading-[.86] tracking-[-.08em] sm:text-[82px] lg:text-[104px]">
@@ -99,29 +101,47 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="relative min-h-[340px] overflow-hidden bg-[#f5f2ea]">
+              <div className="relative flex min-h-[340px] flex-col overflow-hidden bg-[#f5f2ea]">
                 <div className="absolute left-5 top-5 z-10 rounded-full bg-[var(--accent-heat)] px-3 py-1 text-[11px] font-bold uppercase tracking-[.08em] text-white">
                   {heroPc?.badge || 'Featured'}
                 </div>
                 <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(38,38,38,.055)_0_1px,transparent_1px_22px)]" />
-                <div className="absolute inset-x-10 bottom-8 h-20 rounded-full bg-black/10 blur-3xl" />
-                {loading ? (
-                  <div className="grid h-full place-items-center">
-                    <div className="h-64 w-64 animate-pulse rounded-[30px] bg-black/5" />
+                <div className="absolute inset-x-10 bottom-32 h-16 rounded-full bg-black/10 blur-3xl" />
+
+                <div className="flex flex-1 items-center justify-center px-6 pt-14">
+                  {loading ? (
+                    <div className="grid h-64 w-64 place-items-center">
+                      <div className="h-64 w-64 animate-pulse rounded-[30px] bg-black/5" />
+                    </div>
+                  ) : (
+                    heroImage && (
+                      <img
+                        src={heroImage}
+                        alt={heroPc?.name || 'Featured PC'}
+                        width="560"
+                        height="460"
+                        className="relative mx-auto max-h-[290px] w-[86%] max-w-[390px] object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,.16)] transition duration-300 hover:scale-[1.02]"
+                        decoding="async"
+                        fetchPriority="high"
+                      />
+                    )
+                  )}
+                </div>
+
+                <div className="mt-auto grid gap-3 border-t border-[rgba(38,38,38,.08)] bg-[rgba(255,255,255,.46)] p-4 backdrop-blur-sm sm:grid-cols-3">
+                  <div className="rounded-[20px] border border-[var(--line)] bg-white/80 p-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[.12em] text-[var(--ink-muted)]">Starting at</div>
+                    <div className="mt-1 text-lg font-bold">{formatINR(heroPrice)}</div>
                   </div>
-                ) : (
-                  heroImage && (
-                    <img
-                      src={heroImage}
-                      alt={heroPc?.name || 'Featured PC'}
-                      width="520"
-                      height="430"
-                      className="relative mx-auto max-h-[300px] w-[84%] max-w-[360px] object-contain p-6 drop-shadow-[0_18px_18px_rgba(0,0,0,.16)] transition duration-300 hover:scale-[1.02]"
-                      decoding="async"
-                      fetchPriority="high"
-                    />
-                  )
-                )}
+                  <div className="rounded-[20px] border border-[var(--line)] bg-white/80 p-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[.12em] text-[var(--ink-muted)]">Build type</div>
+                    <div className="mt-1 truncate text-lg font-bold">{heroPc?.tagline || 'Balanced performance'}</div>
+                  </div>
+                  <div className="rounded-[20px] border border-[var(--line)] bg-white/80 p-3">
+                    <div className="text-[10px] font-bold uppercase tracking-[.12em] text-[var(--ink-muted)]">Savings</div>
+                    <div className="mt-1 text-lg font-bold text-[var(--success)]">{heroSavings ? formatINR(heroSavings) : 'Live pricing'}</div>
+                  </div>
+                </div>
               </div>
             </div>
           </motion.div>

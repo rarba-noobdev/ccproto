@@ -1,6 +1,24 @@
 import { Link } from 'react-router-dom'
 import { motion, useReducedMotion } from 'framer-motion'
-import { ArrowRight, ArrowUpRight, Star } from 'lucide-react'
+import {
+  ArrowRight,
+  ArrowUpRight,
+  Star,
+  Truck,
+  ShieldCheck,
+  CreditCard,
+  Headphones,
+  Gamepad2,
+  Cpu,
+  Monitor,
+  HardDrive,
+  Keyboard,
+  Wrench,
+  Tag,
+  Clock,
+  Sparkles,
+  ChevronRight,
+} from 'lucide-react'
 import RetailLayout from '@/components/retail/RetailLayout'
 import { ProductSkeleton } from '@/components/retail/ProductCard'
 import { ErrorBanner } from '@/components/retail/StatusPanel'
@@ -10,12 +28,22 @@ import { formatINR } from '@/utils/currency'
 
 const easeOut = [0.23, 1, 0.32, 1]
 
-const indexLinks = [
-  { code: '01', label: 'Configurator', to: '/build' },
-  { code: '02', label: 'Systems', to: '/prebuilt' },
-  { code: '03', label: 'Workstations', to: '/workstations' },
-  { code: '04', label: 'Catalogue', to: '/accessories' },
-  { code: '05', label: 'Notes', to: '/blog' },
+const categoryTiles = [
+  { label: 'Gaming PCs',    sub: 'Prebuilt rigs',     to: '/prebuilt',      Icon: Gamepad2 },
+  { label: 'Workstations',  sub: 'Creator & studio',  to: '/workstations',  Icon: Monitor },
+  { label: 'Components',    sub: 'CPU · GPU · RAM',   to: '/gaming-pcs',    Icon: Cpu },
+  { label: 'Storage',       sub: 'SSD & NVMe',        to: '/category/ssd',  Icon: HardDrive },
+  { label: 'Peripherals',   sub: 'Keys · mice · audio', to: '/accessories', Icon: Keyboard },
+  { label: 'Configurator',  sub: 'Build to order',    to: '/build',         Icon: Wrench },
+]
+
+const brandStrip = ['NVIDIA', 'AMD', 'Intel', 'Corsair', 'ASUS', 'MSI', 'Samsung', 'Logitech']
+
+const trustBar = [
+  { Icon: Truck,       title: 'Free shipping',  sub: 'Pan-India · orders ₹2,500+' },
+  { Icon: ShieldCheck, title: '3-year warranty', sub: 'On every custom build' },
+  { Icon: CreditCard,  title: 'No-cost EMI',     sub: '6 / 9 / 12 month plans' },
+  { Icon: Headphones,  title: 'Bench support',   sub: 'Mon–Sat · 10am–8pm IST' },
 ]
 
 export default function Home() {
@@ -26,75 +54,119 @@ export default function Home() {
   const testimonials = Array.isArray(data?.testimonials) ? data.testimonials : []
   const heroPc = prebuilts[0]
   const heroImage = heroPc?.image || heroPc?.case?.image || heroPc?.gpu?.image || components[0]?.image
-  const bestsellers = prebuilts.slice(0, 5)
-  const deals = components.slice(0, 8)
+  const promoA = prebuilts[1]
+  const promoB = components.find((c) => c.image && c.id !== prebuilts[1]?.id) || components[0]
+  const bestsellers = prebuilts.slice(0, 8)
+  const newArrivals = components.slice(0, 6)
+  const dealOfWeek = components.find((c) => (c.mrp || 0) > (c.price || 0)) || components[0]
+  const dealSave = dealOfWeek?.mrp ? Math.max(0, (dealOfWeek.mrp - dealOfWeek.price)) : 0
+  const dealPct = dealOfWeek?.mrp ? Math.round((dealSave / dealOfWeek.mrp) * 100) : 0
 
   return (
     <RetailLayout>
       <main>
-        {/* Hero — editorial cover */}
-        <section className="border-b border-border-muted">
-          <div className="container-max grid gap-32 py-48 lg:grid-cols-[1.25fr_1fr] lg:gap-56 lg:py-72">
+        {/* Announcement bar */}
+        <div className="bg-ink text-canvas">
+          <div className="container-max flex flex-wrap items-center justify-between gap-12 py-8 text-label-x-small">
+            <p className="inline-flex items-center gap-8 font-medium">
+              <Sparkles className="h-12 w-12 text-accent-heat" aria-hidden="true" />
+              Free shipping across India on orders over ₹2,500 · No-cost EMI from ₹3,999/mo
+            </p>
+            <div className="flex items-center gap-16 text-canvas/72">
+              <Link to="/about" className="transition hover:text-canvas">Track order</Link>
+              <span aria-hidden="true">·</span>
+              <Link to="/contact" className="transition hover:text-canvas">Help</Link>
+              <span aria-hidden="true">·</span>
+              <span>Bengaluru showroom</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Hero — storefront banner + side promos */}
+        <section className="border-b border-border-muted bg-canvas-soft">
+          <div className="container-max grid gap-24 py-32 lg:grid-cols-[1.55fr_1fr] lg:gap-32 lg:py-48">
+            {/* Primary banner */}
             <motion.div
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
+              initial={reduceMotion ? false : { opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4, ease: easeOut }}
-              className="flex flex-col"
+              transition={{ duration: 0.45, ease: easeOut }}
+              className="relative overflow-hidden border border-border-muted bg-ink text-canvas"
             >
-              <p className="chapter mb-24">Issue 01 · Configurator</p>
-              <h1 className="display-large">
-                Computers, made&nbsp;<span className="text-accent-heat">to order</span>.
-              </h1>
-              <p className="mt-24 max-w-[520px] text-body-large leading-[1.55] text-ink-soft">
-                Component-level pricing for gaming, creator, and production rigs. Built in Bengaluru, shipped across India.
-              </p>
-              <div className="mt-32 flex flex-wrap items-center gap-12">
-                <Link to="/build" className="btn-primary" data-tone="heat">
-                  Start configurator <ArrowRight className="h-16 w-16" aria-hidden="true" />
-                </Link>
-                <Link to="/prebuilt" className="btn-secondary">
-                  Browse systems
-                </Link>
-              </div>
-
-              <dl className="mt-48 grid grid-cols-3 gap-16 border-t border-border-muted pt-24">
-                <Stat label="Builds shipped" value="2,400+" />
-                <Stat label="Avg. spec spread" value="6 tiers" />
-                <Stat label="Warranty" value="3 yrs" />
-              </dl>
-            </motion.div>
-
-            <div className="relative flex flex-col justify-between border border-border-muted bg-surface-1">
-              <div className="flex items-center justify-between border-b border-border-muted px-20 py-12">
-                <p className="meta">Featured · {heroPc?.badge || 'Today'}</p>
-                <Link to="/prebuilt" className="meta inline-flex items-center gap-6 transition hover:text-ink">
-                  View <ArrowUpRight className="h-12 w-12" aria-hidden="true" />
-                </Link>
-              </div>
-              <div className="product-image-box relative grid min-h-[280px] flex-1 place-items-center p-32">
-                {loading ? (
-                  <div className="h-[180px] w-[180px] animate-pulse bg-surface-2" />
-                ) : (
-                  heroImage && (
-                    <img
-                      src={heroImage}
-                      alt={heroPc?.name || 'Featured PC'}
-                      width="560"
-                      height="460"
-                      className="relative max-h-[260px] w-[78%] max-w-[360px] object-contain drop-shadow-[0_18px_22px_rgba(0,0,0,.18)]"
-                      decoding="async"
-                      fetchpriority="high"
-                    />
-                  )
-                )}
-              </div>
-              <div className="border-t border-border-muted px-20 py-16">
-                <p className="text-body-medium font-semibold leading-[1.3] tracking-[-.005em]">{heroPc?.name || 'Featured system'}</p>
-                <div className="mt-8 flex items-end justify-between">
-                  <p className="meta">{heroPc?.tagline || 'Balanced performance'}</p>
-                  <p className="price text-title-h5 font-semibold">{formatINR(heroPc?.price || 0)}</p>
+              <div className="poster-grain absolute inset-0" aria-hidden="true" />
+              <div className="relative grid gap-24 p-32 md:grid-cols-[1.1fr_1fr] md:items-center md:p-48">
+                <div>
+                  <span className="inline-flex items-center gap-8 border border-canvas/30 px-10 py-4 text-label-x-small font-medium uppercase tracking-[0.08em] text-canvas/82">
+                    <span className="h-6 w-6 rounded-full bg-accent-heat" /> New season · Issue 01
+                  </span>
+                  <h1 className="mt-20 text-title-h1 font-semibold leading-[1.02] tracking-[-.03em] md:text-display-large">
+                    Custom rigs,<br /><span className="text-accent-heat">benched & boxed.</span>
+                  </h1>
+                  <p className="mt-20 max-w-[440px] text-body-large leading-[1.5] text-canvas/72">
+                    Component-level pricing for gaming, creator, and production builds. Live compatibility checks, 3-year warranty, ships across India.
+                  </p>
+                  <div className="mt-28 flex flex-wrap items-center gap-12">
+                    <Link to="/build" className="btn-primary" data-tone="heat">
+                      Start configurator <ArrowRight className="h-16 w-16" aria-hidden="true" />
+                    </Link>
+                    <Link to="/prebuilt" className="inline-flex min-h-[44px] items-center gap-8 rounded-8 border border-canvas/40 px-18 font-semibold text-canvas transition hover:border-canvas hover:bg-canvas/10">
+                      Shop prebuilts
+                    </Link>
+                  </div>
+                  <dl className="mt-32 grid max-w-[360px] grid-cols-3 gap-16 border-t border-canvas/15 pt-20">
+                    <HeroStat label="Builds" value="2,400+" />
+                    <HeroStat label="Reviews" value="4.9 ★" />
+                    <HeroStat label="Warranty" value="3 yrs" />
+                  </dl>
+                </div>
+                <div className="relative aspect-[5/4] w-full bg-gradient-to-br from-canvas/10 via-canvas/4 to-transparent">
+                  <div className="absolute inset-0 grid place-items-center p-24">
+                    {loading ? (
+                      <div className="h-[200px] w-[260px] animate-pulse bg-canvas/10" />
+                    ) : heroImage && (
+                      <img
+                        src={heroImage}
+                        alt={heroPc?.name || 'Featured PC'}
+                        width="640"
+                        height="520"
+                        className="max-h-[320px] w-[88%] object-contain drop-shadow-[0_24px_28px_rgba(0,0,0,.45)]"
+                        decoding="async"
+                        fetchpriority="high"
+                      />
+                    )}
+                  </div>
+                  {heroPc && (
+                    <div className="absolute bottom-12 right-12 flex items-center gap-12 border border-canvas/25 bg-ink/80 px-14 py-10 backdrop-blur-sm">
+                      <div className="leading-tight">
+                        <p className="text-label-x-small uppercase tracking-[0.08em] text-canvas/60">Featured</p>
+                        <p className="text-body-small font-semibold text-canvas">{heroPc.name}</p>
+                      </div>
+                      <p className="price text-body-medium font-semibold text-accent-heat">{formatINR(heroPc.price)}</p>
+                    </div>
+                  )}
                 </div>
               </div>
+            </motion.div>
+
+            {/* Side promo stack */}
+            <div className="grid gap-16">
+              <PromoTile
+                eyebrow="Deal of the week"
+                title={dealOfWeek?.name || 'Featured component'}
+                price={dealOfWeek?.price}
+                mrp={dealOfWeek?.mrp}
+                pct={dealPct}
+                image={dealOfWeek?.image}
+                to="/gaming-pcs"
+                tone="light"
+              />
+              <PromoTile
+                eyebrow="Editor's pick"
+                title={promoA?.name || promoB?.name || 'Studio build'}
+                price={promoA?.price || promoB?.price}
+                image={promoA?.image || promoA?.case?.image || promoB?.image}
+                to="/workstations"
+                tone="dark"
+              />
             </div>
           </div>
 
@@ -105,24 +177,35 @@ export default function Home() {
           )}
         </section>
 
-        {/* Index — section bookmarks */}
-        <section className="border-b border-border-muted">
-          <div className="container-max">
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
-              {indexLinks.map(({ code, label, to }, i) => (
+        {/* Shop by category — storefront tile rail */}
+        <section className="border-b border-border-muted bg-canvas">
+          <div className="container-max py-32 md:py-40">
+            <div className="mb-20 flex items-end justify-between gap-12">
+              <div>
+                <p className="meta">Shop by category</p>
+                <h2 className="mt-6 text-title-h3 font-semibold tracking-[-.02em]">Find your aisle</h2>
+              </div>
+              <Link to="/accessories" className="meta inline-flex items-center gap-6 transition hover:text-ink">
+                All categories <ArrowUpRight className="h-12 w-12" aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="grid gap-px overflow-hidden border border-border-muted bg-line sm:grid-cols-3 lg:grid-cols-6">
+              {categoryTiles.map(({ label, sub, to, Icon }, i) => (
                 <motion.div
-                  key={code}
-                  initial={reduceMotion ? false : { opacity: 0 }}
-                  whileInView={{ opacity: 1 }}
+                  key={label}
+                  initial={reduceMotion ? false : { opacity: 0, y: 6 }}
+                  whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.3, delay: i * 0.04 }}
-                  className={`border-border-muted py-24 ${i === 0 ? '' : 'border-l'}`}
                 >
-                  <Link to={to} className="group flex h-full flex-col justify-between gap-32 px-20">
-                    <p className="meta">{code}</p>
-                    <div className="flex items-end justify-between">
-                      <span className="text-title-h5 font-semibold tracking-[-.02em]">{label}</span>
-                      <ArrowUpRight className="h-16 w-16 text-ink-muted transition group-hover:text-ink group-hover:-translate-y-0.5 motion-reduce:transform-none" aria-hidden="true" />
+                  <Link
+                    to={to}
+                    className="group flex h-full flex-col justify-between gap-24 bg-surface-1 p-20 transition hover:bg-canvas"
+                  >
+                    <Icon className="h-24 w-24 text-ink-soft transition group-hover:text-accent-heat" aria-hidden="true" />
+                    <div>
+                      <p className="text-body-medium font-semibold leading-tight tracking-[-.005em]">{label}</p>
+                      <p className="meta mt-6">{sub}</p>
                     </div>
                   </Link>
                 </motion.div>
@@ -131,33 +214,70 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Bestsellers */}
-        <section className="border-b border-border-muted">
-          <div className="container-max py-56">
-            <SectionHead chapter="02" title="Systems" link="/prebuilt" linkLabel="All systems" />
-            <div className="mt-32 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {/* Deal-of-the-week strip */}
+        {dealOfWeek && (
+          <section className="border-b border-border-muted bg-ink text-canvas">
+            <div className="container-max grid gap-24 py-32 md:grid-cols-[auto_1fr_auto] md:items-center md:py-28">
+              <div className="flex items-center gap-12">
+                <span className="grid h-44 w-44 place-items-center bg-accent-heat text-canvas">
+                  <Tag className="h-18 w-18" aria-hidden="true" />
+                </span>
+                <div>
+                  <p className="text-label-x-small uppercase tracking-[0.1em] text-canvas/60">Deal of the week</p>
+                  <p className="text-body-large font-semibold tracking-[-.005em]">{dealOfWeek.name}</p>
+                </div>
+              </div>
+              <div className="flex flex-wrap items-center gap-x-20 gap-y-8 md:justify-center">
+                <span className="price text-title-h4 font-semibold text-accent-heat">{formatINR(dealOfWeek.price)}</span>
+                {dealOfWeek.mrp && <span className="price text-body-medium text-canvas/50 line-through">{formatINR(dealOfWeek.mrp)}</span>}
+                {dealPct > 0 && <span className="border border-accent-heat px-10 py-4 text-label-x-small font-semibold uppercase tracking-[0.08em] text-accent-heat">Save {dealPct}%</span>}
+                <span className="inline-flex items-center gap-6 text-label-x-small text-canvas/60"><Clock className="h-12 w-12" aria-hidden="true" /> Ends Sunday</span>
+              </div>
+              <Link to="/gaming-pcs" className="btn-primary" data-tone="heat">
+                Grab it <ArrowRight className="h-16 w-16" aria-hidden="true" />
+              </Link>
+            </div>
+          </section>
+        )}
+
+        {/* Bestsellers — storefront product grid */}
+        <section className="border-b border-border-muted bg-canvas">
+          <div className="container-max py-48">
+            <SectionHead
+              eyebrow="Bestsellers"
+              title="Most-ordered systems"
+              caption="Picked from this quarter's bench notes"
+              link="/prebuilt"
+              linkLabel="Shop all"
+            />
+            <div className="mt-28 grid gap-px overflow-hidden border border-border-muted bg-line sm:grid-cols-2 lg:grid-cols-4">
               {loading
-                ? Array.from({ length: 5 }).map((_, i) => <ProductSkeleton key={i} />)
-                : bestsellers.map((pc, index) => <SystemTile key={pc.id} pc={pc} index={index} />)}
+                ? Array.from({ length: 8 }).map((_, i) => <ProductSkeleton key={i} />)
+                : bestsellers.map((pc, index) => <ProductCard key={pc.id} pc={pc} index={index} />)}
             </div>
           </div>
         </section>
 
-        {/* Editorial poster */}
+        {/* Configurator promo banner */}
         <section className="border-b border-border-muted">
-          <div className="container-max py-56">
-            <div className="poster poster-grain relative grid gap-32 px-32 py-48 md:grid-cols-[1.4fr_1fr] md:py-72 lg:px-56">
+          <div className="container-max py-48">
+            <div className="poster poster-grain relative grid gap-32 overflow-hidden px-32 py-48 md:grid-cols-[1.4fr_1fr] md:py-56 lg:px-56">
               <div className="relative z-10">
-                <p className="chapter mb-20" style={{ color: 'rgba(246,244,238,.66)' }}>Configurator</p>
-                <h2 className="text-title-h2 font-semibold leading-[1.02] tracking-[-.025em] md:text-title-h1">
-                  Plan, then ship.
+                <p className="meta" style={{ color: 'rgba(246,244,238,.66)' }}>Build to order</p>
+                <h2 className="mt-12 text-title-h2 font-semibold leading-[1.04] tracking-[-.025em] md:text-title-h1">
+                  Spec it. Quote it. Ship it.
                 </h2>
-                <p className="mt-20 max-w-[480px] text-body-large text-canvas/72">
-                  Configure case, processor, graphics, memory, storage, cooling, and power. Compatibility checks run as you choose.
+                <p className="mt-16 max-w-[480px] text-body-large text-canvas/72">
+                  Pick case, processor, graphics, memory, storage, cooling, and power. Live compatibility, wattage, and pricing as you choose.
                 </p>
-                <Link to="/build" className="btn-primary mt-32" data-tone="heat">
-                  Open configurator <ArrowRight className="h-16 w-16" aria-hidden="true" />
-                </Link>
+                <div className="mt-28 flex flex-wrap items-center gap-12">
+                  <Link to="/build" className="btn-primary" data-tone="heat">
+                    Open configurator <ArrowRight className="h-16 w-16" aria-hidden="true" />
+                  </Link>
+                  <Link to="/prebuilt" className="inline-flex min-h-[44px] items-center gap-8 rounded-8 border border-canvas/40 px-18 font-semibold text-canvas transition hover:border-canvas hover:bg-canvas/10">
+                    Compare prebuilts
+                  </Link>
+                </div>
               </div>
               <div className="relative z-10 grid grid-cols-2 gap-px border border-canvas/15 bg-canvas/15">
                 {[
@@ -176,33 +296,109 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Deals */}
-        <section className="border-b border-border-muted">
-          <div className="container-max py-56">
-            <SectionHead chapter="03" title="Parts" link="/gaming-pcs" linkLabel="All parts" />
-            <div className="mt-32 grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-5">
-              {deals.map((part) => <DealCard key={part.id} part={part} />)}
+        {/* New arrivals — horizontal product strip */}
+        <section className="border-b border-border-muted bg-canvas">
+          <div className="container-max py-48">
+            <SectionHead
+              eyebrow="Just landed"
+              title="New arrivals"
+              caption="Fresh inventory on the bench"
+              link="/gaming-pcs"
+              linkLabel="See all parts"
+            />
+            <div className="mt-28 grid gap-px overflow-hidden border border-border-muted bg-line sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+              {newArrivals.map((part) => (
+                <PartCard key={part.id} part={part} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Brand strip */}
+        <section className="border-b border-border-muted bg-canvas-soft">
+          <div className="container-max py-24">
+            <div className="flex items-center justify-between gap-12">
+              <p className="meta">Stocked brands</p>
+              <Link to="/accessories" className="meta inline-flex items-center gap-6 transition hover:text-ink">
+                Browse <ArrowUpRight className="h-12 w-12" aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="mt-16 grid grid-cols-4 gap-px overflow-hidden border border-border-muted bg-line md:grid-cols-8">
+              {brandStrip.map((b) => (
+                <div key={b} className="grid h-56 place-items-center bg-canvas text-body-small font-semibold tracking-[-.005em] text-ink-soft transition hover:bg-surface-1 hover:text-ink">
+                  {b}
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Trust bar */}
+        <section className="border-b border-border-muted bg-canvas">
+          <div className="container-max py-32">
+            <div className="grid gap-px overflow-hidden border border-border-muted bg-line md:grid-cols-4">
+              {trustBar.map(({ Icon, title, sub }) => (
+                <div key={title} className="flex items-start gap-14 bg-surface-1 p-20">
+                  <Icon className="mt-2 h-22 w-22 text-accent-heat" aria-hidden="true" />
+                  <div>
+                    <p className="text-body-medium font-semibold leading-tight tracking-[-.005em]">{title}</p>
+                    <p className="meta mt-6 normal-case tracking-normal">{sub}</p>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
         {/* Testimonials */}
-        <section>
-          <div className="container-max py-56">
-            <SectionHead chapter="04" title="Field reports" />
-            <div className="mt-32 grid gap-px bg-line md:grid-cols-3">
+        <section className="border-b border-border-muted bg-canvas-soft">
+          <div className="container-max py-48">
+            <SectionHead eyebrow="Field reports" title="What customers say" caption="Verified post-delivery reviews" />
+            <div className="mt-28 grid gap-px overflow-hidden border border-border-muted bg-line md:grid-cols-3">
               {(testimonials.length ? testimonials.slice(0, 3) : [
-                { id: 'fallback-1', initials: 'AS', body: 'Walked me through every spec choice. The quote stayed honest from estimate to delivery.', author: 'A. Sharma · Creator' },
+                { id: 'fallback-1', initials: 'AS', body: 'Walked me through every spec choice. Quote stayed honest from estimate to delivery.', author: 'A. Sharma · Creator' },
                 { id: 'fallback-2', initials: 'RV', body: 'Bench notes on the prebuilt page made comparing tiers painless.', author: 'R. Verma · Architect' },
                 { id: 'fallback-3', initials: 'KP', body: 'Quiet workstation, clean cable run, accurate thermals.', author: 'K. Pillai · Editor' },
               ]).map((t) => (
-                <blockquote key={t.id} className="bg-canvas p-32">
-                  <Star className="h-16 w-16 fill-current text-ink" aria-hidden="true" />
-                  <p className="mt-20 text-body-large font-medium leading-[1.45] text-ink">"{t.body}"</p>
-                  <p className="meta mt-24">{t.author || t.initials || 'Customer'}</p>
+                <blockquote key={t.id} className="flex h-full flex-col gap-16 bg-canvas p-28">
+                  <div className="flex items-center gap-2">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="h-14 w-14 fill-accent-heat text-accent-heat" aria-hidden="true" />
+                    ))}
+                  </div>
+                  <p className="flex-1 text-body-large font-medium leading-[1.5] text-ink">"{t.body}"</p>
+                  <p className="meta">{t.author || t.initials || 'Customer'}</p>
                 </blockquote>
               ))}
             </div>
+          </div>
+        </section>
+
+        {/* Newsletter */}
+        <section className="bg-canvas">
+          <div className="container-max grid gap-24 py-48 md:grid-cols-[1.2fr_1fr] md:items-center md:py-56">
+            <div>
+              <p className="meta">The dispatch</p>
+              <h2 className="mt-8 text-title-h3 font-semibold leading-[1.05] tracking-[-.02em] md:text-title-h2">
+                Weekly drops, bench notes, and price moves.
+              </h2>
+              <p className="mt-12 max-w-[480px] text-body-medium text-ink-soft">
+                One short email on Fridays. No spam, unsubscribe any time.
+              </p>
+            </div>
+            <form className="flex flex-col gap-12 sm:flex-row" onSubmit={(e) => e.preventDefault()}>
+              <label className="sr-only" htmlFor="newsletter-email">Email</label>
+              <input
+                id="newsletter-email"
+                type="email"
+                required
+                placeholder="you@studio.com"
+                className="input-base flex-1"
+              />
+              <button type="submit" className="btn-primary" data-tone="heat">
+                Subscribe <ChevronRight className="h-16 w-16" aria-hidden="true" />
+              </button>
+            </form>
           </div>
         </section>
       </main>
@@ -210,24 +406,25 @@ export default function Home() {
   )
 }
 
-function Stat({ label, value }) {
+function HeroStat({ label, value }) {
   return (
     <div>
-      <dt className="meta">{label}</dt>
-      <dd className="mt-6 text-title-h5 font-semibold tracking-[-.02em]">{value}</dd>
+      <dt className="text-label-x-small uppercase tracking-[0.08em] text-canvas/55">{label}</dt>
+      <dd className="mt-4 text-body-large font-semibold tracking-[-.01em] text-canvas">{value}</dd>
     </div>
   )
 }
 
-function SectionHead({ chapter, title, link, linkLabel }) {
+function SectionHead({ eyebrow, title, caption, link, linkLabel }) {
   return (
     <div className="flex flex-col gap-12 border-b border-border-muted pb-20 md:flex-row md:items-end md:justify-between">
       <div>
-        {chapter && <p className="chapter mb-12">{chapter}</p>}
-        <h2 className="text-title-h3 font-semibold tracking-[-.025em] md:text-title-h2">{title}</h2>
+        {eyebrow && <p className="meta">{eyebrow}</p>}
+        <h2 className="mt-6 text-title-h3 font-semibold tracking-[-.02em] md:text-title-h2">{title}</h2>
+        {caption && <p className="mt-6 text-body-medium text-ink-soft">{caption}</p>}
       </div>
       {link && (
-        <Link to={link} className="meta inline-flex items-center gap-8 transition hover:text-ink">
+        <Link to={link} className="meta inline-flex items-center gap-8 self-start border border-border-muted px-12 py-8 transition hover:border-ink hover:text-ink md:self-auto">
           {linkLabel} <ArrowUpRight className="h-14 w-14" aria-hidden="true" />
         </Link>
       )}
@@ -235,56 +432,127 @@ function SectionHead({ chapter, title, link, linkLabel }) {
   )
 }
 
-function SystemTile({ pc, index }) {
-  const image = pc.image || pc.case?.image || pc.gpu?.image || pc.cpu?.image
+function PromoTile({ eyebrow, title, price, mrp, pct, image, to, tone = 'light' }) {
+  const dark = tone === 'dark'
   return (
-    <Link to="/prebuilt" className="group flex flex-col bg-surface-1 transition hover:bg-canvas">
-      <div className="relative flex items-center justify-between px-16 pt-12">
-        <span className="meta">#{String(index + 1).padStart(2, '0')}</span>
-        <ArrowUpRight className="h-12 w-12 text-ink-muted transition group-hover:text-ink" aria-hidden="true" />
+    <Link
+      to={to}
+      className={`group relative grid grid-cols-[1.1fr_1fr] items-stretch overflow-hidden border ${dark ? 'border-ink bg-ink text-canvas' : 'border-border-muted bg-surface-1 text-ink'}`}
+    >
+      <div className="flex flex-col justify-between gap-12 p-20">
+        <div>
+          <p className={`text-label-x-small uppercase tracking-[0.1em] ${dark ? 'text-canvas/60' : 'text-ink-muted'}`}>{eyebrow}</p>
+          <p className="mt-8 line-clamp-2 text-body-large font-semibold leading-tight tracking-[-.005em]">{title}</p>
+        </div>
+        <div>
+          {price && (
+            <div className="flex items-baseline gap-10">
+              <span className={`price text-title-h4 font-semibold ${dark ? 'text-accent-heat' : 'text-ink'}`}>{formatINR(price)}</span>
+              {mrp && <span className={`price text-body-small line-through ${dark ? 'text-canvas/50' : 'text-ink-muted'}`}>{formatINR(mrp)}</span>}
+            </div>
+          )}
+          <span className={`mt-12 inline-flex items-center gap-6 text-label-x-small font-semibold uppercase tracking-[0.08em] ${dark ? 'text-canvas' : 'text-ink'}`}>
+            Shop now <ArrowUpRight className="h-12 w-12 transition group-hover:translate-x-1 group-hover:-translate-y-0.5 motion-reduce:transform-none" aria-hidden="true" />
+          </span>
+        </div>
+        {pct > 0 && (
+          <span className="absolute left-12 top-12 bg-accent-heat px-8 py-4 text-label-x-small font-semibold uppercase tracking-[0.08em] text-canvas">−{pct}%</span>
+        )}
       </div>
-      <div className="product-image-box relative grid h-[180px] place-items-center overflow-hidden">
+      <div className={`relative grid place-items-center overflow-hidden ${dark ? 'bg-canvas/8' : 'product-image-box'}`}>
+        {image && (
+          <img
+            src={image}
+            alt={title}
+            width="320"
+            height="240"
+            className="max-h-[150px] w-[78%] object-contain transition duration-300 group-hover:scale-[1.04] motion-reduce:transform-none motion-reduce:transition-none"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
+      </div>
+    </Link>
+  )
+}
+
+function ProductCard({ pc, index }) {
+  const image = pc.image || pc.case?.image || pc.gpu?.image || pc.cpu?.image
+  const save = pc.mrp ? Math.max(0, pc.mrp - pc.price) : 0
+  const pct = pc.mrp ? Math.round((save / pc.mrp) * 100) : 0
+  return (
+    <Link to="/prebuilt" className="group relative flex flex-col bg-surface-1 transition hover:bg-canvas">
+      {index === 0 && (
+        <span className="absolute left-12 top-12 z-10 bg-ink px-8 py-4 text-label-x-small font-semibold uppercase tracking-[0.08em] text-canvas">#1 Bestseller</span>
+      )}
+      {pct > 0 && (
+        <span className="absolute right-12 top-12 z-10 bg-accent-heat px-8 py-4 text-label-x-small font-semibold uppercase tracking-[0.08em] text-canvas">−{pct}%</span>
+      )}
+      <div className="product-image-box relative grid h-[200px] place-items-center overflow-hidden">
         {image && (
           <img
             src={image}
             alt={pc.name}
             width="320"
             height="240"
-            className="relative max-h-[140px] w-[78%] max-w-[220px] object-contain transition duration-4 group-hover:scale-[1.025] motion-reduce:transform-none motion-reduce:transition-none"
+            className="max-h-[160px] w-[78%] max-w-[240px] object-contain transition duration-300 group-hover:scale-[1.04] motion-reduce:transform-none motion-reduce:transition-none"
             loading="lazy"
             decoding="async"
           />
         )}
       </div>
-      <div className="flex flex-1 flex-col gap-8 border-t border-border-muted p-16">
-        <h3 className="line-clamp-2 min-h-[40px] text-body-medium font-semibold leading-20">{pc.name}</h3>
-        <div className="mt-auto flex items-end justify-between gap-8 pt-12">
+      <div className="flex flex-1 flex-col gap-10 border-t border-border-muted p-16">
+        <p className="meta">{pc.badge || pc.tagline || 'Custom build'}</p>
+        <h3 className="line-clamp-2 min-h-[40px] text-body-medium font-semibold leading-20 tracking-[-.005em]">{pc.name}</h3>
+        <div className="flex items-center gap-6 text-label-x-small text-ink-muted">
+          <span className="flex items-center gap-2">
+            {Array.from({ length: 5 }).map((_, i) => (
+              <Star key={i} className="h-10 w-10 fill-accent-heat text-accent-heat" aria-hidden="true" />
+            ))}
+          </span>
+          <span>4.9 · 128</span>
+        </div>
+        <div className="mt-auto flex items-end justify-between gap-8 pt-10">
           <div>
             <p className="price text-title-h5 font-semibold leading-none">{formatINR(pc.price)}</p>
-            {pc.mrp && <p className="price mt-4 text-label-x-small font-normal text-ink-muted line-through">{formatINR(pc.mrp)}</p>}
+            {pc.mrp && <p className="price mt-4 text-label-x-small text-ink-muted line-through">{formatINR(pc.mrp)}</p>}
           </div>
-          <span className="meta">In stock</span>
+          <span className="inline-flex items-center gap-4 text-label-x-small font-semibold uppercase tracking-[0.08em] text-ink transition group-hover:text-accent-heat">
+            View <ArrowUpRight className="h-12 w-12" aria-hidden="true" />
+          </span>
         </div>
       </div>
     </Link>
   )
 }
 
-function DealCard({ part }) {
-  const mrp = part.mrp || part.originalPrice
-  const save = mrp ? Math.max(0, mrp - part.price) : 0
+function PartCard({ part }) {
+  const save = part.mrp ? Math.max(0, part.mrp - part.price) : 0
   return (
     <Link to="/gaming-pcs" className="group flex flex-col bg-surface-1 transition hover:bg-canvas">
-      <div className="flex items-center justify-between px-16 pt-12">
+      <div className="flex items-center justify-between px-14 pt-12">
         <span className="meta">{part.brand || part.category}</span>
         {save > 0 && <span className="meta text-accent-heat">−{formatINR(save)}</span>}
       </div>
-      <div className="product-image-box relative grid h-[160px] place-items-center overflow-hidden">
-        <img src={part.image} alt={part.name} width="300" height="220" className="h-full w-full object-contain p-20 transition duration-4 group-hover:scale-[1.04] motion-reduce:transform-none motion-reduce:transition-none" loading="lazy" decoding="async" />
+      <div className="product-image-box relative grid h-[150px] place-items-center overflow-hidden">
+        {part.image && (
+          <img
+            src={part.image}
+            alt={part.name}
+            width="280"
+            height="200"
+            className="h-full w-full object-contain p-18 transition duration-300 group-hover:scale-[1.05] motion-reduce:transform-none motion-reduce:transition-none"
+            loading="lazy"
+            decoding="async"
+          />
+        )}
       </div>
-      <div className="flex flex-1 flex-col gap-8 border-t border-border-muted p-16">
-        <h3 className="line-clamp-2 min-h-[40px] text-body-medium font-semibold leading-20">{part.name}</h3>
-        <p className="price mt-auto pt-12 text-title-h5 font-semibold">{formatINR(part.price)}</p>
+      <div className="flex flex-1 flex-col gap-8 border-t border-border-muted p-14">
+        <h3 className="line-clamp-2 min-h-[36px] text-body-small font-semibold leading-tight tracking-[-.005em]">{part.name}</h3>
+        <div className="mt-auto flex items-end justify-between gap-6 pt-8">
+          <p className="price text-body-large font-semibold">{formatINR(part.price)}</p>
+          <span className="text-label-x-small font-semibold uppercase tracking-[0.08em] text-ink transition group-hover:text-accent-heat">Add</span>
+        </div>
       </div>
     </Link>
   )

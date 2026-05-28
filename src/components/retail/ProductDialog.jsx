@@ -64,14 +64,15 @@ export default function ProductDialog({ product, open, onClose }) {
             role="dialog"
             aria-modal="true"
             aria-labelledby="product-dialog-title"
-            className="relative grid w-full max-w-[1080px] max-h-[92vh] overflow-hidden border border-border-muted bg-canvas shadow-[0_24px_60px_-12px_rgba(20,20,20,0.45)] md:grid-cols-[1.05fr_1fr]"
+            className="relative grid w-full max-w-[1080px] overflow-hidden border border-border-muted bg-canvas shadow-[0_24px_60px_-12px_rgba(20,20,20,0.45)] md:grid-cols-[1.05fr_1fr]"
+            style={{ height: 'min(92vh, 820px)' }}
             initial={reduceMotion ? false : { opacity: 0, y: 28, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 18, scale: 0.97 }}
             transition={{ duration: 0.4, ease: easeOut }}
           >
             {/* Image side */}
-            <div className="relative bg-ink text-canvas">
+            <div className="relative h-[220px] min-h-0 overflow-hidden bg-ink text-canvas md:h-full">
               <div className="poster-grain absolute inset-0" aria-hidden="true" />
               <div className="heat-orb absolute" style={{ left: '50%', top: '50%', transform: 'translate(-50%,-50%)', opacity: 0.55 }} aria-hidden="true" />
               <div className="absolute left-16 top-16 z-10 flex flex-col items-start gap-6">
@@ -88,7 +89,7 @@ export default function ProductDialog({ product, open, onClose }) {
               >
                 <X className="h-16 w-16" aria-hidden="true" />
               </button>
-              <div className="relative grid h-[260px] place-items-center p-32 md:h-full md:min-h-[480px] md:p-48">
+              <div className="relative grid h-full place-items-center p-24 md:p-40">
                 {product.image && (
                   <motion.img
                     src={product.image}
@@ -108,7 +109,7 @@ export default function ProductDialog({ product, open, onClose }) {
             </div>
 
             {/* Detail side */}
-            <div className="flex flex-col overflow-y-auto bg-surface-1">
+            <div className="flex h-full min-h-0 flex-col overflow-y-auto bg-surface-1">
               <motion.div
                 className="border-b border-border-muted px-24 py-20"
                 initial={reduceMotion ? false : { opacity: 0, y: 12 }}

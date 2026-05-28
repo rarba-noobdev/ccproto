@@ -1,18 +1,47 @@
 import { useRef, useState } from 'react'
-import { X, Trash2 } from 'lucide-react'
+import { X, Trash2, Loader2, ShieldCheck } from 'lucide-react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import toast from 'react-hot-toast'
 import useStore from '@/store/useStore'
 import { formatINR } from '@/utils/currency'
 import useDismissable from '@/hooks/useDismissable'
 import ConfirmDialog from '@/components/ui/ConfirmDialog'
+import { openRazorpayCheckout } from '@/services/razorpay'
 
 export default function CartDrawer() {
-  const { cart, isCartOpen, setCartOpen, removeFromCart, clearCart, cartTotal } = useStore()
+  const { cart, isCartOpen, setCartOpen, removeFromCart, clearCart, cartTotal, user } = useStore()
   const drawerRef = useRef(null)
   const [confirmingClear, setConfirmingClear] = useState(false)
+  const [paying, setPaying] = useState(false)
   const reduceMotion = useReducedMotion()
 
   useDismissable({ open: isCartOpen, onDismiss: () => setCartOpen(false), containerRef: drawerRef })
+
+  const handlePay = async () => {
+    const total = cartTotal()
+    if (!total || cart.length === 0) return
+    setPaying(true)
+    const t = toast.loading('Opening secure checkout…')
+    try {
+      const result = await openRazorpayCheckout({
+        amountInRupees: total,
+        cart: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
+        customer: { name: user?.name, email: user?.email, phone: user?.phone },
+        description: `${cart.length} item${cart.length === 1 ? '' : 's'} · Challenger Computers`,
+      })
+      if (result?.verified) {
+        toast.success('Payment confirmed — receipt sent', { id: t })
+        clearCart()
+        setCartOpen(false)
+      } else if (result?.dismissed) {
+        toast.dismiss(t)
+      }
+    } catch (err) {
+      toast.error(err?.message || 'Payment failed', { id: t })
+    } finally {
+      setPaying(false)
+    }
+  }
 
   return (
     <>
@@ -107,7 +136,25 @@ export default function CartDrawer() {
                   <span className="meta">Estimated total</span>
                   <span className="price text-title-h3 font-semibold">{formatINR(cartTotal())}</span>
                 </div>
-                <button type="button" className="btn-primary w-full" data-tone="heat">Request invoice</button>
+                <button
+                  type="button"
+                  onClick={handlePay}
+                  disabled={paying || cart.length === 0}
+                  className="btn-primary magnetic w-full disabled:cursor-not-allowed disabled:opacity-60"
+                  data-tone="heat"
+                >
+                  {paying ? (
+                    <>
+                      <Loader2 className="h-16 w-16 animate-spin" aria-hidden="true" /> Opening checkout…
+                    </>
+                  ) : (
+                    <>Pay {formatINR(cartTotal())} · Razorpay</>
+                  )}
+                </button>
+                <p className="mt-12 flex items-center justify-center gap-6 text-label-x-small text-ink-muted">
+                  <ShieldCheck className="h-12 w-12 text-accent-heat" aria-hidden="true" />
+                  Secure test checkout · UPI / Cards / Netbanking
+                </p>
                 {cart.length > 0 && (
                   <button
                     type="button"

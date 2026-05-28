@@ -416,6 +416,232 @@
     font-weight: 600;
   }
   .skip-link:focus { transform: translateY(0); }
+
+  /* ===== GAMIFIED HUD ===== */
+
+  /* Mono "terminal" label */
+  .hud-label {
+    font-family: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+    font-size: 10px;
+    line-height: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+  }
+
+  /* Segmented HUD meter (XP / health bar) */
+  .hud-meter {
+    position: relative;
+    height: 10px;
+    width: 100%;
+    background:
+      repeating-linear-gradient(90deg, var(--surface-2) 0 6px, transparent 6px 8px),
+      var(--surface-2);
+    border: 1px solid var(--line);
+    overflow: hidden;
+  }
+  .hud-meter__fill {
+    position: absolute;
+    inset: 0 auto 0 0;
+    background: linear-gradient(90deg, var(--accent-heat) 0%, #ff8a3b 100%);
+    box-shadow:
+      0 0 12px rgba(250, 93, 25, 0.45),
+      inset 0 0 6px rgba(255, 255, 255, 0.25);
+    transition: width .6s cubic-bezier(.2, .9, .2, 1);
+  }
+  .hud-meter__fill::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(90deg, rgba(255,255,255,.22) 0 2px, transparent 2px 6px);
+    mix-blend-mode: overlay;
+    animation: hud-stripes 2.4s linear infinite;
+  }
+  .hud-meter[data-tone="ink"] .hud-meter__fill {
+    background: linear-gradient(90deg, var(--ink) 0%, #2a2a2a 100%);
+    box-shadow: 0 0 8px rgba(20,20,20,.35), inset 0 0 4px rgba(255,255,255,.18);
+  }
+  .hud-meter[data-tone="success"] .hud-meter__fill {
+    background: linear-gradient(90deg, var(--success) 0%, #15b365 100%);
+    box-shadow: 0 0 10px rgba(15,122,69,.45), inset 0 0 4px rgba(255,255,255,.2);
+  }
+  @keyframes hud-stripes {
+    from { background-position: 0 0; }
+    to   { background-position: 18px 0; }
+  }
+
+  /* Scanline overlay — apply over hero/dark panels */
+  .scanlines::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(0deg, rgba(255,255,255,.04) 0 1px, transparent 1px 3px);
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  /* Neon edge — heat glow border for active/selected */
+  .neon-edge {
+    box-shadow:
+      0 0 0 1px var(--accent-heat),
+      0 0 14px rgba(250, 93, 25, 0.35),
+      inset 0 0 18px rgba(250, 93, 25, 0.12);
+  }
+
+  /* Tier ring — circular level indicator */
+  .tier-ring {
+    --tier-pct: 0;
+    --tier-color: var(--accent-heat);
+    position: relative;
+    display: inline-grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background:
+      conic-gradient(var(--tier-color) calc(var(--tier-pct) * 1%), var(--surface-2) 0);
+    transition: background .6s cubic-bezier(.2,.9,.2,1);
+  }
+  .tier-ring::before {
+    content: "";
+    position: absolute;
+    inset: 4px;
+    border-radius: 50%;
+    background: var(--surface-1);
+    border: 1px solid var(--line);
+  }
+  .tier-ring__inner {
+    position: relative;
+    font-family: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -.02em;
+    color: var(--ink);
+  }
+
+  /* Pulse dot — live / in-stock indicator */
+  .pulse-dot {
+    position: relative;
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--success);
+  }
+  .pulse-dot::after {
+    content: "";
+    position: absolute;
+    inset: -4px;
+    border-radius: 50%;
+    border: 1px solid var(--success);
+    animation: pulse-ring 1.8s ease-out infinite;
+    opacity: 0;
+  }
+  .pulse-dot[data-tone="heat"] { background: var(--accent-heat); }
+  .pulse-dot[data-tone="heat"]::after { border-color: var(--accent-heat); }
+  @keyframes pulse-ring {
+    0%   { transform: scale(.6); opacity: .9; }
+    100% { transform: scale(1.8); opacity: 0; }
+  }
+
+  /* Game-style badge — diagonal cut corners */
+  .gbadge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    font-family: ui-monospace, "SFMono-Regular", "Menlo", "Consolas", monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: var(--ink);
+    color: var(--canvas);
+    clip-path: polygon(4px 0, 100% 0, calc(100% - 4px) 100%, 0 100%);
+  }
+  .gbadge[data-tone="heat"] { background: var(--accent-heat); color: #fff; }
+  .gbadge[data-tone="success"] { background: var(--success); color: #fff; }
+  .gbadge[data-tone="warning"] { background: var(--warning); color: #fff; }
+  .gbadge[data-tone="canvas"] { background: var(--canvas); color: var(--ink); border: 1px solid var(--ink); }
+
+  /* Achievement unlock toast */
+  .achievement {
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    background: var(--ink);
+    color: var(--canvas);
+    border-left: 3px solid var(--accent-heat);
+  }
+  .achievement::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(250,93,25,.18), transparent);
+    animation: achievement-sweep 1.6s ease-out;
+    pointer-events: none;
+  }
+  @keyframes achievement-sweep {
+    from { transform: translateX(-100%); }
+    to   { transform: translateX(100%); }
+  }
+
+  /* Stock-remaining bar */
+  .stock-bar {
+    position: relative;
+    height: 3px;
+    width: 100%;
+    background: var(--surface-2);
+    overflow: hidden;
+  }
+  .stock-bar__fill {
+    height: 100%;
+    background: var(--accent-heat);
+    transition: width .5s cubic-bezier(.2,.9,.2,1);
+  }
+  .stock-bar[data-level="low"] .stock-bar__fill { background: var(--accent-heat); }
+  .stock-bar[data-level="mid"] .stock-bar__fill { background: var(--warning); }
+  .stock-bar[data-level="high"] .stock-bar__fill { background: var(--success); }
+
+  /* Heat glow hover (cards, buttons) */
+  .glow-on-hover { transition: box-shadow .25s ease, transform .25s ease; }
+  .glow-on-hover:hover {
+    box-shadow: 0 0 0 1px var(--accent-heat), 0 14px 32px -10px rgba(250,93,25,.35);
+    transform: translateY(-2px);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .glow-on-hover:hover { transform: none; }
+  }
+
+  /* Ticker — looping marquee for HUD strips */
+  .ticker {
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .ticker__track {
+    display: inline-flex;
+    gap: 32px;
+    animation: ticker-scroll 28s linear infinite;
+    will-change: transform;
+  }
+  @keyframes ticker-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  /* CRT flicker for terminal text */
+  .crt-flicker {
+    animation: crt-flicker 3.2s infinite steps(60);
+  }
+  @keyframes crt-flicker {
+    0%, 95%, 100% { opacity: 1; }
+    96% { opacity: .82; }
+    97% { opacity: 1; }
+    98% { opacity: .9; }
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

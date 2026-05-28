@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import { Heart, Plus, Star, ImageOff } from 'lucide-react'
+import { Heart, Plus, Star, ImageOff, Flame, Sparkles } from 'lucide-react'
 import clsx from 'clsx'
 import useStore from '@/store/useStore'
 import { formatINR } from '@/utils/currency'
+import { GBadge, StockBar, PulseDot } from '@/components/ui/Hud'
 
 function formatRating(rating) {
   const n = Number(rating)
@@ -18,15 +19,19 @@ export function ProductCard({ product, compact = false }) {
   const wishlisted = isWishlisted(product.id)
   const rating = formatRating(product.rating)
   const label = product.brand || product.category || 'Part'
+  const isNew = product.is_new || product.new
+  const isHot = (product.sold_count || 0) > 200 || product.bestseller
+  const stock = Number.isFinite(product.stock) ? product.stock : null
+  const stockTotal = product.stock_capacity || 100
 
   return (
-    <article className="group flex min-w-0 flex-col bg-surface-1 transition duration-4 hover:bg-canvas motion-reduce:transition-none">
+    <article className="group glow-on-hover relative flex min-w-0 flex-col border border-transparent bg-surface-1 transition duration-200 hover:bg-canvas motion-reduce:transition-none">
       <div className={clsx('product-image-box relative overflow-hidden', compact ? 'h-176' : 'h-208')}>
-        {discount > 0 && (
-          <span className="absolute right-12 top-12 z-10 bg-ink px-8 py-2 text-label-x-small font-semibold text-canvas">
-            −{discount}%
-          </span>
-        )}
+        <div className="absolute left-12 top-12 z-10 flex flex-col items-start gap-6">
+          {discount > 0 && <GBadge tone="heat">−{discount}%</GBadge>}
+          {isNew && <GBadge tone="canvas" icon={Sparkles}>New</GBadge>}
+          {isHot && <GBadge tone="ink" icon={Flame}>Hot</GBadge>}
+        </div>
         <button
           type="button"
           onClick={() => toggleWishlist(product)}
@@ -59,7 +64,7 @@ export function ProductCard({ product, compact = false }) {
           <span className="meta truncate">{label}</span>
           {rating && (
             <span className="inline-flex items-center gap-4 text-label-x-small font-medium text-ink-soft">
-              <Star className="h-12 w-12 fill-current text-ink" aria-hidden="true" />
+              <Star className="h-12 w-12 fill-accent-heat text-accent-heat" aria-hidden="true" />
               {rating}
             </span>
           )}
@@ -68,6 +73,12 @@ export function ProductCard({ product, compact = false }) {
         <h3 className="truncate-2 mt-8 min-h-[40px] text-body-medium font-semibold leading-20 tracking-[-.005em]">
           {product.name}
         </h3>
+
+        {stock !== null ? (
+          <div className="mt-10"><StockBar remaining={stock} total={stockTotal} /></div>
+        ) : (
+          <div className="mt-10"><PulseDot tone="success" label="In stock" /></div>
+        )}
 
         <div className="mt-auto flex items-end justify-between gap-12 pt-16">
           <div className="min-w-0">

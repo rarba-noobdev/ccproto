@@ -20,6 +20,7 @@ import {
 import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 import { ErrorBanner } from '@/components/retail/StatusPanel'
+import { HudMeter, LevelBadge, AchievementToast, PulseDot, GBadge, AnimatedNumber } from '@/components/ui/Hud'
 import { fetchComponents } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { formatINR } from '@/utils/currency'
@@ -43,6 +44,7 @@ export default function BuildPC() {
   const [build, setBuild] = useState({})
   const [query, setQuery] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [achievement, setAchievement] = useState(null)
   const reduceMotion = useReducedMotion()
   const { data: result = [], loading, error } = useSupabaseQuery(() => fetchComponents(), [])
   const data = Array.isArray(result) ? result : []
@@ -120,8 +122,19 @@ export default function BuildPC() {
   }
 
   const selectPart = (part) => {
+    const wasUnset = !build[active]
     setBuild((current) => ({ ...current, [active]: part }))
     setBuilderComponent(active, part)
+    if (wasUnset) {
+      const newCount = selected.length + 1
+      const milestones = {
+        1: { title: 'First part locked in', sub: '+100 XP · keep going' },
+        3: { title: 'Loadout primed', sub: 'Ready to order' },
+        7: { title: 'Build complete', sub: 'All seven slots filled · S-class' },
+      }
+      const milestone = milestones[newCount]
+      if (milestone) setAchievement({ ...milestone, id: Date.now() })
+    }
     if (activeIndex < steps.length - 1) {
       setTimeout(() => moveTo(steps[activeIndex + 1].key), 120)
     }
@@ -198,13 +211,37 @@ export default function BuildPC() {
           })}
         </nav>
 
-        {/* Progress strip */}
-        <div className="mb-24 flex items-center gap-12 border border-border-muted bg-surface-1 px-16 py-10">
-          <span className="meta whitespace-nowrap">Step {activeIndex + 1} / {steps.length}</span>
-          <div className="h-[3px] flex-1 overflow-hidden bg-line" role="progressbar" aria-valuenow={progress} aria-valuemin={0} aria-valuemax={100} aria-label="Build progress">
-            <div className="h-full bg-ink transition-all duration-4" style={{ width: `${progress}%` }} />
+        {/* Build progress HUD */}
+        <div className="mb-24 grid gap-16 border border-border-muted bg-surface-1 p-16 md:grid-cols-[auto_1fr_auto_auto] md:items-center md:gap-20">
+          <LevelBadge score={score} size={48} />
+          <HudMeter
+            value={selected.length}
+            max={steps.length}
+            label={`Loadout · step ${activeIndex + 1} of ${steps.length}`}
+            sublabel={`${progress}% complete`}
+            tone="heat"
+            suffix=""
+          />
+          <div className="flex items-center gap-8">
+            <PulseDot tone={ready ? 'success' : 'heat'} />
+            <span className="hud-label">{ready ? 'Ready to ship' : 'In progress'}</span>
           </div>
-          <span className="meta whitespace-nowrap">{progress}%</span>
+          <div className="text-right">
+            <p className="hud-label">Total</p>
+            <p className="price text-title-h5 font-semibold leading-none">
+              <AnimatedNumber value={price} prefix="₹" />
+            </p>
+          </div>
+        </div>
+
+        {/* Achievement toast */}
+        <div className="pointer-events-none fixed bottom-24 right-24 z-50 max-w-[320px]">
+          <AchievementToast
+            show={!!achievement}
+            title={achievement?.title}
+            sub={achievement?.sub}
+            onClose={() => setAchievement(null)}
+          />
         </div>
 
         <div className="grid gap-16 lg:grid-cols-[minmax(0,1fr)_380px] 2xl:grid-cols-[minmax(0,1fr)_420px]">
@@ -400,10 +437,22 @@ function QuotePanel({ activeStep, activePart, build, bottleneck, draw, orderBuil
           <p className="price shrink-0 text-title-h4 font-semibold">{formatINR(price)}</p>
         </div>
 
-        <div className="mt-16 grid grid-cols-3 gap-px border border-border-muted bg-line">
-          <Metric value={score || '—'} label="Score" />
-          <Metric value={draw ? `${draw}W` : '—'} label="Draw" />
-          <Metric value={build.psu ? `${Math.max(0, psuHeadroom)}W` : '—'} label="Spare" />
+        <div className="mt-16 flex flex-col gap-14 border border-border-muted bg-canvas-soft p-14">
+          <div className="flex items-center justify-between">
+            <LevelBadge score={score} size={48} />
+            <GBadge tone={ready ? 'heat' : 'canvas'}>{ready ? 'Battle-ready' : 'Building'}</GBadge>
+          </div>
+          <HudMeter value={score} max={100} label="Build score" tone="heat" suffix="" />
+          <HudMeter value={draw} max={build.psu?.wattage || 850} label="Power draw" tone="ink" suffix="W" />
+          {build.psu && (
+            <HudMeter
+              value={Math.max(0, psuHeadroom)}
+              max={build.psu.wattage}
+              label="PSU headroom"
+              tone={psuHeadroom < 100 ? 'heat' : 'success'}
+              suffix="W"
+            />
+          )}
         </div>
 
         {bottleneck && (

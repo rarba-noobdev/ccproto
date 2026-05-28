@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { Cpu, MemoryStick, Monitor, ShoppingBag } from 'lucide-react'
 import RetailLayout from '@/components/retail/RetailLayout'
 import PageHeader from '@/components/retail/PageHeader'
 import { ErrorBanner } from '@/components/retail/StatusPanel'
+import ProductDialog from '@/components/retail/ProductDialog'
 import { fetchPrebuilts } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
 import { formatINR } from '@/utils/currency'
@@ -49,9 +51,38 @@ export default function Workstations() {
 
 function WorkstationCard({ pc, onAdd }) {
   const image = pc.image || pc.case?.image || pc.gpu?.image || pc.cpu?.image
+  const [open, setOpen] = useState(false)
+  const product = {
+    ...pc,
+    image,
+    brand: pc.badge || 'Workstation',
+    highlights: [
+      pc.tagline,
+      pc.cpu?.name && `${pc.cpu.name} processor`,
+      pc.gpu?.name && `${pc.gpu.name} graphics`,
+      pc.ram?.name && `${pc.ram.name} memory`,
+      ...(Array.isArray(pc.use_cases) ? pc.use_cases : []),
+    ].filter(Boolean),
+    specs: [
+      pc.cpu?.name && { key: 'Processor', value: pc.cpu.name },
+      pc.gpu?.name && { key: 'Graphics', value: pc.gpu.name },
+      pc.ram?.name && { key: 'Memory', value: pc.ram.name },
+      pc.storage?.name && { key: 'Storage', value: pc.storage.name },
+      pc.cooler?.name && { key: 'Cooling', value: pc.cooler.name },
+      pc.case?.name && { key: 'Chassis', value: pc.case.name },
+    ].filter(Boolean),
+  }
 
   return (
-    <article className="group flex min-w-0 flex-col bg-surface-1 transition hover:bg-canvas">
+    <>
+    <article
+      role="button"
+      tabIndex={0}
+      onClick={() => setOpen(true)}
+      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setOpen(true) } }}
+      aria-label={`View details for ${pc.name}`}
+      className="group glow-on-hover flex min-w-0 cursor-pointer flex-col border border-transparent bg-surface-1 transition hover:bg-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ink"
+    >
       <div className="flex items-center justify-between border-b border-border-muted px-16 py-12">
         <span className="meta">{pc.badge || 'Workstation'}</span>
         <span className="meta">{pc.use_cases?.[0] || '—'}</span>
@@ -86,7 +117,7 @@ function WorkstationCard({ pc, onAdd }) {
           </div>
           <button
             type="button"
-            onClick={() => onAdd(image)}
+            onClick={(e) => { e.stopPropagation(); onAdd(image) }}
             className="btn-primary min-h-40 px-14 text-body-small"
             aria-label={`Add ${pc.name} to cart`}
             data-tone="heat"
@@ -96,6 +127,8 @@ function WorkstationCard({ pc, onAdd }) {
         </div>
       </div>
     </article>
+    <ProductDialog product={product} open={open} onClose={() => setOpen(false)} />
+    </>
   )
 }
 

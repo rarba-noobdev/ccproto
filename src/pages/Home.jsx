@@ -19,8 +19,10 @@ import {
   Sparkles,
   ChevronRight,
 } from 'lucide-react'
+import { useState } from 'react'
 import RetailLayout from '@/components/retail/RetailLayout'
 import { ProductSkeleton } from '@/components/retail/ProductCard'
+import ProductDialog from '@/components/retail/ProductDialog'
 import { ErrorBanner } from '@/components/retail/StatusPanel'
 import { fetchHomeData } from '@/lib/supabase'
 import { useSupabaseQuery } from '@/hooks/useSupabaseQuery'
@@ -497,8 +499,35 @@ function ProductCard({ pc, index }) {
   const image = pc.image || pc.case?.image || pc.gpu?.image || pc.cpu?.image
   const save = pc.mrp ? Math.max(0, pc.mrp - pc.price) : 0
   const pct = pc.mrp ? Math.round((save / pc.mrp) * 100) : 0
+  const [open, setOpen] = useState(false)
+  const product = {
+    ...pc,
+    image,
+    brand: pc.badge || pc.tagline || 'System',
+    rating: pc.rating || 4.9,
+    review_count: pc.review_count || 128,
+    highlights: [
+      pc.cpu?.name && `${pc.cpu.name} processor`,
+      pc.gpu?.name && `${pc.gpu.name} graphics`,
+      pc.ram?.name && `${pc.ram.name} memory`,
+      pc.storage?.name && `${pc.storage.name} storage`,
+    ].filter(Boolean),
+    specs: [
+      pc.cpu?.name && { key: 'Processor', value: pc.cpu.name },
+      pc.gpu?.name && { key: 'Graphics', value: pc.gpu.name },
+      pc.ram?.name && { key: 'Memory', value: pc.ram.name },
+      pc.storage?.name && { key: 'Storage', value: pc.storage.name },
+      pc.cooler?.name && { key: 'Cooling', value: pc.cooler.name },
+      pc.case?.name && { key: 'Chassis', value: pc.case.name },
+    ].filter(Boolean),
+  }
   return (
-    <Link to="/prebuilt" className="group relative flex flex-col bg-surface-1 transition hover:bg-canvas">
+    <>
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className="group glow-on-hover relative flex flex-col border border-transparent bg-surface-1 text-left transition hover:bg-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ink"
+    >
       {index === 0 && (
         <span className="absolute left-12 top-12 z-10 bg-ink px-8 py-4 text-label-x-small font-semibold uppercase tracking-[0.08em] text-canvas">#1 Bestseller</span>
       )}
@@ -539,14 +568,22 @@ function ProductCard({ pc, index }) {
           </span>
         </div>
       </div>
-    </Link>
+    </button>
+    <ProductDialog product={product} open={open} onClose={() => setOpen(false)} />
+    </>
   )
 }
 
 function PartCard({ part }) {
   const save = part.mrp ? Math.max(0, part.mrp - part.price) : 0
+  const [open, setOpen] = useState(false)
   return (
-    <Link to="/gaming-pcs" className="group flex flex-col bg-surface-1 transition hover:bg-canvas">
+    <>
+    <button
+      type="button"
+      onClick={() => setOpen(true)}
+      className="group glow-on-hover flex flex-col border border-transparent bg-surface-1 text-left transition hover:bg-canvas focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-ink"
+    >
       <div className="flex items-center justify-between px-14 pt-12">
         <span className="meta">{part.brand || part.category}</span>
         {save > 0 && <span className="meta text-accent-heat">−{formatINR(save)}</span>}
@@ -568,9 +605,11 @@ function PartCard({ part }) {
         <h3 className="line-clamp-2 min-h-[36px] text-body-small font-semibold leading-tight tracking-[-.005em]">{part.name}</h3>
         <div className="mt-auto flex items-end justify-between gap-6 pt-8">
           <p className="price text-body-large font-semibold">{formatINR(part.price)}</p>
-          <span className="text-label-x-small font-semibold uppercase tracking-[0.08em] text-ink transition group-hover:text-accent-heat">Add</span>
+          <span className="text-label-x-small font-semibold uppercase tracking-[0.08em] text-ink transition group-hover:text-accent-heat">View</span>
         </div>
       </div>
-    </Link>
+    </button>
+    <ProductDialog product={part} open={open} onClose={() => setOpen(false)} />
+    </>
   )
 }

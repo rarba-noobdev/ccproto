@@ -73,15 +73,16 @@ export default function Prebuilt() {
               </div>
             </div>
 
-            <aside className="overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_24px_80px_rgba(38,38,38,.10)]">
-              <div className="relative grid min-h-[240px] place-items-center overflow-hidden bg-[#f6f3ed] p-6">
+            <aside className="flex h-full overflow-hidden rounded-[34px] border border-[var(--line)] bg-[var(--surface-1)] shadow-[0_24px_80px_rgba(38,38,38,.10)]">
+              <div className="flex min-w-0 flex-1 flex-col">
+              <div className="relative grid min-h-[230px] place-items-center overflow-hidden bg-[#f6f3ed] p-6">
                 <span className="absolute left-5 top-5 rounded-full bg-[var(--accent-heat)] px-3 py-1 text-[11px] font-black uppercase tracking-[.08em] text-white">
                   {featured?.badge || 'Featured'}
                 </span>
                 <div className="absolute inset-x-10 bottom-5 h-10 rounded-full bg-black/10 blur-xl" aria-hidden="true" />
-                {heroImage && <img src={heroImage} alt={featured?.name || 'Featured ready system'} width="420" height="320" className="relative max-h-[205px] w-[82%] max-w-[320px] object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,.18)]" decoding="async" fetchPriority="high" />}
+                {heroImage && <img src={heroImage} alt={featured?.name || 'Featured ready system'} width="420" height="320" className="relative max-h-[195px] w-[80%] max-w-[300px] object-contain drop-shadow-[0_18px_18px_rgba(0,0,0,.18)]" decoding="async" fetchPriority="high" />}
               </div>
-              <div className="p-5">
+              <div className="flex flex-1 flex-col p-5">
                 <div className="mb-3 flex items-start justify-between gap-4">
                   <div className="min-w-0">
                     <h2 className="truncate text-2xl font-black tracking-[-.055em]">{featured?.name || 'Ready system'}</h2>
@@ -89,14 +90,28 @@ export default function Prebuilt() {
                   </div>
                   <div className="price shrink-0 text-2xl font-black">{formatINR(featured?.price || 0)}</div>
                 </div>
+
+                <div className="grid gap-2">
+                  <FeaturedSpec icon={Cpu} label="CPU" value={featured?.cpu?.name} />
+                  <FeaturedSpec icon={Monitor} label="GPU" value={featured?.gpu?.name} />
+                  <FeaturedSpec icon={MemoryStick} label="Memory" value={featured?.ram?.name} />
+                </div>
+
+                <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+                  <Metric value={featured?.fps_1440p} label="1440p" />
+                  <Metric value={featured?.stock} label="Stock" />
+                  <Metric value={featured?.rating || 4.8} label="Rating" />
+                </div>
+
                 <button
                   type="button"
                   disabled={!featured}
                   onClick={() => featured && addToCart({ ...featured, image: heroImage })}
-                  className="btn-primary w-full disabled:cursor-not-allowed disabled:opacity-50"
+                  className="btn-primary mt-auto w-full disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   <ShoppingCart className="h-4 w-4" /> Add featured
                 </button>
+              </div>
               </div>
             </aside>
           </div>
@@ -206,6 +221,18 @@ function Spec({ icon: Icon, label, value }) {
       </span>
       <span className="text-[10px] font-black uppercase tracking-wide text-[var(--ink-muted)]">{label}</span>
       <span className="truncate text-xs font-black text-[var(--ink-soft)]">{value || 'Selected part'}</span>
+    </div>
+  )
+}
+
+function FeaturedSpec({ icon: Icon, label, value }) {
+  return (
+    <div className="grid min-w-0 grid-cols-[30px_64px_1fr] items-center gap-2 rounded-[16px] border border-[var(--line)] bg-[var(--surface-2)] px-3 py-2.5">
+      <span className="grid h-7 w-7 place-items-center rounded-full bg-white text-[var(--ink-soft)] shadow-[inset_0_1px_0_rgba(255,255,255,.9)]">
+        <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+      </span>
+      <span className="text-[10px] font-black uppercase tracking-wide text-[var(--ink-muted)]">{label}</span>
+      <span className="truncate text-xs font-black text-[var(--ink-soft)]">{value || 'Configured part'}</span>
     </div>
   )
 }

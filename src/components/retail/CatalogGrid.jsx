@@ -1,11 +1,15 @@
 import { useMemo, useState } from 'react'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { ArrowDownAZ, Search, SlidersHorizontal } from 'lucide-react'
 import { ProductCard, ProductSkeleton } from '@/components/retail/ProductCard'
 import SelectMenu from '@/components/ui/SelectMenu'
 import { EmptyPanel, SkeletonGrid } from '@/components/retail/StatusPanel'
 import { formatINR } from '@/utils/currency'
 
+const easeOut = [0.23, 1, 0.32, 1]
+
 export default function CatalogGrid({ products = [], loading = false, categories = true }) {
+  const reduceMotion = useReducedMotion()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('all')
   const [sort, setSort] = useState('price-asc')
@@ -79,9 +83,29 @@ export default function CatalogGrid({ products = [], loading = false, categories
       {loading ? (
         <SkeletonGrid Card={ProductSkeleton} />
       ) : (
-        <div className="grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
-          {visible.map((product) => <ProductCard key={product.id} product={product} />)}
-        </div>
+        <motion.div
+          layout
+          className="grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5"
+        >
+          <AnimatePresence mode="popLayout">
+            {visible.map((product, i) => (
+              <motion.div
+                key={product.id}
+                layout
+                initial={reduceMotion ? false : { opacity: 0, y: 16, scale: 0.97 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.96 }}
+                transition={{
+                  duration: 0.4,
+                  ease: easeOut,
+                  delay: reduceMotion ? 0 : Math.min(i * 0.03, 0.3),
+                }}
+              >
+                <ProductCard product={product} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
       )}
 
       {!loading && visible.length === 0 && (

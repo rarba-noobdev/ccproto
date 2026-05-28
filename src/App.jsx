@@ -17,14 +17,15 @@ import Auth from '@/pages/Auth'
 import UserDashboard from '@/pages/UserDashboard'
 import AdminDashboard from '@/pages/AdminDashboard'
 
+const easeOut = [0.23, 1, 0.32, 1]
 const PageWrapper = ({ children }) => (
   <motion.div
     id="main-content"
     tabIndex={-1}
-    initial={{ opacity: 0, y: 8 }}
-    animate={{ opacity: 1, y: 0 }}
-    exit={{ opacity: 0, y: -8 }}
-    transition={{ duration: 0.22 }}
+    initial={{ opacity: 0, y: 18, filter: 'blur(6px)' }}
+    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+    exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+    transition={{ duration: 0.42, ease: easeOut }}
   >
     {children}
   </motion.div>

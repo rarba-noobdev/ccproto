@@ -62,32 +62,43 @@ export default function CartDrawer() {
                     </div>
                   </div>
                 ) : (
-                  <ul>
-                    {cart.map((item) => (
-                      <li key={item.id} className="border-b border-border-muted">
-                        <div className="flex gap-16 px-24 py-20">
-                          {item.image && (
-                            <div className="product-image-box grid h-[72px] w-[72px] shrink-0 place-items-center border border-border-muted">
-                              <img src={item.image} alt={item.name} width="72" height="72" className="h-full w-full object-contain p-8" loading="lazy" decoding="async" />
+                  <motion.ul layout>
+                    <AnimatePresence initial={false}>
+                      {cart.map((item, index) => (
+                        <motion.li
+                          key={item.id}
+                          layout
+                          initial={reduceMotion ? false : { opacity: 0, x: 30, height: 0 }}
+                          animate={{ opacity: 1, x: 0, height: 'auto' }}
+                          exit={{ opacity: 0, x: -40, height: 0 }}
+                          transition={{ duration: 0.32, ease: [0.23, 1, 0.32, 1], delay: reduceMotion ? 0 : index * 0.04 }}
+                          className="border-b border-border-muted"
+                        >
+                          <div className="flex gap-16 px-24 py-20">
+                            {item.image && (
+                              <div className="product-image-box grid h-[72px] w-[72px] shrink-0 place-items-center border border-border-muted">
+                                <img src={item.image} alt={item.name} width="72" height="72" className="h-full w-full object-contain p-8" loading="lazy" decoding="async" />
+                              </div>
+                            )}
+                            <div className="min-w-0 flex-1">
+                              <h3 className="truncate-2 text-body-medium font-semibold leading-20">{item.name}</h3>
+                              <p className="meta mt-6">Qty {item.quantity}</p>
+                              <p className="price mt-8 text-body-medium font-semibold">{formatINR(item.price * item.quantity)}</p>
                             </div>
-                          )}
-                          <div className="min-w-0 flex-1">
-                            <h3 className="truncate-2 text-body-medium font-semibold leading-20">{item.name}</h3>
-                            <p className="meta mt-6">Qty {item.quantity}</p>
-                            <p className="price mt-8 text-body-medium font-semibold">{formatINR(item.price * item.quantity)}</p>
+                            <motion.button
+                              type="button"
+                              onClick={() => removeFromCart(item.id)}
+                              className="grid h-36 w-36 shrink-0 place-items-center border border-border-muted text-ink-soft transition hover:border-accent-heat hover:text-accent-heat"
+                              aria-label={`Remove ${item.name}`}
+                              whileTap={reduceMotion ? undefined : { scale: 0.88, rotate: -8 }}
+                            >
+                              <Trash2 className="h-14 w-14" aria-hidden="true" />
+                            </motion.button>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => removeFromCart(item.id)}
-                            className="grid h-36 w-36 shrink-0 place-items-center border border-border-muted text-ink-soft transition hover:border-ink hover:text-ink"
-                            aria-label={`Remove ${item.name}`}
-                          >
-                            <Trash2 className="h-14 w-14" aria-hidden="true" />
-                          </button>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
+                        </motion.li>
+                      ))}
+                    </AnimatePresence>
+                  </motion.ul>
                 )}
               </div>
 

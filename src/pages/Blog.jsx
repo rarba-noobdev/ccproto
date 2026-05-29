@@ -76,7 +76,7 @@ export default function Blog() {
                     <p className="mt-16 text-body-large text-ink-soft">{featured.excerpt}</p>
                   </div>
                   <div className="mt-24 flex items-center justify-between border-t border-border-muted pt-20">
-                    <p className="meta">{featured.author || 'Challenger team'}</p>
+                    <p className="meta">{featured.author || 'Zaid team'}</p>
                     <ArrowUpRight className="h-16 w-16 text-ink transition group-hover:-translate-y-0.5 motion-reduce:transform-none" aria-hidden="true" />
                   </div>
                 </div>

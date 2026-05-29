@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 export default function LoadingScreen({ onComplete }) {
   const [progress, setProgress] = useState(0)
   const [phase, setPhase] = useState('initializing')
-  const phases = ['INITIALIZING SYSTEMS', 'LOADING COMPONENTS', 'CALIBRATING PERFORMANCE', 'LAUNCHING Challenger Computers']
+  const phases = ['INITIALIZING SYSTEMS', 'LOADING COMPONENTS', 'CALIBRATING PERFORMANCE', 'LAUNCHING Zaid Info']
 
   useEffect(() => {
     let current = 0
@@ -37,7 +37,7 @@ export default function LoadingScreen({ onComplete }) {
         transition={{ delay: 0.2 }}
       >
         <div className="font-display text-[48px] leading-[1] font-medium tracking-[-2.5px] text-ink mb-8">
-          Challenger Computers
+          Zaid Info
         </div>
         <div className="text-label-x-small tracking-[-0.12px] text-ink-muted">
           GAMING SYSTEMS

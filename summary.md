@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is a React + Vite custom PC builder/storefront for Challenger Computers. The target product direction is a premium, professional gaming PC commerce site, not a generic neon/cyberpunk mockup. The user wants the UI to feel consistent, dense enough for real shopping, and based on real catalog data rather than placeholders.
+This is a React + Vite custom PC builder/storefront for Zaid Info. The target product direction is a premium, professional gaming PC commerce site, not a generic neon/cyberpunk mockup. The user wants the UI to feel consistent, dense enough for real shopping, and based on real catalog data rather than placeholders.
 
 ## Stack
 
@@ -184,7 +184,7 @@ Uses Supabase admin data and Recharts. Keep it clean and SaaS-like, not marketin
 ## Instagram/Reels Section
 
 Instagram blocks direct media scraping and Firecrawl does not support Instagram scraping. Public indexed reel URLs were used instead:
-- `https://www.instagram.com/challenger_computer/reels/`
+- `https://www.instagram.com/zaid_computer/reels/`
 - `https://www.instagram.com/reel/DYtYJUcPe4x/`
 - `https://www.instagram.com/reel/DCO76Ijy-ff/`
 - `https://www.instagram.com/reel/Cv4SeUgvNtN/`

@@ -5,7 +5,7 @@ import PageHeader from '@/components/retail/PageHeader'
 
 const channels = [
   [Phone, 'Sales', '+91 98765 43210'],
-  [Mail, 'Email', 'support@challengercomputers.in'],
+  [Mail, 'Email', 'support@zaidinfo.in'],
   [MapPin, 'Studio', 'Chennai, Karnataka'],
   [MessageSquare, 'Reply within', '2 business hours'],
 ]

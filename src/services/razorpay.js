@@ -65,7 +65,7 @@ export async function openRazorpayCheckout({
   amountInRupees,
   cart = [],
   customer = {},
-  description = 'Challenger Computers order',
+  description = 'Zaid Info order',
   onSuccess,
   onFailure,
   onDismiss,
@@ -78,7 +78,7 @@ export async function openRazorpayCheckout({
       key: order.key_id,
       amount: order.amount,
       currency: order.currency,
-      name: 'Challenger Computers',
+      name: 'Zaid Info',
       description,
       order_id: order.order_id,
       prefill: {

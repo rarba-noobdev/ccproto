@@ -51,14 +51,12 @@ export function Header() {
     <header className="sticky top-0 z-40">
       <div className="surface">
         <div className="container-max flex h-64 items-center justify-between gap-32">
-          <Link to="/" className="flex items-center" aria-label="Challenger Computers home">
-            <img
-              src="https://challengerbuildyourpc.com/static/media/navlogo-challenger.7aa229f9140087ca3a98.png"
-              alt="Challenger Computers"
-              className="h-40 w-auto brightness-0"
-              decoding="async"
-              loading="eager"
-            />
+          <Link to="/" className="flex items-center gap-10" aria-label="Zaid Info home">
+            <span className="grid h-32 w-32 place-items-center bg-ink text-canvas text-body-medium font-semibold tracking-[-.04em]" style={{ fontFamily: 'ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace' }}>Z</span>
+            <span className="flex flex-col leading-none">
+              <span className="text-body-large font-semibold tracking-[-.02em] text-ink">Zaid Info</span>
+              <span className="hud-label mt-2" style={{ color: 'var(--ink-muted)' }}>Custom PCs · Chennai</span>
+            </span>
           </Link>
 
           <nav className="hidden items-center gap-28 lg:flex" aria-label="Primary">
@@ -172,12 +170,10 @@ export function Header() {
               transition={{ duration: 0.22 }}
             >
               <div className="flex h-64 items-center justify-between border-b border-border-muted px-20">
-                <img
-                  src="https://challengerbuildyourpc.com/static/media/navlogo-challenger.7aa229f9140087ca3a98.png"
-                  alt="Challenger Computers"
-                  className="h-32 w-auto brightness-0"
-                  decoding="async"
-                />
+                <div className="flex items-center gap-10">
+                  <span className="grid h-28 w-28 place-items-center bg-ink text-canvas text-body-small font-semibold" style={{ fontFamily: 'ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace' }}>Z</span>
+                  <span className="text-body-large font-semibold tracking-[-.02em] text-ink">Zaid Info</span>
+                </div>
                 <button type="button" onClick={() => setOpen(false)} className="icon-btn" aria-label="Close menu">
                   <X className="h-16 w-16" aria-hidden="true" />
                 </button>
@@ -227,13 +223,13 @@ export function Footer() {
       <div className="container-max py-48">
         <div className="flex flex-col gap-24 md:flex-row md:items-end md:justify-between">
           <div>
-            <img
-              src="https://challengerbuildyourpc.com/static/media/navlogo-challenger.7aa229f9140087ca3a98.png"
-              alt="Challenger Computers"
-              className="h-40 w-auto brightness-0"
-              decoding="async"
-              loading="lazy"
-            />
+            <div className="flex items-center gap-12">
+              <span className="grid h-40 w-40 place-items-center bg-ink text-canvas text-title-h5 font-semibold tracking-[-.04em]" style={{ fontFamily: 'ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace' }}>Z</span>
+              <div className="flex flex-col leading-none">
+                <span className="text-title-h4 font-semibold tracking-[-.02em] text-ink">Zaid Info</span>
+                <span className="hud-label mt-4" style={{ color: 'var(--ink-muted)' }}>Custom PCs · Chennai</span>
+              </div>
+            </div>
             <p className="meta mt-12">Chennai, IN · Est. 2014</p>
           </div>
           <nav className="flex flex-wrap gap-28 text-body-small font-medium text-ink-soft" aria-label="Footer">
@@ -246,7 +242,7 @@ export function Footer() {
           </nav>
         </div>
         <div className="mt-32 flex flex-col gap-8 border-t border-border-muted pt-20 md:flex-row md:items-center md:justify-between">
-          <p className="meta">© {new Date().getFullYear()} Challenger Computers</p>
+          <p className="meta">© {new Date().getFullYear()} Zaid Info</p>
           <p className="meta">GST · Warranty · India</p>
         </div>
       </div>

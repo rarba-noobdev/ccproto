@@ -27,7 +27,7 @@ export default function CartDrawer() {
         amountInRupees: total,
         cart: cart.map((item) => ({ id: item.id, name: item.name, price: item.price, quantity: item.quantity })),
         customer: { name: user?.name, email: user?.email, phone: user?.phone },
-        description: `${cart.length} item${cart.length === 1 ? '' : 's'} · Challenger Computers`,
+        description: `${cart.length} item${cart.length === 1 ? '' : 's'} · Zaid Info`,
       })
       if (result?.verified) {
         toast.success('Payment confirmed — receipt sent', { id: t })

@@ -8,7 +8,7 @@ import useStore from '@/store/useStore'
 const easeOut = [0.23, 1, 0.32, 1]
 
 export default function Auth() {
-  const [email, setEmail] = useState('admin@challengercomputers.in')
+  const [email, setEmail] = useState('admin@zaidinfo.in')
   const [name, setName] = useState('Admin')
   const reduceMotion = useReducedMotion()
   const { login } = useStore()

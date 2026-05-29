@@ -1,7 +1,7 @@
 export const prebuiltPCs = [
   {
-    id: 'challenger-pulse-5600gt',
-    name: 'Challenger Pulse 5600GT',
+    id: 'zaid-pulse-5600gt',
+    name: 'Zaid Pulse 5600GT',
     tagline: 'Balanced 1080p gaming tower with a clean upgrade path.',
     price: 75280,
     originalPrice: 77306,
@@ -27,8 +27,8 @@ export const prebuiltPCs = [
     category: 'gaming',
   },
   {
-    id: 'challenger-vector-5060-ti',
-    name: 'Challenger Vector 5060 Ti',
+    id: 'zaid-vector-5060-ti',
+    name: 'Zaid Vector 5060 Ti',
     tagline: 'Upper-midrange 1080p and 1440p gaming system.',
     price: 131467,
     originalPrice: 133493,
@@ -54,8 +54,8 @@ export const prebuiltPCs = [
     category: 'gaming',
   },
   {
-    id: 'challenger-hammer-r7',
-    name: 'Challenger Hammer R7',
+    id: 'zaid-hammer-r7',
+    name: 'Zaid Hammer R7',
     tagline: 'Ryzen 7 build tuned for 1080p and 1440p play.',
     price: 109350,
     originalPrice: 110850,
@@ -81,8 +81,8 @@ export const prebuiltPCs = [
     category: 'gaming',
   },
   {
-    id: 'challenger-forge-i7',
-    name: 'Challenger Forge i7',
+    id: 'zaid-forge-i7',
+    name: 'Zaid Forge i7',
     tagline: 'Intel Core i7 tower with RTX 5060 graphics.',
     price: 141950,
     originalPrice: 144965,
@@ -108,8 +108,8 @@ export const prebuiltPCs = [
     category: 'gaming',
   },
   {
-    id: 'challenger-nova-ddr5',
-    name: 'Challenger Nova DDR5',
+    id: 'zaid-nova-ddr5',
+    name: 'Zaid Nova DDR5',
     tagline: 'DDR5 Ryzen build for modern high-refresh 1080p gaming.',
     price: 113719,
     originalPrice: 116219,
@@ -135,8 +135,8 @@ export const prebuiltPCs = [
     category: 'gaming',
   },
   {
-    id: 'challenger-studio-9600x',
-    name: 'Challenger Studio 9600X',
+    id: 'zaid-studio-9600x',
+    name: 'Zaid Studio 9600X',
     tagline: 'Ryzen 9000-series workstation-class gaming build.',
     price: 148690,
     originalPrice: 151199,
@@ -164,10 +164,10 @@ export const prebuiltPCs = [
 ]
 
 export const accessories = [
-  { id: 'challenger-27-180hz-display', name: 'Challenger 27-inch 180Hz Display', price: 15425, originalPrice: 22990, category: 'display', categoryLabel: 'Displays', setupSlot: 'Visuals', rating: 4.7, image: 'https://mdcomputers.in/image/catalog/monitor/benq/ex271/ex271-image-main0.webp' },
-  { id: 'challenger-75-keyboard', name: 'Challenger 75% Mechanical Keyboard', price: 16480, originalPrice: 25999, category: 'keyboard', categoryLabel: 'Keyboards', setupSlot: 'Control', rating: 4.8, image: 'https://mdcomputers.in/image/catalog/keyboard/razer/rz03-05000100-r3m1/rz03-05000100-r3m1-image-main.jpg' },
-  { id: 'challenger-pro-wireless-mouse', name: 'Challenger Pro Wireless Mouse', price: 9550, originalPrice: 10995, category: 'mouse', categoryLabel: 'Mice', setupSlot: 'Aim', rating: 4.8, image: 'https://mdcomputers.in/image/catalog/mouse/logitech/910-005274/910-005274-image-main.jpg' },
-  { id: 'challenger-cloud-headset', name: 'Challenger Cloud Gaming Headset', price: 5400, originalPrice: 12987, category: 'audio', categoryLabel: 'Audio', setupSlot: 'Comms', rating: 4.7, image: 'https://mdcomputers.in/image/catalog/headphone/hyper-x/4p5m0aa/4p5m0aa-image-main10.webp' },
-  { id: 'challenger-large-desk-mat', name: 'Challenger Large Desk Mat', price: 315, originalPrice: 599, category: 'desk', categoryLabel: 'Desk Gear', setupSlot: 'Surface', rating: 4.5, image: 'https://www.mdcomputers.in/image/catalog/mouse%20pad/ant-esports/m290/mp290-image-main.jpg' },
-  { id: 'challenger-4k-capture-card', name: 'Challenger 4K Capture Card', price: 31100, originalPrice: 49000, category: 'streaming', categoryLabel: 'Streaming', setupSlot: 'Creator', rating: 4.7, image: 'https://mdcomputers.in/image/catalog/gc575/gc575-image-main.jpg' },
+  { id: 'zaid-27-180hz-display', name: 'Zaid 27-inch 180Hz Display', price: 15425, originalPrice: 22990, category: 'display', categoryLabel: 'Displays', setupSlot: 'Visuals', rating: 4.7, image: 'https://mdcomputers.in/image/catalog/monitor/benq/ex271/ex271-image-main0.webp' },
+  { id: 'zaid-75-keyboard', name: 'Zaid 75% Mechanical Keyboard', price: 16480, originalPrice: 25999, category: 'keyboard', categoryLabel: 'Keyboards', setupSlot: 'Control', rating: 4.8, image: 'https://mdcomputers.in/image/catalog/keyboard/razer/rz03-05000100-r3m1/rz03-05000100-r3m1-image-main.jpg' },
+  { id: 'zaid-pro-wireless-mouse', name: 'Zaid Pro Wireless Mouse', price: 9550, originalPrice: 10995, category: 'mouse', categoryLabel: 'Mice', setupSlot: 'Aim', rating: 4.8, image: 'https://mdcomputers.in/image/catalog/mouse/logitech/910-005274/910-005274-image-main.jpg' },
+  { id: 'zaid-cloud-headset', name: 'Zaid Cloud Gaming Headset', price: 5400, originalPrice: 12987, category: 'audio', categoryLabel: 'Audio', setupSlot: 'Comms', rating: 4.7, image: 'https://mdcomputers.in/image/catalog/headphone/hyper-x/4p5m0aa/4p5m0aa-image-main10.webp' },
+  { id: 'zaid-large-desk-mat', name: 'Zaid Large Desk Mat', price: 315, originalPrice: 599, category: 'desk', categoryLabel: 'Desk Gear', setupSlot: 'Surface', rating: 4.5, image: 'https://www.mdcomputers.in/image/catalog/mouse%20pad/ant-esports/m290/mp290-image-main.jpg' },
+  { id: 'zaid-4k-capture-card', name: 'Zaid 4K Capture Card', price: 31100, originalPrice: 49000, category: 'streaming', categoryLabel: 'Streaming', setupSlot: 'Creator', rating: 4.7, image: 'https://mdcomputers.in/image/catalog/gc575/gc575-image-main.jpg' },
 ]

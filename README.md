@@ -1,4 +1,4 @@
-# Challenger Computers
+# Zaid Info
 
 Minimal PC builder and component storefront built with React, Vite, TailwindCSS, Framer Motion, Zustand, and Recharts.
 

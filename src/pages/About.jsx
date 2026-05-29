@@ -15,7 +15,7 @@ export default function About() {
       <PageHeader
         kicker="Issue 05 · About"
         title="A workshop, not a marketplace."
-        description="Challenger Computers assembles, tests, and ships gaming and creator systems from Chennai."
+        description="Zaid Info assembles, tests, and ships gaming and creator systems from Chennai."
       />
       <section className="container-max py-48">
         <div className="grid gap-px bg-line sm:grid-cols-2 lg:grid-cols-4 border border-border-muted">

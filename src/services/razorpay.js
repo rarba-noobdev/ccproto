@@ -41,8 +41,19 @@ async function callFunction(path, payload) {
   return data
 }
 
+export const RAZORPAY_TEST_MAX_RUPEES = 500000
+
 export async function createRazorpayOrder({ amountInRupees, cart, customer }) {
-  const amount = Math.round(Number(amountInRupees) * 100)
+  const rupees = Math.round(Number(amountInRupees))
+  if (!Number.isFinite(rupees) || rupees < 1) {
+    throw new Error('Invalid amount')
+  }
+  if (rupees > RAZORPAY_TEST_MAX_RUPEES) {
+    const err = new Error(`Test mode caps a single payment at ₹${RAZORPAY_TEST_MAX_RUPEES.toLocaleString('en-IN')}. Reduce your cart or split the order.`)
+    err.code = 'AMOUNT_OVER_TEST_LIMIT'
+    throw err
+  }
+  const amount = rupees * 100
   return callFunction('order', { amount, currency: 'INR', cart, customer })
 }
 
